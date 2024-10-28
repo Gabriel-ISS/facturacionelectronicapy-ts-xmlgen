@@ -12,9 +12,9 @@ class JSonDteIdentificacionDocumentoService {
   public generateDatosDocumentoAsociado(params: any, dataDocumentoAsociado: any, data: any) {
     const jsonResult: any = {
       iTipDocAso: dataDocumentoAsociado['formato'],
-      dDesTipDocAso: constanteService.tiposDocumentosAsociados.filter(
-        (td) => td.codigo === +dataDocumentoAsociado['formato'],
-      )[0]['descripcion'],
+      dDesTipDocAso: constanteService.associatedDocumentTypes.filter(
+        (td) => td.code === +dataDocumentoAsociado['formato'],
+      )[0]['description'],
     };
 
     if (dataDocumentoAsociado['formato'] == 1) {
@@ -22,7 +22,7 @@ class JSonDteIdentificacionDocumentoService {
       if (dataDocumentoAsociado['cdc'] && dataDocumentoAsociado['cdc'].length >= 44) {
         jsonResult['dCdCDERef'] = dataDocumentoAsociado['cdc'];
       }
-      if (data['tipoDocumento'] == 5 || data['tipoDocumento'] == 6 || data['tipoDocumento'] == 7) {
+      if (data.tipoDocumento == 5 || data.tipoDocumento == 6 || data.tipoDocumento == 7) {
         if (dataDocumentoAsociado['rucFusionado'].length >= 3) {
           jsonResult['dRucFus'] = dataDocumentoAsociado['rucFusionado'];
         }
@@ -45,9 +45,9 @@ class JSonDteIdentificacionDocumentoService {
       }
       if (dataDocumentoAsociado['tipoDocumentoImpreso']) {
         jsonResult['iTipoDocAso'] = +dataDocumentoAsociado['tipoDocumentoImpreso'];
-        jsonResult['dDTipoDocAso'] = constanteService.tiposDocumentosImpresos.filter(
-          (td) => td.codigo === +dataDocumentoAsociado['tipoDocumentoImpreso'],
-        )[0]['descripcion'];
+        jsonResult['dDTipoDocAso'] = constanteService.printedDocumentTypes.filter(
+          (td) => td.code === +dataDocumentoAsociado['tipoDocumentoImpreso'],
+        )[0]['description'];
       }
       if (dataDocumentoAsociado['fecha']) {
         jsonResult['dFecEmiDI'] = dataDocumentoAsociado['fecha'];
@@ -72,9 +72,9 @@ class JSonDteIdentificacionDocumentoService {
       //H002 = Constancia electronica
       if (dataDocumentoAsociado['constanciaTipo']) {
         jsonResult['iTipCons'] = dataDocumentoAsociado['constanciaTipo'];
-        jsonResult['dDesTipCons'] = constanteService.tiposConstancias.filter(
-          (tc) => tc.codigo === dataDocumentoAsociado['constanciaTipo'],
-        )[0]['descripcion'];
+        jsonResult['dDesTipCons'] = constanteService.constancyTypes.filter(
+          (tc) => tc.code === dataDocumentoAsociado['constanciaTipo'],
+        )[0]['description'];
         jsonResult['dNumCons'] = +dataDocumentoAsociado['constanciaNumero'];
         jsonResult['dNumControl'] = dataDocumentoAsociado['constanciaControl'];
       }
@@ -91,14 +91,14 @@ class JSonDteIdentificacionDocumentoService {
    */
   public generateDatosCarga(params: any, data: any) {
     const jsonResult: any = {
-      cUniMedTotVol: data['complementarios']['carga']['unidadMedida'],
-      dDesUniMedTotVol: data['complementarios']['carga']['ordenVenta'],
-      dTotVolMerc: data['complementarios']['carga']['numeroAsiento'],
-      cUniMedTotPes: data['complementarios']['carga']['numeroAsiento'],
-      dDesUniMedTotPes: data['complementarios']['carga']['numeroAsiento'],
-      dTotPesMerc: data['complementarios']['carga']['numeroAsiento'],
-      iCarCarga: data['complementarios']['carga']['numeroAsiento'],
-      dDesCarCarga: data['complementarios']['carga']['numeroAsiento'],
+      cUniMedTotVol: data.complementarios['carga']['unidadMedida'],
+      dDesUniMedTotVol: data.complementarios['carga']['ordenVenta'],
+      dTotVolMerc: data.complementarios['carga']['numeroAsiento'],
+      cUniMedTotPes: data.complementarios['carga']['numeroAsiento'],
+      dDesUniMedTotPes: data.complementarios['carga']['numeroAsiento'],
+      dTotPesMerc: data.complementarios['carga']['numeroAsiento'],
+      iCarCarga: data.complementarios['carga']['numeroAsiento'],
+      dDesCarCarga: data.complementarios['carga']['numeroAsiento'],
     };
 
     return jsonResult;

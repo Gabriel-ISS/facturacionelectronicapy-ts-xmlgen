@@ -1,28 +1,30 @@
-import * as xml2js from 'xml2js';
+import xml2js from 'xml2js';
 
 import stringUtilService from './StringUtil.service';
-import fechaUtilService from './FechaUtil.service';
-import constanteService from './constants.service';
+import dateUtilService from '../helpers/DateHelper';
+import constantService from './constants.service';
 import jsonDteItem from './jsonDteItem.service';
-import jsonDteAlgoritmos from './jsonDteAlgoritmos.service';
-import jsonDteComplementarios from './jsonDteComplementario.service';
-import jsonDteTransporte from './jsonDteTransporte.service';
-import jsonDteTotales from './jsonDteTotales.service';
-import jsonDteComplementarioComercial from './jsonDteComplementariosComerciales.service';
-import jsonDteIdentificacionDocumento from './jsonDteIdentificacionDocumento.service';
-import jsonDeMainValidate from './jsonDeMainValidate.service';
-import { XmlgenConfig } from './type.interface.';
+import jsonDteAlgorithms from './jsonDteAlgoritmos.service';
+import jsonDteComplementary from './jsonDteComplementario.service';
+import jsonDteTransport from './jsonDteTransporte.service';
+import jsonDteTotals from './jsonDteTotales.service';
+import jsonDteComercialComplementary from './jsonDteComplementariosComerciales.service';
+import jsonDteDocumentIdentify from './jsonDteIdentificacionDocumento.service';
+import jsonDeMainValidate from './EDocumentMainValidate.service';
+import { XmlGenConfig } from './type.interface';
+import { DEFAULT_NAME } from '../constants/other.constants';
 
+// TODO: Nada de any
 class JSonDeMainService {
-  codigoSeguridad: any = null;
-  codigoControl: any = null;
-  json: any = {};
-  validateError = true;
+  private securityCode: any = null;
+  private controlCode: any = null;
+  private json: any = {};
+  private validationError = true;
 
-  public generateXMLDE(params: any, data: any, config?: XmlgenConfig): Promise<any> {
+  public generateXMLDocument(params: any, data: any, config?: XmlGenConfig): Promise<any> {
     return new Promise((resolve, reject) => {
       try {
-        let defaultConfig: XmlgenConfig = {
+        let defaultConfig: XmlGenConfig = {
           defaultValues: true,
           //arrayValuesSeparator : ', ',
           errorSeparator: '; ',
@@ -52,12 +54,12 @@ class JSonDeMainService {
    * @param data
    * @returns
    */
-  private generateXMLDeService(params: any, data: any, config: XmlgenConfig) {
+  private generateXMLDeService(params: any, data: any, config: XmlGenConfig) {
     this.removeUnderscoreAndPutCamelCase(data);
 
     this.addDefaultValues(data);
 
-    if (this.validateError) {
+    if (this.validationError) {
       jsonDeMainValidate.validateValues({ ...params }, { ...data }, config);
     }
 
@@ -75,69 +77,69 @@ class JSonDeMainService {
     //---
     this.generateDatosEspecificosPorTipoDE(params, data, config);
 
-    if (data['tipoDocumento'] == 1 || data['tipoDocumento'] == 4) {
+    if (data.tipoDocumento == 1 || data.tipoDocumento == 4) {
       this.generateDatosCondicionOperacionDE(params, data, config);
     }
 
     //['gDtipDE']=E001
     this.json['rDE']['DE']['gDtipDE']['gCamItem'] = jsonDteItem.generateDatosItemsOperacion(params, data, config);
 
-    let gCamEsp = jsonDteComplementarios.generateDatosComplementariosComercialesDeUsoEspecificos(params, data);
+    let gCamEsp = jsonDteComplementary.generateDatosComplementariosComercialesDeUsoEspecificos(params, data);
     if (gCamEsp) {
       this.json['rDE']['DE']['gDtipDE']['gCamEsp'] = gCamEsp;
     }
 
-    if (data['tipoDocumento'] == 1 || data['tipoDocumento'] == 7) {
+    if (data.tipoDocumento == 1 || data.tipoDocumento == 7) {
       //1 Opcional, 7 Obligatorio
-      if (data['detalleTransporte']) {
-        this.json['rDE']['DE']['gDtipDE']['gTransp'] = jsonDteTransporte.generateDatosTransporte(params, data);
+      if (data.detalleTransporte) {
+        this.json['rDE']['DE']['gDtipDE']['gTransp'] = jsonDteTransport.generateDatosTransporte(params, data);
       }
     }
 
-    if (data['tipoDocumento'] != 7) {
+    if (data.tipoDocumento != 7) {
       const items = this.json['rDE']['DE']['gDtipDE']['gCamItem'];
-      this.json['rDE']['DE']['gTotSub'] = jsonDteTotales.generateDatosTotales(params, data, items, config);
+      this.json['rDE']['DE']['gTotSub'] = jsonDteTotals.generateDatosTotales(params, data, items, config);
     }
 
-    if (data['complementarios']) {
-      this.json['rDE']['DE']['gCamGen'] = jsonDteComplementarioComercial.generateDatosComercialesUsoGeneral(
+    if (data.complementarios) {
+      this.json['rDE']['DE']['gCamGen'] = jsonDteComercialComplementary.generateDatosComercialesUsoGeneral(
         params,
         data,
       );
     }
 
-    if (data['tipoDocumento'] == 4 || data['tipoDocumento'] == 5 || data['tipoDocumento'] == 6) {
-      if (!data['documentoAsociado']) {
+    if (data.tipoDocumento == 4 || data.tipoDocumento == 5 || data.tipoDocumento == 6) {
+      if (!data.documentoAsociado) {
         /*throw new Error(
           'Documento asociado es obligatorio para el tipo de documento electrónico (' +
-            data['tipoDocumento'] +
+            data.tipoDocumento +
             ') seleccionado',
         );*/
       }
     }
     if (
-      data['tipoDocumento'] == 1 ||
-      data['tipoDocumento'] == 4 ||
-      data['tipoDocumento'] == 5 ||
-      data['tipoDocumento'] == 6 ||
-      data['tipoDocumento'] == 7
+      data.tipoDocumento == 1 ||
+      data.tipoDocumento == 4 ||
+      data.tipoDocumento == 5 ||
+      data.tipoDocumento == 6 ||
+      data.tipoDocumento == 7
     ) {
-      if (data['documentoAsociado']) {
-        if (!Array.isArray(data['documentoAsociado'])) {
-          this.json['rDE']['DE']['gCamDEAsoc'] = jsonDteIdentificacionDocumento.generateDatosDocumentoAsociado(
+      if (data.documentoAsociado) {
+        if (!Array.isArray(data.documentoAsociado)) {
+          this.json['rDE']['DE']['gCamDEAsoc'] = jsonDteDocumentIdentify.generateDatosDocumentoAsociado(
             params,
-            data['documentoAsociado'],
+            data.documentoAsociado,
             data
           );
         } else {
           //Caso sea un array.
           this.json['rDE']['DE']['gCamDEAsoc'] = new Array();
 
-          for (var i = 0; i < data['documentoAsociado'].length; i++) {
-            const dataDocumentoAsociado = data['documentoAsociado'][i];
+          for (var i = 0; i < data.documentoAsociado.length; i++) {
+            const dataDocumentoAsociado = data.documentoAsociado[i];
 
             this.json['rDE']['DE']['gCamDEAsoc'].push(
-              jsonDteIdentificacionDocumento.generateDatosDocumentoAsociado(params, dataDocumentoAsociado, data)
+              jsonDteDocumentIdentify.generateDatosDocumentoAsociado(params, dataDocumentoAsociado, data)
             );
           }
         }
@@ -165,22 +167,22 @@ class JSonDeMainService {
   generateCodigoControl(params: any, data: any) {
     if (data.cdc && (data.cdc + '').length == 44) {
       //Caso ya se le pase el CDC
-      this.codigoSeguridad = data.cdc.substring(34, 43);
-      this.codigoControl = data.cdc;
+      this.securityCode = data.cdc.substring(34, 43);
+      this.controlCode = data.cdc;
 
       //Como se va utilizar el CDC enviado como parametro, va a verificar que todos los datos del XML coincidan con el CDC.
-      const tipoDocumentoCDC = this.codigoControl.substring(0, 2);
-      const establecimientoCDC = this.codigoControl.substring(11, 14);
-      const puntoCDC = this.codigoControl.substring(14, 17);
-      const numeroCDC = this.codigoControl.substring(17, 24);
-      const fechaCDC = this.codigoControl.substring(25, 33);
-      const tipoEmisionCDC = this.codigoControl.substring(33, 34);
+      const tipoDocumentoCDC = this.controlCode.substring(0, 2);
+      const establecimientoCDC = this.controlCode.substring(11, 14);
+      const puntoCDC = this.controlCode.substring(14, 17);
+      const numeroCDC = this.controlCode.substring(17, 24);
+      const fechaCDC = this.controlCode.substring(25, 33);
+      const tipoEmisionCDC = this.controlCode.substring(33, 34);
 
-      const establecimiento = stringUtilService.leftZero(data['establecimiento'], 3);
+      const establecimiento = stringUtilService.leftZero(data.establecimiento, 3);
 
-      const punto = stringUtilService.leftZero(data['punto'], 3);
+      const punto = stringUtilService.leftZero(data.punto, 3);
 
-      const numero = stringUtilService.leftZero(data['numero'], 7);
+      const numero = stringUtilService.leftZero(data.numero, 7);
 
       const fecha =
         (data['fecha'] + '').substring(0, 4) +
@@ -189,8 +191,8 @@ class JSonDeMainService {
     } else {
       this.validateCamposDelCDC(params, data);
 
-      this.codigoSeguridad = stringUtilService.leftZero(data.codigoSeguridadAleatorio, 9);
-      this.codigoControl = jsonDteAlgoritmos.generateCodigoControl(params, data, this.codigoSeguridad);
+      this.securityCode = stringUtilService.leftZero(data.codigoSeguridadAleatorio, 9);
+      this.controlCode = jsonDteAlgorithms.generateCodigoControl(params, data, this.securityCode);
     }
   }
 
@@ -219,8 +221,8 @@ class JSonDeMainService {
       throw new Error('El RUC del Emisor debe contener el DV en params.ruc');
     }
 
-    let rucEmisor = params['ruc'].split('-')[0];
-    let dvEmisor = params['ruc'].split('-')[1];
+    let rucEmisor = params.ruc.split('-')[0];
+    let dvEmisor = params.ruc.split('-')[1];
 
     if ((rucEmisor + '').length > 8) {
       throw new Error('La parte del RUC del Emisor no puede superar los 8 caracteres');
@@ -784,34 +786,34 @@ class JSonDeMainService {
    * @param data
    */
   private addDefaultValues(data: any) {
-    if (constanteService.tiposDocumentos.filter((um) => um.codigo === +data['tipoDocumento']).length == 0) {
+    if (constantService.documentTypes.filter((um) => um.code === +data.tipoDocumento).length == 0) {
       //No quitar este throw
       throw new Error(
         "Tipo de Documento '" +
-          data['tipoDocumento'] +
+          data.tipoDocumento +
           "' en data.tipoDocumento no válido. Valores: " +
-          constanteService.tiposDocumentos.map((a) => a.codigo + '-' + a.descripcion),
+          constantService.documentTypes.map((a) => a.code + '-' + a.description),
       );
     }
-    data['tipoDocumentoDescripcion'] = constanteService.tiposDocumentos.filter(
-      (td) => td.codigo == +data['tipoDocumento'],
-    )[0]['descripcion'];
+    data['tipoDocumentoDescripcion'] = constantService.documentTypes.filter(
+      (td) => td.code == +data.tipoDocumento,
+    )[0]['description'];
 
-    if (!data['tipoEmision']) {
-      data['tipoEmision'] = 1;
+    if (!data.tipoEmision) {
+      data.tipoEmision = 1;
     }
 
     if (!data['tipoTransaccion']) {
       data['tipoTransaccion'] = 1;
     }
 
-    if (!data['moneda']) {
-      data['moneda'] = 'PYG';
+    if (!data.moneda) {
+      data.moneda = 'PYG';
     }
 
-    if (data['moneda'] != 'PYG') {
-      if (!data['condicionTipoCambio']) {
-        data['condicionTipoCambio'] = 1; //Por el Global
+    if (data.moneda != 'PYG') {
+      if (!data.condicionTipoCambio) {
+        data.condicionTipoCambio = 1; //Por el Global
       }
     }
 
@@ -840,27 +842,27 @@ class JSonDeMainService {
   }
 
   private generateDe(params: any, data: any) {
-    if (params['ruc'].indexOf('-') == -1) {
+    if (params.ruc.indexOf('-') == -1) {
       //throw new Error('RUC debe contener dígito verificador en params.ruc');
     }
-    const rucEmisor = params['ruc'].split('-')[0];
-    const dvEmisor = params['ruc'].split('-')[1];
+    const rucEmisor = params.ruc.split('-')[0];
+    const dvEmisor = params.ruc.split('-')[1];
 
-    const id = this.codigoControl;
+    const id = this.controlCode;
 
     let fechaFirmaDigital = new Date();
     if (data.fechaFirmaDigital) {
       fechaFirmaDigital = new Date(data.fechaFirmaDigital);
     }
 
-    let digitoVerificadorString = this.codigoControl + '';
+    let digitoVerificadorString = this.controlCode + '';
 
     const jsonResult = {
       $: {
         Id: id,
       },
       dDVId: digitoVerificadorString.substring(digitoVerificadorString.length - 1, digitoVerificadorString.length),
-      dFecFirma: fechaUtilService.convertToJSONFormat(fechaFirmaDigital),
+      dFecFirma: dateUtilService.getISODateTimeString(fechaFirmaDigital),
       dSisFact: 1,
     };
 
@@ -882,32 +884,32 @@ class JSonDeMainService {
      * @param options 
      */
   private generateDatosOperacion(params: any, data: any) {
-    if (params['ruc'].indexOf('-') == -1) {
+    if (params.ruc.indexOf('-') == -1) {
       //throw new Error('RUC debe contener dígito verificador en params.ruc');
     }
-    const rucEmisor = params['ruc'].split('-')[0];
-    const dvEmisor = params['ruc'].split('-')[1];
+    const rucEmisor = params.ruc.split('-')[0];
+    const dvEmisor = params.ruc.split('-')[1];
 
-    const id = jsonDteAlgoritmos.generateCodigoControl(params, data, this.codigoSeguridad);
-    const digitoVerificador = jsonDteAlgoritmos.calcularDigitoVerificador(rucEmisor, 11);
+    const id = jsonDteAlgorithms.generateCodigoControl(params, data, this.securityCode);
+    const digitoVerificador = jsonDteAlgorithms.calcularDigitoVerificador(rucEmisor, 11);
 
     if (id.length != 44) {
     }
 
-    const codigoSeguridadAleatorio = this.codigoSeguridad;
+    const codigoSeguridadAleatorio = this.securityCode;
 
-    if (constanteService.tiposEmisiones.filter((um) => um.codigo === data['tipoEmision']).length == 0) {
+    if (constantService.emissionTypes.filter((um) => um.code === data.tipoEmision).length == 0) {
       /*throw new Error(
         "Tipo de Emisión '" +
-          data['tipoEmision'] +
+          data.tipoEmision +
           "' en data.tipoEmision no válido. Valores: " +
           constanteService.tiposEmisiones.map((a) => a.codigo + '-' + a.descripcion),
       );*/
     }
 
     this.json['rDE']['DE']['gOpeDE'] = {
-      iTipEmi: data['tipoEmision'],
-      dDesTipEmi: constanteService.tiposEmisiones.filter((td) => td.codigo == data['tipoEmision'])[0]['descripcion'],
+      iTipEmi: data.tipoEmision,
+      dDesTipEmi: constantService.emissionTypes.filter((td) => td.code == data.tipoEmision)[0]['description'],
       dCodSeg: codigoSeguridadAleatorio,
     };
 
@@ -940,14 +942,14 @@ class JSonDeMainService {
      */
   private generateDatosTimbrado(params: any, data: any) {
     this.json['rDE']['DE']['gTimb'] = {
-      iTiDE: data['tipoDocumento'],
+      iTiDE: data.tipoDocumento,
       dDesTiDE: data['tipoDocumentoDescripcion'],
-      dNumTim: params['timbradoNumero'],
-      dEst: stringUtilService.leftZero(data['establecimiento'], 3),
-      dPunExp: stringUtilService.leftZero(data['punto'], 3),
-      dNumDoc: stringUtilService.leftZero(data['numero'], 7),
+      dNumTim: params.timbradoNumero,
+      dEst: stringUtilService.leftZero(data.establecimiento, 3),
+      dPunExp: stringUtilService.leftZero(data.punto, 3),
+      dNumDoc: stringUtilService.leftZero(data.numero, 7),
       //dSerieNum : null,
-      //dFeIniT: params['timbradoFecha'].substring(0, 10),
+      //dFeIniT: params.timbradoFecha.substring(0, 10),
     };
 
     if (data['numeroSerie']) {
@@ -957,7 +959,7 @@ class JSonDeMainService {
       this.json['rDE']['DE']['gTimb']['dSerieNum'] = data['serie'];
     }
     //if (data['numeroSerie']) {
-    this.json['rDE']['DE']['gTimb']['dFeIniT'] = params['timbradoFecha'].substring(0, 10);
+    this.json['rDE']['DE']['gTimb']['dFeIniT'] = params.timbradoFecha.substring(0, 10);
     //}
   }
 
@@ -972,7 +974,7 @@ class JSonDeMainService {
      * @param data 
      * @param options 
      */
-  private generateDatosGenerales(params: any, data: any, config: XmlgenConfig) {
+  private generateDatosGenerales(params: any, data: any, config: XmlGenConfig) {
     this.json['rDE']['DE']['gDatGralOpe'] = {
       dFeEmiDE: data['fecha'],
     };
@@ -1004,47 +1006,47 @@ class JSonDeMainService {
      * @param data 
      * @param options 
      */
-  private generateDatosGeneralesInherentesOperacion(params: any, data: any, config: XmlgenConfig) {
-    if (data['tipoDocumento'] == 7) {
+  private generateDatosGeneralesInherentesOperacion(params: any, data: any, config: XmlGenConfig) {
+    if (data.tipoDocumento == 7) {
       //C002
       return; //No informa si el tipo de documento es 7
     }
 
-    let moneda = data['moneda'];
+    let moneda = data.moneda;
     if (!moneda && config.defaultValues === true) {
       moneda = 'PYG';
     }
 
     this.json['rDE']['DE']['gDatGralOpe']['gOpeCom'] = {};
 
-    if (data['tipoDocumento'] == 1 || data['tipoDocumento'] == 4) {
+    if (data.tipoDocumento == 1 || data.tipoDocumento == 4) {
       //Obligatorio informar iTipTra D011
       if (!data['tipoTransaccion']) {
         //throw new Error('Debe proveer el Tipo de Transacción en data.tipoTransaccion');
       }
       this.json['rDE']['DE']['gDatGralOpe']['gOpeCom']['iTipTra'] = data['tipoTransaccion'];
-      this.json['rDE']['DE']['gDatGralOpe']['gOpeCom']['dDesTipTra'] = constanteService.tiposTransacciones.filter(
-        (tt) => tt.codigo == data['tipoTransaccion'],
-      )[0]['descripcion'];
+      this.json['rDE']['DE']['gDatGralOpe']['gOpeCom']['dDesTipTra'] = constantService.transactionTypes.filter(
+        (tt) => tt.code == data['tipoTransaccion'],
+      )[0]['description'];
     }
 
     this.json['rDE']['DE']['gDatGralOpe']['gOpeCom']['iTImp'] = data['tipoImpuesto']; //D013
-    this.json['rDE']['DE']['gDatGralOpe']['gOpeCom']['dDesTImp'] = constanteService.tiposImpuestos.filter(
-      (ti) => ti.codigo == data['tipoImpuesto'],
-    )[0]['descripcion']; //D013
+    this.json['rDE']['DE']['gDatGralOpe']['gOpeCom']['dDesTImp'] = constantService.taxTypes.filter(
+      (ti) => ti.code == data['tipoImpuesto'],
+    )[0]['description']; //D013
     this.json['rDE']['DE']['gDatGralOpe']['gOpeCom']['cMoneOpe'] = moneda; //D015
-    this.json['rDE']['DE']['gDatGralOpe']['gOpeCom']['dDesMoneOpe'] = constanteService.monedas.filter(
-      (m) => m.codigo == moneda,
-    )[0]['descripcion'];
+    this.json['rDE']['DE']['gDatGralOpe']['gOpeCom']['dDesMoneOpe'] = constantService.currencies.filter(
+      (m) => m.code == moneda,
+    )[0]['description'];
 
     if (moneda != 'PYG') {
-      if (!data['condicionTipoCambio']) {
+      if (!data.condicionTipoCambio) {
         //throw new Error('Debe informar el tipo de Cambio en data.condicionTipoCambio');
       }
       //Obligatorio informar dCondTiCam D017
-      this.json['rDE']['DE']['gDatGralOpe']['gOpeCom']['dCondTiCam'] = data['condicionTipoCambio'];
+      this.json['rDE']['DE']['gDatGralOpe']['gOpeCom']['dCondTiCam'] = data.condicionTipoCambio;
     }
-    if (data['condicionTipoCambio'] == 1 && moneda != 'PYG') {
+    if (data.condicionTipoCambio == 1 && moneda != 'PYG') {
       if (!(data['cambio'] && data['cambio'] > 0)) {
         //throw new Error('Debe informar el valor del Cambio en data.cambio');
       }
@@ -1056,7 +1058,7 @@ class JSonDeMainService {
       this.json['rDE']['DE']['gDatGralOpe']['gOpeCom']['iCondAnt'] = data['condicionAnticipo'];
       this.json['rDE']['DE']['gDatGralOpe']['gOpeCom']['dDesCondAnt'] =
         'Anticipo ' +
-        constanteService.globalPorItem.filter((ca) => ca.codigo == data['condicionAnticipo'])[0]['descripcion'];
+        constantService.advancePaymentConditions.filter((ca) => ca.code == data['condicionAnticipo'])[0]['description'];
     }
 
     if (data['obligaciones'] && Array.isArray(data['obligaciones'])) {
@@ -1065,9 +1067,9 @@ class JSonDeMainService {
         let gOblAfeItem: any = {};
         gOblAfeItem['cOblAfe'] = data['obligaciones'][i]['codigo'];
         //gOblAfeItem['dDesOblAfe'] = params['obligaciones'][i]['descripcion'];
-        gOblAfeItem['dDesOblAfe'] = constanteService.obligaciones.filter(
-          (ca) => ca.codigo == +data['obligaciones'][i]['codigo'],
-        )[0]['descripcion'];
+        gOblAfeItem['dDesOblAfe'] = constantService.obligations.filter(
+          (ca) => ca.code == +data['obligaciones'][i]['codigo'],
+        )[0]['description'];
         gOblAfe.push(gOblAfeItem);
       }
 
@@ -1089,8 +1091,8 @@ class JSonDeMainService {
     }
 
     //Validar si el establecimiento viene en params
-    let establecimiento = stringUtilService.leftZero(data['establecimiento'], 3);
-    //let punto = stringUtilService.leftZero(data['punto'], 3);
+    let establecimiento = stringUtilService.leftZero(data.establecimiento, 3);
+    //let punto = stringUtilService.leftZero(data.punto, 3);
 
     if (params.establecimientos.filter((um: any) => um.codigo === establecimiento).length == 0) {
       /*throw new Error(
@@ -1100,67 +1102,67 @@ class JSonDeMainService {
           params.establecimientos.map((a: any) => a.codigo + '-' + a.denominacion),
       );*/
     }
-    if (params['ruc'].indexOf('-') == -1) {
+    if (params.ruc.indexOf('-') == -1) {
       //throw new Error('RUC debe contener dígito verificador en params.ruc');
     }
 
     this.json['rDE']['DE']['gDatGralOpe']['gEmis'] = {};
-    this.json['rDE']['DE']['gDatGralOpe']['gEmis']['dRucEm'] = params['ruc'].split('-')[0];
-    this.json['rDE']['DE']['gDatGralOpe']['gEmis']['dDVEmi'] = params['ruc'].split('-')[1];
+    this.json['rDE']['DE']['gDatGralOpe']['gEmis']['dRucEm'] = params.ruc.split('-')[0];
+    this.json['rDE']['DE']['gDatGralOpe']['gEmis']['dDVEmi'] = params.ruc.split('-')[1];
     this.json['rDE']['DE']['gDatGralOpe']['gEmis']['iTipCont'] = params['tipoContribuyente'];
-    if (typeof params['tipoRegimen'] != undefined) {
-      this.json['rDE']['DE']['gDatGralOpe']['gEmis']['cTipReg'] = params['tipoRegimen'];
+    if (typeof params.tipoRegimen != undefined) {
+      this.json['rDE']['DE']['gDatGralOpe']['gEmis']['cTipReg'] = params.tipoRegimen;
     }
-    this.json['rDE']['DE']['gDatGralOpe']['gEmis']['dNomEmi'] = params['razonSocial'];
-    if (params['nombreFantasia'] && (params['nombreFantasia'] + '').length > 0) {
-      this.json['rDE']['DE']['gDatGralOpe']['gEmis']['dNomFanEmi'] = params['nombreFantasia'];
+    this.json['rDE']['DE']['gDatGralOpe']['gEmis']['dNomEmi'] = params.razonSocial;
+    if (params.nombreFantasia && (params.nombreFantasia + '').length > 0) {
+      this.json['rDE']['DE']['gDatGralOpe']['gEmis']['dNomFanEmi'] = params.nombreFantasia;
     }
-    this.json['rDE']['DE']['gDatGralOpe']['gEmis']['dDirEmi'] = params['establecimientos'].filter(
+    this.json['rDE']['DE']['gDatGralOpe']['gEmis']['dDirEmi'] = params.establecimientos.filter(
       (e: any) => e.codigo === establecimiento,
     )[0]['direccion'];
-    this.json['rDE']['DE']['gDatGralOpe']['gEmis']['dNumCas'] = params['establecimientos'].filter(
+    this.json['rDE']['DE']['gDatGralOpe']['gEmis']['dNumCas'] = params.establecimientos.filter(
       (e: any) => e.codigo === establecimiento,
     )[0]['numeroCasa'];
 
-    let dCompDir1 = params['establecimientos'].filter((e: any) => e.codigo === establecimiento)[0][
+    let dCompDir1 = params.establecimientos.filter((e: any) => e.codigo === establecimiento)[0][
       'complementoDireccion1'
     ];
     if (dCompDir1 && (dCompDir1 + '').length > 1) {
       this.json['rDE']['DE']['gDatGralOpe']['gEmis']['dCompDir1'] = dCompDir1;
     }
 
-    let dCompDir2 = params['establecimientos'].filter((e: any) => e.codigo === establecimiento)[0][
+    let dCompDir2 = params.establecimientos.filter((e: any) => e.codigo === establecimiento)[0][
       'complementoDireccion2'
     ];
     if (dCompDir2 && (dCompDir2 + '').length > 1) {
       this.json['rDE']['DE']['gDatGralOpe']['gEmis']['dCompDir2'] = dCompDir2;
     }
 
-    this.json['rDE']['DE']['gDatGralOpe']['gEmis']['cDepEmi'] = params['establecimientos'].filter(
+    this.json['rDE']['DE']['gDatGralOpe']['gEmis']['cDepEmi'] = params.establecimientos.filter(
       (e: any) => e.codigo === establecimiento,
     )[0]['departamento'];
-    this.json['rDE']['DE']['gDatGralOpe']['gEmis']['dDesDepEmi'] = constanteService.departamentos.filter(
+    this.json['rDE']['DE']['gDatGralOpe']['gEmis']['dDesDepEmi'] = constantService.departments.filter(
       (td) =>
-        td.codigo === params['establecimientos'].filter((e: any) => e.codigo === establecimiento)[0]['departamento'],
-    )[0]['descripcion'];
-    this.json['rDE']['DE']['gDatGralOpe']['gEmis']['cDisEmi'] = params['establecimientos'].filter(
+        td.code === params.establecimientos.filter((e: any) => e.codigo === establecimiento)[0]['departamento'],
+    )[0]['description'];
+    this.json['rDE']['DE']['gDatGralOpe']['gEmis']['cDisEmi'] = params.establecimientos.filter(
       (e: any) => e.codigo === establecimiento,
     )[0]['distrito'];
-    this.json['rDE']['DE']['gDatGralOpe']['gEmis']['dDesDisEmi'] = constanteService.distritos.filter(
-      (td) => td.codigo === params['establecimientos'].filter((e: any) => e.codigo === establecimiento)[0]['distrito'],
-    )[0]['descripcion'];
-    this.json['rDE']['DE']['gDatGralOpe']['gEmis']['cCiuEmi'] = params['establecimientos'].filter(
+    this.json['rDE']['DE']['gDatGralOpe']['gEmis']['dDesDisEmi'] = constantService.districts.filter(
+      (td) => td.code === params.establecimientos.filter((e: any) => e.codigo === establecimiento)[0]['distrito'],
+    )[0]['description'];
+    this.json['rDE']['DE']['gDatGralOpe']['gEmis']['cCiuEmi'] = params.establecimientos.filter(
       (e: any) => e.codigo === establecimiento,
     )[0]['ciudad'];
-    this.json['rDE']['DE']['gDatGralOpe']['gEmis']['dDesCiuEmi'] = constanteService.ciudades.filter(
-      (td) => td.codigo === params['establecimientos'].filter((e: any) => e.codigo === establecimiento)[0]['ciudad'],
-    )[0]['descripcion'];
-    this.json['rDE']['DE']['gDatGralOpe']['gEmis']['dTelEmi'] = params['establecimientos'].filter(
+    this.json['rDE']['DE']['gDatGralOpe']['gEmis']['dDesCiuEmi'] = constantService.cities.filter(
+      (td) => td.code === params.establecimientos.filter((e: any) => e.codigo === establecimiento)[0]['ciudad'],
+    )[0]['description'];
+    this.json['rDE']['DE']['gDatGralOpe']['gEmis']['dTelEmi'] = params.establecimientos.filter(
       (e: any) => e.codigo === establecimiento,
     )[0]['telefono'];
 
-    if (params['establecimientos'].filter((e: any) => e.codigo === establecimiento)[0]['email']) {
-      let email = new String(params['establecimientos'].filter((e: any) => e.codigo === establecimiento)[0]['email']); //Hace una copia, para no alterar.
+    if (params.establecimientos.filter((e: any) => e.codigo === establecimiento)[0]['email']) {
+      let email = new String(params.establecimientos.filter((e: any) => e.codigo === establecimiento)[0]['email']); //Hace una copia, para no alterar.
 
       //Verificar si tiene varios correos.
       if (email.indexOf(',') > -1) {
@@ -1170,7 +1172,7 @@ class JSonDeMainService {
 
       this.json['rDE']['DE']['gDatGralOpe']['gEmis']['dEmailE'] = email.trim();
     }
-    this.json['rDE']['DE']['gDatGralOpe']['gEmis']['dDenSuc'] = params['establecimientos'].filter(
+    this.json['rDE']['DE']['gDatGralOpe']['gEmis']['dDenSuc'] = params.establecimientos.filter(
       (e: any) => e.codigo === establecimiento,
     )[0]['denominacion'];
 
@@ -1199,9 +1201,9 @@ class JSonDeMainService {
   private generateDatosGeneralesResponsableGeneracionDE(params: any, data: any) {
     this.json['rDE']['DE']['gDatGralOpe']['gEmis']['gRespDE'] = {
       iTipIDRespDE: data['usuario']['documentoTipo'],
-      dDTipIDRespDE: constanteService.tiposDocumentosIdentidades.filter(
-        (td) => td.codigo === +data['usuario']['documentoTipo'],
-      )[0]['descripcion'],
+      dDTipIDRespDE: constantService.identityDocuments.filter(
+        (td) => td.code === +data['usuario']['documentoTipo'],
+      )[0]['description'],
     };
 
     if (data['usuario']['documentoTipo'] == 9) {
@@ -1248,7 +1250,7 @@ class JSonDeMainService {
       iNatRec: data['cliente']['contribuyente'] ? 1 : 2,
       iTiOpe: +data['cliente']['tipoOperacion'],
       cPaisRec: data['cliente']['pais'],
-      dDesPaisRe: constanteService.paises.filter((pais) => pais.codigo === data['cliente']['pais'])[0]['descripcion'],
+      dDesPaisRe: constantService.countries.filter((pais) => pais.code === data['cliente']['pais'])[0]['description'],
     };
 
     if (data['cliente']['contribuyente']) {
@@ -1266,8 +1268,8 @@ class JSonDeMainService {
       if (data['cliente']['documentoTipo']) {
         this.json['rDE']['DE']['gDatGralOpe']['gDatRec']['iTipIDRec'] = +data['cliente']['documentoTipo'];
         this.json['rDE']['DE']['gDatGralOpe']['gDatRec']['dDTipIDRec'] =
-          constanteService.tiposDocumentosReceptor.filter((tdr) => tdr.codigo === +data['cliente']['documentoTipo'])[0][
-            'descripcion'
+          constantService.typesOfDocumentsReceptors.filter((tdr) => tdr.code === +data['cliente']['documentoTipo'])[0][
+            'description'
           ];
       }
 
@@ -1282,7 +1284,7 @@ class JSonDeMainService {
       if (+data['cliente']['documentoTipo'] === 5) {
         //Si es innominado completar con cero
         this.json['rDE']['DE']['gDatGralOpe']['gDatRec']['dNumIDRec'] = '0';
-        this.json['rDE']['DE']['gDatGralOpe']['gDatRec']['dNomRec'] = 'Sin Nombre';
+        this.json['rDE']['DE']['gDatGralOpe']['gDatRec']['dNomRec'] = DEFAULT_NAME;
       }
     }
 
@@ -1303,23 +1305,23 @@ class JSonDeMainService {
     //
     if (data['cliente']['direccion'] && +data['cliente']['tipoOperacion'] != 4) {
       this.json['rDE']['DE']['gDatGralOpe']['gDatRec']['cDepRec'] = +data['cliente']['departamento'];
-      this.json['rDE']['DE']['gDatGralOpe']['gDatRec']['dDesDepRec'] = constanteService.departamentos.filter(
-        (td) => td.codigo === +data['cliente']['departamento'],
-      )[0]['descripcion'];
+      this.json['rDE']['DE']['gDatGralOpe']['gDatRec']['dDesDepRec'] = constantService.departments.filter(
+        (td) => td.code === +data['cliente']['departamento'],
+      )[0]['description'];
     }
 
     if (data['cliente']['direccion'] && +data['cliente']['tipoOperacion'] != 4) {
       this.json['rDE']['DE']['gDatGralOpe']['gDatRec']['cDisRec'] = +data['cliente']['distrito'];
-      this.json['rDE']['DE']['gDatGralOpe']['gDatRec']['dDesDisRec'] = constanteService.distritos.filter(
-        (td) => td.codigo === +data['cliente']['distrito'],
-      )[0]['descripcion'];
+      this.json['rDE']['DE']['gDatGralOpe']['gDatRec']['dDesDisRec'] = constantService.districts.filter(
+        (td) => td.code === +data['cliente']['distrito'],
+      )[0]['description'];
     }
 
     if (data['cliente']['direccion'] && +data['cliente']['tipoOperacion'] != 4) {
       this.json['rDE']['DE']['gDatGralOpe']['gDatRec']['cCiuRec'] = +data['cliente']['ciudad'];
-      this.json['rDE']['DE']['gDatGralOpe']['gDatRec']['dDesCiuRec'] = constanteService.ciudades.filter(
-        (td) => td.codigo === +data['cliente']['ciudad'],
-      )[0]['descripcion'];
+      this.json['rDE']['DE']['gDatGralOpe']['gDatRec']['dDesCiuRec'] = constantService.cities.filter(
+        (td) => td.code === +data['cliente']['ciudad'],
+      )[0]['description'];
     }
 
     //Asignar null a departamento, distrito y ciudad si tipoOperacion = 4
@@ -1355,21 +1357,21 @@ class JSonDeMainService {
    * @param data
    * @param options
    */
-  private generateDatosEspecificosPorTipoDE(params: any, data: any, config: XmlgenConfig) {
+  private generateDatosEspecificosPorTipoDE(params: any, data: any, config: XmlGenConfig) {
     this.json['rDE']['DE']['gDtipDE'] = {};
 
-    if (+data['tipoDocumento'] === 1) {
+    if (+data.tipoDocumento === 1) {
       this.generateDatosEspecificosPorTipoDE_FacturaElectronica(params, data, config);
     }
-    if (+data['tipoDocumento'] === 4) {
+    if (+data.tipoDocumento === 4) {
       this.generateDatosEspecificosPorTipoDE_Autofactura(params, data);
     }
 
-    if (+data['tipoDocumento'] === 5 || data['tipoDocumento'] === 6) {
+    if (+data.tipoDocumento === 5 || data.tipoDocumento === 6) {
       this.generateDatosEspecificosPorTipoDE_NotaCreditoDebito(params, data);
     }
 
-    if (+data['tipoDocumento'] === 7) {
+    if (+data.tipoDocumento === 7) {
       this.generateDatosEspecificosPorTipoDE_RemisionElectronica(params, data);
     }
   }
@@ -1381,9 +1383,9 @@ class JSonDeMainService {
    * @param data
    * @param options
    */
-  private generateDatosEspecificosPorTipoDE_FacturaElectronica(params: any, data: any, config: XmlgenConfig) {
+  private generateDatosEspecificosPorTipoDE_FacturaElectronica(params: any, data: any, config: XmlGenConfig) {
     if (
-      constanteService.indicadoresPresencias.filter((um: any) => um.codigo === +data['factura']['presencia']).length ==
+      constantService.presenceIndicators.filter((um: any) => um.codigo === +data['factura']['presencia']).length ==
       0
     ) {
       /*throw new Error(
@@ -1396,9 +1398,9 @@ class JSonDeMainService {
 
     this.json['rDE']['DE']['gDtipDE']['gCamFE'] = {
       iIndPres: data['factura']['presencia'],
-      dDesIndPres: constanteService.indicadoresPresencias.filter(
-        (ip) => ip.codigo === +data['factura']['presencia'],
-      )[0]['descripcion'],
+      dDesIndPres: constantService.presenceIndicators.filter(
+        (ip) => ip.code === +data['factura']['presencia'],
+      )[0]['description'],
       //dFecEmNR : data['factura']['fechaEnvio']
     };
 
@@ -1457,65 +1459,65 @@ class JSonDeMainService {
   private generateDatosEspecificosPorTipoDE_Autofactura(params: any, data: any) {
     this.json['rDE']['DE']['gDtipDE']['gCamAE'] = {
       iNatVen: data['autoFactura']['tipoVendedor'], //1=No contribuyente, 2=Extranjero
-      dDesNatVen: constanteService.naturalezaVendedorAutofactura.filter(
-        (nv) => nv.codigo === data['autoFactura']['tipoVendedor'],
-      )[0]['descripcion'],
+      dDesNatVen: constantService.sellerNatureSelfInvoicingCase.filter(
+        (nv) => nv.code === data['autoFactura']['tipoVendedor'],
+      )[0]['description'],
       iTipIDVen: data['autoFactura']['documentoTipo'],
-      dDTipIDVen: constanteService.tiposDocumentosIdentidades.filter(
-        (td) => td.codigo === data['autoFactura']['documentoTipo'],
-      )[0]['descripcion'],
+      dDTipIDVen: constantService.identityDocuments.filter(
+        (td) => td.code === data['autoFactura']['documentoTipo'],
+      )[0]['description'],
       dNumIDVen: data['autoFactura']['documentoNumero'],
       dNomVen: data['autoFactura']['nombre'],
       dDirVen: data['autoFactura']['direccion'],
       dNumCasVen: data['autoFactura']['numeroCasa'],
 
       cDepVen: +data['autoFactura']['departamento'],
-      dDesDepVen: constanteService.departamentos.filter((td) => td.codigo === +data['autoFactura']['departamento'])[0][
-        'descripcion'
+      dDesDepVen: constantService.departments.filter((td) => td.code === +data['autoFactura']['departamento'])[0][
+        'description'
       ],
       cDisVen: +data['autoFactura']['distrito'],
-      dDesDisVen: constanteService.distritos.filter((td) => td.codigo === +data['autoFactura']['distrito'])[0][
-        'descripcion'
+      dDesDisVen: constantService.districts.filter((td) => td.code === +data['autoFactura']['distrito'])[0][
+        'description'
       ],
       cCiuVen: +data['autoFactura']['ciudad'],
-      dDesCiuVen: constanteService.ciudades.filter((td) => td.codigo === +data['autoFactura']['ciudad'])[0][
-        'descripcion'
+      dDesCiuVen: constantService.cities.filter((td) => td.code === +data['autoFactura']['ciudad'])[0][
+        'description'
       ],
       dDirProv: data['autoFactura']['ubicacion']['lugar'],
       cDepProv: +data['autoFactura']['ubicacion']['departamento'],
-      dDesDepProv: constanteService.departamentos.filter(
-        (td) => td.codigo === +data['autoFactura']['ubicacion']['departamento'],
-      )[0]['descripcion'],
+      dDesDepProv: constantService.departments.filter(
+        (td) => td.code === +data['autoFactura']['ubicacion']['departamento'],
+      )[0]['description'],
       cDisProv: +data['autoFactura']['ubicacion']['distrito'],
-      dDesDisProv: constanteService.distritos.filter(
-        (td) => td.codigo === +data['autoFactura']['ubicacion']['distrito'],
-      )[0]['descripcion'],
+      dDesDisProv: constantService.districts.filter(
+        (td) => td.code === +data['autoFactura']['ubicacion']['distrito'],
+      )[0]['description'],
       cCiuProv: +data['autoFactura']['ubicacion']['ciudad'],
-      dDesCiuProv: constanteService.ciudades.filter(
-        (td) => td.codigo === +data['autoFactura']['ubicacion']['ciudad'],
-      )[0]['descripcion'],
+      dDesCiuProv: constantService.cities.filter(
+        (td) => td.code === +data['autoFactura']['ubicacion']['ciudad'],
+      )[0]['description'],
     };
   }
 
   private generateDatosEspecificosPorTipoDE_NotaCreditoDebito(params: any, data: any) {
     this.json['rDE']['DE']['gDtipDE']['gCamNCDE'] = {
       iMotEmi: +data['notaCreditoDebito']['motivo'],
-      dDesMotEmi: constanteService.notasCreditosMotivos.filter(
-        (nv) => nv.codigo === +data['notaCreditoDebito']['motivo'],
-      )[0]['descripcion'],
+      dDesMotEmi: constantService.creditNoteReasons.filter(
+        (nv) => nv.code === +data['notaCreditoDebito']['motivo'],
+      )[0]['description'],
     };
   }
 
   private generateDatosEspecificosPorTipoDE_RemisionElectronica(params: any, data: any) {
     this.json['rDE']['DE']['gDtipDE']['gCamNRE'] = {
       iMotEmiNR: +data['remision']['motivo'], //E501
-      dDesMotEmiNR: constanteService.remisionesMotivos.filter((nv) => nv.codigo === +data['remision']['motivo'])[0][
-        'descripcion'
+      dDesMotEmiNR: constantService.remissionReasons.filter((nv) => nv.code === +data['remision']['motivo'])[0][
+        'description'
       ],
       iRespEmiNR: +data['remision']['tipoResponsable'],
-      dDesRespEmiNR: constanteService.remisionesResponsables.filter(
-        (nv) => nv.codigo === +data['remision']['tipoResponsable'],
-      )[0]['descripcion'],
+      dDesRespEmiNR: constantService.referralResponsible.filter(
+        (nv) => nv.code === +data['remision']['tipoResponsable'],
+      )[0]['description'],
     };
 
     if (+data['remision']['motivo'] == 99) {
@@ -1539,12 +1541,12 @@ class JSonDeMainService {
    * @param data
    * @param options
    */
-  private generateDatosCondicionOperacionDE(params: any, data: any, config: XmlgenConfig) {
+  private generateDatosCondicionOperacionDE(params: any, data: any, config: XmlGenConfig) {
     if (!data['condicion']) {
       return;
     }
     if (
-      constanteService.condicionesOperaciones.filter((um: any) => um.codigo === data['condicion']['tipo']).length == 0
+      constantService.operatingConditions.filter((um: any) => um.codigo === data['condicion']['tipo']).length == 0
     ) {
       /*throw new Error(
         "Condición de la Operación '" +
@@ -1556,8 +1558,8 @@ class JSonDeMainService {
 
     this.json['rDE']['DE']['gDtipDE']['gCamCond'] = {
       iCondOpe: data['condicion']['tipo'],
-      dDCondOpe: constanteService.condicionesOperaciones.filter((co) => co.codigo === data['condicion']['tipo'])[0][
-        'descripcion'
+      dDCondOpe: constantService.operatingConditions.filter((co) => co.code === data['condicion']['tipo'])[0][
+        'description'
       ],
     };
 
@@ -1577,7 +1579,7 @@ class JSonDeMainService {
    * @param data
    * @param options
    */
-  private generateDatosCondicionOperacionDE_Contado(params: any, data: any, config: XmlgenConfig) {
+  private generateDatosCondicionOperacionDE_Contado(params: any, data: any, config: XmlGenConfig) {
     if (data['condicion']['entregas'] && data['condicion']['entregas'].length > 0) {
       const entregas = [];
       for (let i = 0; i < data['condicion']['entregas'].length; i++) {
@@ -1585,8 +1587,8 @@ class JSonDeMainService {
 
         const cuotaInicialEntrega: any = {
           iTiPago: dataEntrega['tipo'],
-          dDesTiPag: constanteService.condicionesTiposPagos.filter((co) => co.codigo === dataEntrega['tipo'])[0][
-            'descripcion'
+          dDesTiPag: constantService.paymentTypes.filter((co) => co.code === dataEntrega['tipo'])[0][
+            'description'
           ],
         };
 
@@ -1606,9 +1608,9 @@ class JSonDeMainService {
         }
 
         cuotaInicialEntrega['cMoneTiPag'] = dataEntrega['moneda'];
-        cuotaInicialEntrega['dDMoneTiPag'] = constanteService.monedas.filter(
-          (m) => m.codigo == dataEntrega['moneda'],
-        )[0]['descripcion'];
+        cuotaInicialEntrega['dDMoneTiPag'] = constantService.currencies.filter(
+          (m) => m.code == dataEntrega['moneda'],
+        )[0]['description'];
 
         if (dataEntrega['moneda'] != 'PYG') {
           if (dataEntrega['cambio']) {
@@ -1623,9 +1625,9 @@ class JSonDeMainService {
             dDesDenTarj:
               +dataEntrega['infoTarjeta']['tipo'] === 99
                 ? dataEntrega['infoTarjeta']['tipoDescripcion']
-                : constanteService.tarjetasCreditosTipos.filter(
-                    (co) => co.codigo === dataEntrega['infoTarjeta']['tipo'],
-                  )[0]['descripcion'],
+                : constantService.creditCards.filter(
+                    (co) => co.code === dataEntrega['infoTarjeta']['tipo'],
+                  )[0]['description'],
           };
 
           if (dataEntrega['infoTarjeta']['razonSocial'] && dataEntrega['infoTarjeta']['ruc']) {
@@ -1690,7 +1692,7 @@ class JSonDeMainService {
    * @param data
    * @param options
    */
-  private generateDatosCondicionOperacionDE_Credito(params: any, data: any, config: XmlgenConfig) {
+  private generateDatosCondicionOperacionDE_Credito(params: any, data: any, config: XmlGenConfig) {
     if (!data['condicion']['credito']['tipo']) {
       /*throw new Error(
         'El tipo de Crédito en data.condicion.credito.tipo es obligatorio si la condición posee créditos',
@@ -1698,7 +1700,7 @@ class JSonDeMainService {
     }
 
     if (
-      constanteService.condicionesCreditosTipos.filter((um: any) => um.codigo === data['condicion']['credito']['tipo'])
+      constantService.creditTypes.filter((um: any) => um.codigo === data['condicion']['credito']['tipo'])
         .length == 0
     ) {
       /*throw new Error(
@@ -1711,9 +1713,9 @@ class JSonDeMainService {
 
     this.json['rDE']['DE']['gDtipDE']['gCamCond']['gPagCred'] = {
       iCondCred: data['condicion']['credito']['tipo'],
-      dDCondCred: constanteService.condicionesCreditosTipos.filter(
-        (co) => co.codigo === +data['condicion']['credito']['tipo'],
-      )[0]['descripcion'],
+      dDCondCred: constantService.creditTypes.filter(
+        (co) => co.code === +data['condicion']['credito']['tipo'],
+      )[0]['description'],
     };
 
     if (+data['condicion']['credito']['tipo'] === 1) {
@@ -1752,7 +1754,7 @@ class JSonDeMainService {
         for (let i = 0; i < data['condicion']['credito']['infoCuotas'].length; i++) {
           const infoCuota = data['condicion']['credito']['infoCuotas'][i];
 
-          if (constanteService.monedas.filter((um: any) => um.codigo === infoCuota['moneda']).length == 0) {
+          if (constantService.currencies.filter((um: any) => um.codigo === infoCuota['moneda']).length == 0) {
             /*throw new Error(
               "Moneda '" +
                 infoCuota['moneda'] +
@@ -1765,7 +1767,7 @@ class JSonDeMainService {
 
           const gCuotas: any = {
             cMoneCuo: infoCuota['moneda'],
-            dDMoneCuo: constanteService.monedas.filter((co) => co.codigo === infoCuota['moneda'])[0]['descripcion'],
+            dDMoneCuo: constantService.currencies.filter((co) => co.code === infoCuota['moneda'])[0]['description'],
             dMonCuota: infoCuota['monto'],
           };
 
@@ -1791,44 +1793,44 @@ class JSonDeMainService {
     return xml;
   }
 
-  getPaises() {
-    return constanteService.paises;
+  getCountries() {
+    return constantService.countries;
   }
 
-  getDepartamentos() {
-    return constanteService.departamentos;
+  getDepartments() {
+    return constantService.departments;
   }
 
-  getDistritos(departamento: number | null) {
+  getDistricts(departamento: number | null) {
     if (departamento) {
-      return constanteService.distritos.filter((dis) => dis.departamento === departamento);
+      return constantService.districts.filter((dis) => dis.departamento === departamento);
     } else {
-      return constanteService.distritos;
+      return constantService.districts;
     }
   }
 
-  getCiudades(distrito: number | null) {
+  getCities(distrito: number | null) {
     if (distrito) {
-      return constanteService.ciudades.filter((ciu) => ciu.distrito === distrito);
+      return constantService.cities.filter((ciu) => ciu.distrito === distrito);
     } else {
-      return constanteService.ciudades;
+      return constantService.cities;
     }
   }
 
-  getTiposRegimenes() {
-    return constanteService.tiposRegimenes;
+  getRegimeTypes() {
+    return constantService.regimeTypes;
   }
 
-  getDepartamento(departamentoId: number) {
-    return constanteService.departamentos.filter((dis) => dis.codigo === departamentoId);
+  getDepartment(departmentId: number) {
+    return constantService.departments.find((d) => d.code === departmentId);
   }
 
-  getDistrito(distritoId: number) {
-    return constanteService.distritos.filter((dis) => dis.codigo === distritoId);
+  getDistrict(districtId: number) {
+    return constantService.districts.find((d) => d.code === districtId);
   }
 
-  getCiudad(ciudadId: number) {
-    return constanteService.ciudades.filter((ciu) => ciu.codigo === ciudadId);
+  getCity(cityId: number) {
+    return constantService.cities.find((c) => c.code === cityId);
   }
 }
 

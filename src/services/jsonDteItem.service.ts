@@ -1,6 +1,6 @@
 import stringUtilService from './StringUtil.service';
 import constanteService from './constants.service';
-import { XmlgenConfig } from './type.interface.';
+import { XmlGenConfig } from './type.interface';
 
 class JSonDteItemService {
   /**
@@ -10,7 +10,7 @@ class JSonDteItemService {
    * @param data
    * @param options
    */
-  public generateDatosItemsOperacion(params: any, data: any, config: XmlgenConfig) {
+  public generateDatosItemsOperacion(params: any, data: any, config: XmlGenConfig) {
     const jsonResult: any = [];
 
     //Recorrer array de infoCuotas e informar en el JSON
@@ -47,16 +47,16 @@ class JSonDteItemService {
         gCamItem['dDesProSer'] = item['descripcion']; // RG 24/2019
 
         gCamItem['cUniMed'] = item['unidadMedida'];
-        gCamItem['dDesUniMed'] = constanteService.unidadesMedidas
-          .filter((um) => um.codigo === +item['unidadMedida'])[0]
-          ['representacion'].trim();
+        gCamItem['dDesUniMed'] = constanteService.measurementUnits
+          .filter((um) => um.code === +item['unidadMedida'])[0]
+          ['representation'].trim();
 
         gCamItem['dCantProSer'] = item['cantidad'];
 
         if (item['pais']) {
           gCamItem['cPaisOrig'] = item['pais'];
-          gCamItem['dDesPaisOrig'] = constanteService.paises.filter((pais) => pais.codigo === item['pais'])[0][
-            'descripcion'
+          gCamItem['dDesPaisOrig'] = constanteService.countries.filter((pais) => pais.code === item['pais'])[0][
+            'description'
           ];
         }
 
@@ -64,12 +64,12 @@ class JSonDteItemService {
           gCamItem['dInfItem'] = (item['observacion'] + '').trim();
         }
 
-        if (data['tipoDocumento'] === 7) {
+        if (data.tipoDocumento === 7) {
           if (item['tolerancia']) {
             gCamItem['cRelMerc'] = item['tolerancia'];
-            gCamItem['dDesRelMerc'] = constanteService.relevanciasMercaderias.filter(
-              (um) => um.codigo === item['tolerancia'],
-            )[0]['descripcion'];
+            gCamItem['dDesRelMerc'] = constanteService.merchandiseRelevances.filter(
+              (um) => um.code === item['tolerancia'],
+            )[0]['description'];
 
             if (item['toleranciaCantidad']) {
               gCamItem['dCanQuiMer'] = item['toleranciaCantidad'];
@@ -82,7 +82,7 @@ class JSonDteItemService {
         }
 
         //Tratamiento E719. Tiene relacion con generateDatosGeneralesInherentesOperacion
-        if (data['tipoDocumento'] == 1 || data['tipoDocumento'] == 4) {
+        if (data.tipoDocumento == 1 || data.tipoDocumento == 4) {
           if (data['tipoTransaccion'] === 9) {
             if (item['cdcAnticipo']) {
               gCamItem['dCDCAnticipo'] = item['cdcAnticipo'];
@@ -90,7 +90,7 @@ class JSonDteItemService {
           }
         }
 
-        if (data['tipoDocumento'] != 7) {
+        if (data.tipoDocumento != 7) {
           //Oblitatorio informar
           gCamItem['gValorItem'] = this.generateDatosItemsOperacionPrecioTipoCambioTotal(params, data, item, i, config);
         }
@@ -101,7 +101,7 @@ class JSonDteItemService {
           data['tipoImpuesto'] == 4 ||
           data['tipoImpuesto'] == 5
         ) {
-          if (data['tipoDocumento'] != 4 && data['tipoDocumento'] != 7) {
+          if (data.tipoDocumento != 4 && data.tipoDocumento != 7) {
             gCamItem['gCamIVA'] = this.generateDatosItemsOperacionIVA(params, data, item, i, { ...gCamItem }, config);
           }
         }
@@ -178,7 +178,7 @@ class JSonDteItemService {
     data: any,
     item: any,
     i: number,
-    config: XmlgenConfig,
+    config: XmlGenConfig,
   ) {
     const jsonResult: any = {};
 
@@ -192,7 +192,7 @@ class JSonDteItemService {
       jsonResult['dTotBruOpeItem'] = parseFloat(jsonResult['dTotBruOpeItem'].toFixed(config.pygDecimals));
     }
 
-    if (data['condicionTipoCambio'] && data['condicionTipoCambio'] == 2) {
+    if (data.condicionTipoCambio && data.condicionTipoCambio == 2) {
       jsonResult['dTiCamIt'] = item['cambio'];
     }
     jsonResult['gValorRestaItem'] = this.generateDatosItemsOperacionDescuentoAnticipoValorTotal(
@@ -219,7 +219,7 @@ class JSonDteItemService {
     data: any,
     item: any,
     i: number,
-    config: XmlgenConfig,
+    config: XmlGenConfig,
   ) {
     const jsonResult: any = {};
 
@@ -327,7 +327,7 @@ class JSonDteItemService {
         jsonResult['dTotOpeItem'] = parseFloat(jsonResult['dTotOpeItem'].toFixed(8));
       }
     }
-    if (data['tipoDocumento'] == 4) {
+    if (data.tipoDocumento == 4) {
       //Si es Autofactura
       jsonResult['dTotOpeItem'] = parseFloat(item['precioUnitario']) * parseFloat(item['cantidad']);
 
@@ -337,7 +337,7 @@ class JSonDteItemService {
       }
     }
 
-    if (data['condicionTipoCambio'] == 2) {
+    if (data.condicionTipoCambio == 2) {
       jsonResult['dTotOpeGs'] = jsonResult['dTotOpeItem'] * item['cambio'];
     }
     return jsonResult;
@@ -357,12 +357,12 @@ class JSonDteItemService {
     item: any,
     i: number,
     gCamItem: any,
-    config: XmlgenConfig,
+    config: XmlGenConfig,
   ) {
     const jsonResult: any = {
       iAfecIVA: item['ivaTipo'], //E731
-      dDesAfecIVA: constanteService.codigosAfectaciones.filter((ca) => ca.codigo === +item['ivaTipo'])[0][
-        'descripcion'
+      dDesAfecIVA: constanteService.taxTreatments.filter((ca) => ca.code === +item['ivaTipo'])[0][
+        'description'
       ],
       dPropIVA: item['ivaBase'], //E733
       dTasaIVA: item['iva'], //E734
@@ -614,9 +614,9 @@ class JSonDteItemService {
 
     const jsonResult: any = {
       iTipOpVN: item['sectorAutomotor']['tipo'],
-      dDesTipOpVN: constanteService.tiposOperacionesVehiculos.filter(
-        (ov) => ov.codigo === item['sectorAutomotor']['tipo'],
-      )[0]['descripcion'],
+      dDesTipOpVN: constanteService.vehicleOperationTypes.filter(
+        (ov) => ov.code === item['sectorAutomotor']['tipo'],
+      )[0]['description'],
       dChasis: item['sectorAutomotor']['chasis'],
       dColor: item['sectorAutomotor']['color'],
       dPotencia: item['sectorAutomotor']['potencia'],
@@ -624,9 +624,9 @@ class JSonDteItemService {
       dPNet: item['sectorAutomotor']['pesoNeto'],
       dPBruto: item['sectorAutomotor']['pesoBruto'],
       iTipCom: item['sectorAutomotor']['tipoCombustible'],
-      dDesTipCom: constanteService.tiposCombustibles.filter(
-        (tc) => tc.codigo === item['sectorAutomotor']['tipoCombustible'],
-      )[0]['descripcion'],
+      dDesTipCom: constanteService.fuelTypes.filter(
+        (tc) => tc.code === item['sectorAutomotor']['tipoCombustible'],
+      )[0]['description'],
       dNroMotor: item['sectorAutomotor']['numeroMotor'],
       dCapTracc: item['sectorAutomotor']['capacidadTraccion'],
       dAnoFab: item['sectorAutomotor']['año'],

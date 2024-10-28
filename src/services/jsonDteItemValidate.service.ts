@@ -1,12 +1,12 @@
 import stringUtilService from './StringUtil.service';
 import constanteService from './constants.service';
-import { XmlgenConfig } from './type.interface.';
+import { XmlGenConfig } from './type.interface';
 
 class JSonDteItemValidateService {
   errors: Array<string>;
 
   constructor() {
-    this.errors = new Array();
+    this.validator.errors = new Array();
   }
 
   /**
@@ -16,8 +16,8 @@ class JSonDteItemValidateService {
    * @param data
    * @param options
    */
-  public generateDatosItemsOperacionValidate(params: any, data: any, config: XmlgenConfig, errors: Array<string>) {
-    this.errors = errors;
+  public generateDatosItemsOperacionValidate(params: any, data: any, config: XmlGenConfig, errors: Array<string>) {
+    this.validator.errors = errors;
     const regExpOnlyNumber = new RegExp(/^\d+$/);
 
     const jsonResult: any = [];
@@ -31,7 +31,7 @@ class JSonDteItemValidateService {
 
         //Validaciones
         if (!((item['codigo'] + '').length >= 1 && (item['codigo'] + '').length <= 50)) {
-          this.errors.push(
+          this.validator.errors.push(
             'El código del item (' +
               item['codigo'] +
               ') en data.items[' +
@@ -41,10 +41,10 @@ class JSonDteItemValidateService {
         }
 
         if (!item['ncm']) {
-          //this.errors.push('La descripción del item en data.items[' + i + '].ncm no puede ser null');
+          //this.validator.errors.push('La descripción del item en data.items[' + i + '].ncm no puede ser null');
         } else {
           if (!(item['ncm'].length >= 6 && item['ncm'].length <= 8)) {
-            this.errors.push(
+            this.validator.errors.push(
               'El valor del campo NCM (' +
                 item['ncm'] +
                 ') en data.items[' +
@@ -54,37 +54,37 @@ class JSonDteItemValidateService {
           }
         }
 
-        if (constanteService.unidadesMedidas.filter((um) => um.codigo === +unidadMedida).length == 0) {
-          this.errors.push(
+        if (constanteService.measurementUnits.filter((um) => um.code === +unidadMedida).length == 0) {
+          this.validator.errors.push(
             "Unidad de Medida '" +
               unidadMedida +
               "' en data.items[" +
               i +
               '].unidadMedida no encontrado. Valores: ' +
-              constanteService.unidadesMedidas.map((a) => a.codigo + '-' + a.descripcion.trim()),
+              constanteService.measurementUnits.map((a) => a.code + '-' + a.description.trim()),
           );
         }
-        if (data['tipoDocumento'] === 7) {
+        if (data.tipoDocumento === 7) {
           if (!item['tolerancia']) {
-            /*this.errors.push(
+            /*this.validator.errors.push(
               'La Tolerancia es opcional para el Tipo de Documento = 7 en data.items[' + i + '].tolerancia',
             );*/
             //No es obligatorio
           } else {
             //Si tiene tolerancia, entonces valida
-            if (constanteService.relevanciasMercaderias.filter((um) => um.codigo === +item['tolerancia']).length == 0) {
-              this.errors.push(
+            if (constanteService.merchandiseRelevances.filter((um) => um.code === +item['tolerancia']).length == 0) {
+              this.validator.errors.push(
                 "Tolerancia de Mercaderia '" +
                   item['tolerancia'] +
                   "' en data.items[" +
                   i +
                   '].tolerancia no encontrado. Valores: ' +
-                  constanteService.relevanciasMercaderias.map((a) => a.codigo + '-' + a.descripcion),
+                  constanteService.merchandiseRelevances.map((a) => a.code + '-' + a.description),
               );
             }
 
             if (!(item['toleranciaCantidad'] && item['toleranciaPorcentaje'])) {
-              this.errors.push(
+              this.validator.errors.push(
                 'La Tolerancia require especificar la cantidad y porcentaje de quiebra o merma en data.items[' +
                   i +
                   '].toleranciaCantidad y data.items[' +
@@ -98,10 +98,10 @@ class JSonDteItemValidateService {
         let regexp = new RegExp('<[^>]*>'); //HTML/XML TAGS
 
         if (!item['descripcion']) {
-          this.errors.push('La descripción del item en data.items[' + i + '].descripcion no puede ser null');
+          this.validator.errors.push('La descripción del item en data.items[' + i + '].descripcion no puede ser null');
         } else {
           if (!((item['descripcion'] + '').length >= 1 && (item['descripcion'] + '').length <= 2000)) {
-            this.errors.push(
+            this.validator.errors.push(
               'La descripción del item (' +
                 item['descripcion'] +
                 ') en data.items[' +
@@ -111,7 +111,7 @@ class JSonDteItemValidateService {
           }
 
           if (regexp.test(item['descripcion'])) {
-            this.errors.push(
+            this.validator.errors.push(
               'La descripción del item (' +
                 item['descripcion'] +
                 ') en data.items[' +
@@ -122,7 +122,7 @@ class JSonDteItemValidateService {
         }
 
         if ((item['cantidad'] + '').split('.')[1]?.length > 8) {
-          this.errors.push(
+          this.validator.errors.push(
             'La Cantidad del item "' +
               item['cantidad'] +
               '" en data.items[' +
@@ -133,7 +133,7 @@ class JSonDteItemValidateService {
 
         if (data.moneda == 'PYG') {
           /*if ((item['precioUnitario'] + '').split('.')[1]?.length > (config.pygDecimals || 0)) {
-            this.errors.push(
+            this.validator.errors.push(
               'El Precio Unitario del item "' +
                 item['precioUnitario'] +
                 '" en "PYG" en data.items[' +
@@ -144,7 +144,7 @@ class JSonDteItemValidateService {
             );
           }*/
           if ((item['precioUnitario'] + '').split('.')[1]?.length > 8) {
-            this.errors.push(
+            this.validator.errors.push(
               'El Precio Unitario del item "' +
                 item['precioUnitario'] +
                 '" en "PYG" en data.items[' +
@@ -154,7 +154,7 @@ class JSonDteItemValidateService {
           }
         } else {
           if ((item['precioUnitario'] + '').split('.')[1]?.length > 8) {
-            this.errors.push(
+            this.validator.errors.push(
               'El Precio Unitario del item "' +
                 item['precioUnitario'] +
                 '" en data.items[' +
@@ -166,7 +166,7 @@ class JSonDteItemValidateService {
 
         if (data.moneda == 'PYG') {
           /*if ((item['descuento'] + '').split('.')[1]?.length > (config.pygDecimals || 0)) {
-            this.errors.push(
+            this.validator.errors.push(
               'El Descuento del item "' +
                 item['descuento'] +
                 '" en "PYG" en data.items[' +
@@ -177,7 +177,7 @@ class JSonDteItemValidateService {
             );
           }*/
           if ((item['descuento'] + '').split('.')[1]?.length > 8) {
-            this.errors.push(
+            this.validator.errors.push(
               'El Descuento del item "' +
                 item['descuento'] +
                 '" en "PYG" en data.items[' +
@@ -187,7 +187,7 @@ class JSonDteItemValidateService {
           }
         } else {
           if ((item['descuento'] + '').split('.')[1]?.length > 8) {
-            this.errors.push(
+            this.validator.errors.push(
               'El Descuento del item "' +
                 item['descuento'] +
                 '" en data.items[' +
@@ -201,10 +201,10 @@ class JSonDteItemValidateService {
         /*if (
           !(item['cantidad'] != null && (item['cantidad'] + '').length > 0 && regExpOnlyNumber.test(item['cantidad']))
         ) {
-          this.errors.push('Debe especificar la cantidad del item en data.items[' + i + '].cantidad');
+          this.validator.errors.push('Debe especificar la cantidad del item en data.items[' + i + '].cantidad');
         } else {*/
         if (+item['cantidad'] <= 0) {
-          this.errors.push('La cantidad del item en data.items[' + i + '].cantidad debe ser mayor a cero');
+          this.validator.errors.push('La cantidad del item en data.items[' + i + '].cantidad debe ser mayor a cero');
         }
         //}
 
@@ -215,10 +215,10 @@ class JSonDteItemValidateService {
             regExpOnlyNumber.test(item['precioUnitario'])
           )
         ) {
-          this.errors.push('Debe especificar la precio unitario del item en data.items[' + i + '].precioUnitario');
+          this.validator.errors.push('Debe especificar la precio unitario del item en data.items[' + i + '].precioUnitario');
         } else {*/
         if (+item['precioUnitario'] < 0) {
-          this.errors.push(
+          this.validator.errors.push(
             'El precio unitario del item en data.items[' + i + '].precioUnitario debe ser mayor o igual a cero',
           );
         }
@@ -226,26 +226,26 @@ class JSonDteItemValidateService {
 
         if (item['descuento']) {
           if (+item['descuento'] < 0) {
-            this.errors.push(
+            this.validator.errors.push(
               'El Descuento del item en data.items[' + i + '].descuento debe ser mayor o igual Anticipo cero',
             );
           }
         }
         if (item['anticipo']) {
           if (+item['anticipo'] < 0) {
-            this.errors.push('El Anticipo del item en data.items[' + i + '].anticipo debe ser mayor o igual a cero');
+            this.validator.errors.push('El Anticipo del item en data.items[' + i + '].anticipo debe ser mayor o igual a cero');
           }
         }
 
         if (item['cambio']) {
           if (+item['cambio'] < 0) {
-            this.errors.push('El Cambio del item en data.items[' + i + '].cambio debe ser mayor o igual a cero');
+            this.validator.errors.push('El Cambio del item en data.items[' + i + '].cambio debe ser mayor o igual a cero');
           }
         }
 
         if (item['cdcAnticipo']) {
           if (item['cdcAnticipo'].length != 44) {
-            this.errors.push(
+            this.validator.errors.push(
               'El Valor (' +
                 item['cdcAnticipo'] +
                 ') del CDC del Anticipo en data.items[' +
@@ -256,21 +256,21 @@ class JSonDteItemValidateService {
         }
 
         if (item['pais']) {
-          if (constanteService.paises.filter((pais: any) => pais.codigo === item['pais']).length == 0) {
-            this.errors.push(
+          if (constanteService.countries.filter((pais: any) => pais.codigo === item['pais']).length == 0) {
+            this.validator.errors.push(
               "Pais '" +
                 item['pais'] +
                 "' del Producto en data.items[" +
                 i +
                 '].pais no encontrado. Valores: ' +
-                constanteService.paises.map((a: any) => a.codigo + '-' + a.descripcion),
+                constanteService.countries.map((a: any) => a.codigo + '-' + a.descripcion),
             );
           }
         }
 
         if (item['observacion'] && (item['observacion'] + '').trim().length > 0) {
           if (!((item['observacion'] + '').trim().length >= 1 && (item['observacion'] + '').trim().length <= 500)) {
-            this.errors.push(
+            this.validator.errors.push(
               'La observación del item (' +
                 item['observacion'] +
                 ') en data.items[' +
@@ -279,7 +279,7 @@ class JSonDteItemValidateService {
             );
           }
           if (regexp.test(item['observacion'])) {
-            this.errors.push(
+            this.validator.errors.push(
               'La observación del item (' +
                 item['observacion'] +
                 ') en data.items[' +
@@ -290,17 +290,17 @@ class JSonDteItemValidateService {
         }
 
         //Tratamiento E719. Tiene relacion con generateDatosGeneralesInherentesOperacion
-        if (data['tipoDocumento'] == 1 || data['tipoDocumento'] == 4) {
+        if (data.tipoDocumento == 1 || data.tipoDocumento == 4) {
           if (data['tipoTransaccion'] !== 9) {
-            /*if (data['documentoAsociado'] != null && tiene que ser tipo 9) {
+            /*if (data.documentoAsociado != null && tiene que ser tipo 9) {
               if (!item['cdcAnticipo']) {
-                this.errors.push('Debe informar data.items*.cdcAnticipo');
+                this.validator.errors.push('Debe informar data.items*.cdcAnticipo');
               }              
             }*/
           }
         }
 
-        if (data['tipoDocumento'] != 7) {
+        if (data.tipoDocumento != 7) {
           //Oblitatorio informar
           this.generateDatosItemsOperacionDescuentoAnticipoValorTotalValidate(params, data, item, i);
         }
@@ -311,7 +311,7 @@ class JSonDteItemValidateService {
           data['tipoImpuesto'] == 4 ||
           data['tipoImpuesto'] == 5
         ) {
-          if (data['tipoDocumento'] != 4 && data['tipoDocumento'] != 7) {
+          if (data.tipoDocumento != 4 && data.tipoDocumento != 7) {
             this.generateDatosItemsOperacionIVAValidate(params, data, item, i);
           }
         }
@@ -334,7 +334,7 @@ class JSonDteItemValidateService {
 
         if (data['cliente']['tipoOperacion'] && data['cliente']['tipoOperacion'] === 3) {
           if (!item['dncp']) {
-            this.errors.push(
+            this.validator.errors.push(
               'Debe especificar los datos de la DNCP en ' +
                 'data.items[' +
                 i +
@@ -348,7 +348,7 @@ class JSonDteItemValidateService {
                 (item['dncp']['codigoNivelGeneral'] + '').length <= 8
               )
             ) {
-              this.errors.push(
+              this.validator.errors.push(
                 'Debe especificar los datos de la DNCP en ' +
                   'data.items[' +
                   i +
@@ -365,7 +365,7 @@ class JSonDteItemValidateService {
                 (item['dncp']['codigoNivelEspecifico'] + '').length <= 4
               )
             ) {
-              this.errors.push(
+              this.validator.errors.push(
                 'Debe especificar los datos de la DNCP en ' +
                   'data.items[' +
                   i +
@@ -378,7 +378,7 @@ class JSonDteItemValidateService {
         }
       } //end-for
     }
-    return this.errors;
+    return this.validator.errors;
   }
 
   /**
@@ -395,7 +395,7 @@ class JSonDteItemValidateService {
     if (item['descuento'] && +item['descuento'] > 0) {
       //Validar que si el descuento es mayor al precio
       if (+item['descuento'] > +item['precioUnitario']) {
-        this.errors.push(
+        this.validator.errors.push(
           "Descuento '" +
             item['descuento'] +
             "' del Producto en data.items[" +
@@ -409,7 +409,7 @@ class JSonDteItemValidateService {
         //Validar IVA
         //Quiere decir que no va a ir nada en exenta, gravada5 y gravada10, para este item.
         if (item['ivaTipo'] != 3) {
-          this.errors.push(
+          this.validator.errors.push(
             'Descuento igual a Precio Unitario corresponde tener Tipo de Iva = 3-Exento en data.items[' +
               i +
               '].ivaTipo',
@@ -428,20 +428,20 @@ class JSonDteItemValidateService {
    * @param items Es el item actual del array de items de "data" que se está iterando
    */
   private generateDatosItemsOperacionIVAValidate(params: any, data: any, item: any, i: number) {
-    if (constanteService.codigosAfectaciones.filter((um) => um.codigo === +item['ivaTipo']).length == 0) {
-      this.errors.push(
+    if (constanteService.taxTreatments.filter((um) => um.code === +item['ivaTipo']).length == 0) {
+      this.validator.errors.push(
         "Tipo de IVA '" +
           item['ivaTipo'] +
           "' en data.items[" +
           i +
           '].ivaTipo no encontrado. Valores: ' +
-          constanteService.codigosAfectaciones.map((a) => a.codigo + '-' + a.descripcion),
+          constanteService.taxTreatments.map((a) => a.code + '-' + a.description),
       );
     }
 
     if (item['ivaTipo'] == 1) {
       if (item['ivaBase'] != 100) {
-        this.errors.push(
+        this.validator.errors.push(
           'Valor de "ivaBase"=' +
             item['ivaBase'] +
             ' debe ser igual a 100 para "ivaTipo" = 1 en data.items[' +
@@ -454,7 +454,7 @@ class JSonDteItemValidateService {
     if (item['ivaTipo'] == 2 || item['ivaTipo'] == 3) {
       //Exento
       if (item['ivaBase'] != 0) {
-        this.errors.push(
+        this.validator.errors.push(
           'Valor de "ivaBase"=' +
             item['ivaBase'] +
             ' debe ser igual a 0 para "ivaTipo" = ' +
@@ -466,7 +466,7 @@ class JSonDteItemValidateService {
       }
 
       if (item['iva'] != 0) {
-        this.errors.push(
+        this.validator.errors.push(
           'Valor de "iva"=' +
             item['iva'] +
             ' debe ser igual a 0 para "ivaTipo" = ' +
@@ -480,7 +480,7 @@ class JSonDteItemValidateService {
 
     if (item['iva'] == 0) {
       if (item['ivaTipo'] != 2 && item['ivaTipo'] != 3) {
-        this.errors.push(
+        this.validator.errors.push(
           '"Iva" = 0 no se admite para "ivaTipo"=' + item['ivaTipo'] + ' proporcionado en data.items[' + i + '].iva',
         );
       }
@@ -488,7 +488,7 @@ class JSonDteItemValidateService {
 
     if (item['iva'] == 5) {
       if (item['ivaTipo'] != 1 && item['ivaTipo'] != 4) {
-        this.errors.push(
+        this.validator.errors.push(
           '"Iva" = 5 no se admite para "ivaTipo"=' + item['ivaTipo'] + ' proporcionado en data.items[' + i + '].iva',
         );
       }
@@ -496,18 +496,18 @@ class JSonDteItemValidateService {
 
     if (item['iva'] == 10) {
       if (item['ivaTipo'] != 1 && item['ivaTipo'] != 4) {
-        this.errors.push(
+        this.validator.errors.push(
           '"Iva" = 10 no se admite para "ivaTipo"=' + item['ivaTipo'] + ' proporcionado en data.items[' + i + '].iva',
         );
       }
     }
 
     if (!(item['iva'] == 0 || item['iva'] == 5 || item['iva'] == 10)) {
-      this.errors.push('Valor invalido "iva"=' + item['iva'] + ' proporcionado en data.items[' + i + '].iva');
+      this.validator.errors.push('Valor invalido "iva"=' + item['iva'] + ' proporcionado en data.items[' + i + '].iva');
     }
 
     if (!(item['ivaBase'] >= 0 && item['ivaBase'] <= 100)) {
-      this.errors.push('Valor invalido "ivaBase"=' + item['iva'] + ' proporcionado en data.items[' + i + '].ivaBase');
+      this.validator.errors.push('Valor invalido "ivaBase"=' + item['iva'] + ' proporcionado en data.items[' + i + '].ivaBase');
     }
   }
 
@@ -529,7 +529,7 @@ class JSonDteItemValidateService {
           (item['registroEntidadComercial'] + '').trim().length <= 20
         )
       ) {
-        this.errors.push(
+        this.validator.errors.push(
           'El Número de Registro de la Entidad Comercial del item (' +
             item['registroEntidadComercial'] +
             ') en data.items[' +
@@ -538,7 +538,7 @@ class JSonDteItemValidateService {
         );
       }
       if (regexpXMLHTML.test(item['registroEntidadComercial'])) {
-        this.errors.push(
+        this.validator.errors.push(
           'El Número de Registro de la Entidad Comercial del item (' +
             item['registroEntidadComercial'] +
             ') en data.items[' +
@@ -564,35 +564,35 @@ class JSonDteItemValidateService {
     }
 
     if (
-      constanteService.tiposOperacionesVehiculos.filter((um) => um.codigo === item['sectorAutomotor']['tipo']).length ==
+      constanteService.vehicleOperationTypes.filter((um) => um.code === item['sectorAutomotor']['tipo']).length ==
       0
     ) {
-      this.errors.push(
+      this.validator.errors.push(
         "Tipo de Operación de Venta de Automotor '" +
           item['sectorAutomotor']['tipo'] +
           "' en data.items[" +
           i +
           '].sectorAutomotor.tipo no encontrado. Valores: ' +
-          constanteService.tiposOperacionesVehiculos.map((a) => a.codigo + '-' + a.descripcion),
+          constanteService.vehicleOperationTypes.map((a) => a.code + '-' + a.description),
       );
     }
     if (
-      constanteService.tiposCombustibles.filter((um) => um.codigo === item['sectorAutomotor']['tipoCombustible'])
+      constanteService.fuelTypes.filter((um) => um.code === item['sectorAutomotor']['tipoCombustible'])
         .length == 0
     ) {
-      this.errors.push(
+      this.validator.errors.push(
         "Tipo de Combustible '" +
           item['sectorAutomotor']['tipoCombustible'] +
           "' en data.items[" +
           i +
           '].sectorAutomotor.tipoCombustible no encontrado. Valores: ' +
-          constanteService.tiposCombustibles.map((a) => a.codigo + '-' + a.descripcion),
+          constanteService.fuelTypes.map((a) => a.code + '-' + a.description),
       );
     }
 
     if (item['sectorAutomotor']['chasis']) {
       if (item['sectorAutomotor']['chasis'].length != 17) {
-        this.errors.push(
+        this.validator.errors.push(
           "El Chassis '" + item['sectorAutomotor']['chasis'] + "' en data.items[" + i + '] debe tener 17 caracteres',
         );
       }
@@ -600,7 +600,7 @@ class JSonDteItemValidateService {
 
     if (item['sectorAutomotor']['cilindradas']) {
       if ((item['sectorAutomotor']['cilindradas'] + '').length != 4) {
-        this.errors.push(
+        this.validator.errors.push(
           "La Cilindradas '" +
             item['sectorAutomotor']['cilindradas'] +
             "' en data.items[" +

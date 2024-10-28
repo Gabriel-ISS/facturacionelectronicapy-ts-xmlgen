@@ -1,5 +1,5 @@
-import stringUtilService from './StringUtil.service';
-import fechaUtilService from './FechaUtil.service';
+import fechaUtilService from '../helpers/DateHelper';
+import { EDocumentData } from './EDocumentData.type';
 
 class JSonDteAlgoritmosService {
   /**
@@ -64,26 +64,35 @@ class JSonDteAlgoritmosService {
    * @param data
    * @returns
    */
-  public generateCodigoControl(params: any, data: any, codigoSeguridad: any) {
-    if (params['ruc'].indexOf('-') == -1) {
+  public generateCodigoControl(
+    params: any,
+    data: EDocumentData,
+    codigoSeguridad: any,
+  ) {
+    if (params.ruc.indexOf('-') == -1) {
       throw new Error('RUC debe contener dígito verificador en params.ruc');
     }
-    const tipoDocumento = data['tipoDocumento'];
+    const tipoDocumento = data.tipoDocumento;
 
-    let rucEmisor = params['ruc'].split('-')[0];
-    rucEmisor = stringUtilService.leftZero(rucEmisor, 8);
+    let [rucEmisor, dvEmisor] = (params.ruc as string).split('-');
 
-    const dvEmisor = params['ruc'].split('-')[1];
-    const establecimiento = stringUtilService.leftZero(data['establecimiento'], 3);
-    const punto = stringUtilService.leftZero(data['punto'], 3);
-    const numero = stringUtilService.leftZero(data['numero'], 7);
+    let rucEmisorParaCalculoDV = rucEmisor;
+    let dvEmisorParaCalculoDV = dvEmisor;
+
+    rucEmisor = rucEmisor.padStart(8, '0');
+
+    const establecimiento = data.establecimiento.padStart(3, '0');
+    const punto = data.punto.padStart(3, '0');
+    const numero = data.numero.padStart(7, '0');
     const tipoContribuyente = params['tipoContribuyente'];
-    const fechaEmision = fechaUtilService.convertToAAAAMMDD(new Date(data['fecha']));
-    const tipoEmision = data['tipoEmision']; //1=Normal 2=Contingencia
+    const fechaEmision = fechaUtilService.getCDCFormatDateString(
+      new Date(data['fecha']),
+    );
+    const tipoEmision = data.tipoEmision; //1=Normal 2=Contingencia
     const codigoSeguridadAleatorio = codigoSeguridad;
 
     let cdc =
-      stringUtilService.leftZero(tipoDocumento, 2) +
+      tipoDocumento.toString().padStart(2, '0') +
       rucEmisor +
       dvEmisor +
       establecimiento +
@@ -94,7 +103,6 @@ class JSonDteAlgoritmosService {
       tipoEmision +
       codigoSeguridadAleatorio;
 
-    let rucEmisorParaCalculoDV = params['ruc'].split('-')[0];
     //Si el RUC tiene letras A, B o C, esas letras hay que reemplazar con el código ASCII
     rucEmisorParaCalculoDV = rucEmisorParaCalculoDV.replace('A', '65');
     rucEmisorParaCalculoDV = rucEmisorParaCalculoDV.replace('B', '66');
@@ -102,11 +110,10 @@ class JSonDteAlgoritmosService {
     rucEmisorParaCalculoDV = rucEmisorParaCalculoDV.replace('a', '97');
     rucEmisorParaCalculoDV = rucEmisorParaCalculoDV.replace('b', '98');
     rucEmisorParaCalculoDV = rucEmisorParaCalculoDV.replace('c', '99');
-    rucEmisorParaCalculoDV = stringUtilService.leftZero(rucEmisorParaCalculoDV, 8);
-    const dvEmisorParaCalculoDV = params['ruc'].split('-')[1];
+    rucEmisorParaCalculoDV = rucEmisorParaCalculoDV.padStart(8, '0');
 
     let cdcParaCalculoDV =
-      stringUtilService.leftZero(tipoDocumento, 2) +
+      tipoDocumento.toString().padStart(2, '0') +
       rucEmisorParaCalculoDV +
       dvEmisorParaCalculoDV +
       establecimiento +

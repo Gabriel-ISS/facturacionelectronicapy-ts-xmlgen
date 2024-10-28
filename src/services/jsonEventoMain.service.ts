@@ -1,15 +1,15 @@
 import * as xml2js from 'xml2js';
-import fechaUtilService from './FechaUtil.service';
+import fechaUtilService from '../helpers/DateHelper';
 import constanteService from './constants.service';
 import stringUtilService from './StringUtil.service';
-import { XmlgenConfig } from './type.interface.';
+import { XmlGenConfig } from './type.interface';
 
 class JSonEventoMainService {
   codigoSeguridad: any = null;
   codigoControl: any = null;
   json: any = {};
 
-  public generateXMLEventoCancelacion(id: number, params: any, data: any, config?: XmlgenConfig): Promise<any> {
+  public generateXMLCancellationEvent(id: number, params: any, data: any, config?: XmlGenConfig): Promise<any> {
     data.tipoEvento = 1; //Cancelacion
     return new Promise(async (resolve, reject) => {
       try {
@@ -24,7 +24,7 @@ class JSonEventoMainService {
     });
   }
 
-  public generateXMLEventoInutilizacion(id: number, params: any, data: any, config?: XmlgenConfig): Promise<any> {
+  public generateXMLDisablementEvent(id: number, params: any, data: any, config?: XmlGenConfig): Promise<any> {
     data.tipoEvento = 2; //Inutilizacion
     return new Promise(async (resolve, reject) => {
       try {
@@ -42,7 +42,7 @@ class JSonEventoMainService {
     });
   }
 
-  public generateXMLEventoConformidad(id: number, params: any, data: any, config?: XmlgenConfig): Promise<any> {
+  public generateXMLComplianceEvent(id: number, params: any, data: any, config?: XmlGenConfig): Promise<any> {
     data.tipoEvento = 11; //Conformidad
     return new Promise(async (resolve, reject) => {
       try {
@@ -57,7 +57,7 @@ class JSonEventoMainService {
     });
   }
 
-  public generateXMLEventoDisconformidad(id: number, params: any, data: any, config?: XmlgenConfig): Promise<any> {
+  public generateXMLDisagreementEvent(id: number, params: any, data: any, config?: XmlGenConfig): Promise<any> {
     data.tipoEvento = 12; //Disconformidad
     return new Promise(async (resolve, reject) => {
       try {
@@ -72,7 +72,7 @@ class JSonEventoMainService {
     });
   }
 
-  public generateXMLEventoDesconocimiento(id: number, params: any, data: any, config?: XmlgenConfig): Promise<any> {
+  public generateXMLUnawarenceEvent(id: number, params: any, data: any, config?: XmlGenConfig): Promise<any> {
     data.tipoEvento = 13; //Desconocimiento
     return new Promise(async (resolve, reject) => {
       try {
@@ -87,7 +87,7 @@ class JSonEventoMainService {
     });
   }
 
-  public generateXMLEventoNotificacion(id: number, params: any, data: any, config?: XmlgenConfig): Promise<any> {
+  public generateXMLNotificationEvent(id: number, params: any, data: any, config?: XmlGenConfig): Promise<any> {
     data.tipoEvento = 14; //Notificacion
     return new Promise(async (resolve, reject) => {
       try {
@@ -102,7 +102,7 @@ class JSonEventoMainService {
     });
   }
 
-  public generateXMLEventoNominacion(id: number, params: any, data: any, config?: XmlgenConfig): Promise<any> {
+  public generateXMLNominationEvent(id: number, params: any, data: any, config?: XmlGenConfig): Promise<any> {
     data.tipoEvento = 15; //Nominacion
     return new Promise(async (resolve, reject) => {
       try {
@@ -117,11 +117,11 @@ class JSonEventoMainService {
     });
   }
 
-  public generateXMLEventoActualizacionDatosTransporte(
+  public generateXMLTransportDataUpdateEvent(
     id: number,
     params: any,
     data: any,
-    config?: XmlgenConfig,
+    config?: XmlGenConfig,
   ): Promise<any> {
     data.tipoEvento = 16; //ActualizacionDatosTransporte
     return new Promise(async (resolve, reject) => {
@@ -180,7 +180,7 @@ class JSonEventoMainService {
 
     this.json['gGroupGesEve']['rGesEve']['rEve']['$'] = {};
     this.json['gGroupGesEve']['rGesEve']['rEve']['$']['Id'] = 1;
-    this.json['gGroupGesEve']['rGesEve']['rEve']['dFecFirma'] = fechaUtilService.convertToJSONFormat(new Date());
+    this.json['gGroupGesEve']['rGesEve']['rEve']['dFecFirma'] = fechaUtilService.getISODateTimeString(new Date());
     this.json['gGroupGesEve']['rGesEve']['rEve']['dVerFor'] = params.version;
     this.json['gGroupGesEve']['rGesEve']['rEve']['gGroupTiEvt'] = {};
 
@@ -295,16 +295,16 @@ class JSonEventoMainService {
     if (!data['timbrado']) {
       throw new Error('Falta el Timbrado en data.timbrado');
     }
-    if (!data['establecimiento']) {
+    if (!data.establecimiento) {
       throw new Error('Falta el Establecimiento en data.establecimiento');
     }
-    if (new String(data['establecimiento']).length != 3) {
+    if (new String(data.establecimiento).length != 3) {
       throw new Error('El establecimiento debe tener una longitud de 3 caracteres');
     }
-    if (!data['punto']) {
+    if (!data.punto) {
       throw new Error('Falta el Punto en data.punto');
     }
-    if (new String(data['punto']).length != 3) {
+    if (new String(data.punto).length != 3) {
       throw new Error('El punto debe tener una longitud de 3 caracteres');
     }
 
@@ -317,7 +317,7 @@ class JSonEventoMainService {
     if (+data['desde'] > +data['hasta']) {
       throw new Error('El valor inicial en data.desde debe ser inferior o igual al valor final en data.hasta');
     }
-    if (!data['tipoDocumento']) {
+    if (!data.tipoDocumento) {
       throw new Error('Falta el Tipo de Documento en data.tipoDocumento');
     }
     if (new String(data['timbrado']).length != 8) {
@@ -339,11 +339,11 @@ class JSonEventoMainService {
     const jsonResult: any = {};
     jsonResult['rGeVeInu'] = {
       dNumTim: stringUtilService.leftZero(data['timbrado'], 8),
-      dEst: stringUtilService.leftZero(data['establecimiento'], 3),
-      dPunExp: stringUtilService.leftZero(data['punto'], 3),
+      dEst: stringUtilService.leftZero(data.establecimiento, 3),
+      dPunExp: stringUtilService.leftZero(data.punto, 3),
       dNumIn: stringUtilService.leftZero(data['desde'], 7),
       dNumFin: stringUtilService.leftZero(data['hasta'], 7),
-      iTiDE: data['tipoDocumento'],
+      iTiDE: data.tipoDocumento,
       mOtEve: data['motivo'],
     };
 
@@ -361,12 +361,12 @@ class JSonEventoMainService {
   private eventosReceptorConformidad(params: any, data: any) {
     const jsonResult: any = {};
 
-    if (constanteService.eventoConformidadTipo.filter((um: any) => um.codigo === data['tipoConformidad']).length == 0) {
+    if (constanteService.complianceEventTypes.filter((um: any) => um.codigo === data['tipoConformidad']).length == 0) {
       throw new Error(
         "Tipo de Conformidad '" +
           data['tipoConformidad'] +
           "' en data.tipoConformidad no encontrado. Valores: " +
-          constanteService.eventoConformidadTipo.map((a: any) => a.codigo + '-' + a.descripcion),
+          constanteService.complianceEventTypes.map((a: any) => a.codigo + '-' + a.descripcion),
       );
     }
 
@@ -446,12 +446,12 @@ class JSonEventoMainService {
       throw new Error('El Motivo del Desconocimiento en data.motivo debe contener de [5-500] caracteres');
     }
 
-    if (constanteService.tipoReceptor.filter((um: any) => um.codigo === +data['tipoReceptor']).length == 0) {
+    if (constanteService.receptorTypes.filter((um: any) => um.codigo === +data['tipoReceptor']).length == 0) {
       throw new Error(
         "Tipo de Receptor '" +
           data['tipoReceptor'] +
           "' en data.tipoReceptor no encontrado. Valores: " +
-          constanteService.tipoReceptor.map((a: any) => a.codigo + '-' + a.descripcion),
+          constanteService.receptorTypes.map((a: any) => a.codigo + '-' + a.descripcion),
       );
     }
 
@@ -492,13 +492,13 @@ class JSonEventoMainService {
 
     if (+data['tipoReceptor'] == 2) {
       if (
-        constanteService.tiposDocumentosIdentidades.filter((um: any) => um.codigo === data['documentoTipo']).length == 0
+        constanteService.identityDocuments.filter((um: any) => um.codigo === data['documentoTipo']).length == 0
       ) {
         throw new Error(
           "Tipo de Documento '" +
             data['documentoTipo'] +
             "' en data.documentoTipo no encontrado. Valores: " +
-            constanteService.tiposDocumentosIdentidades.map((a: any) => a.codigo + '-' + a.descripcion),
+            constanteService.identityDocuments.map((a: any) => a.codigo + '-' + a.descripcion),
         );
       }
 
@@ -525,12 +525,12 @@ class JSonEventoMainService {
       throw new Error('El CDC en data.cdc debe tener 44 caracteres');
     }
 
-    if (constanteService.tipoReceptor.filter((um: any) => um.codigo === +data['tipoReceptor']).length == 0) {
+    if (constanteService.receptorTypes.filter((um: any) => um.codigo === +data['tipoReceptor']).length == 0) {
       throw new Error(
         "Tipo de Receptor '" +
           data['tipoReceptor'] +
           "' en data.tipoReceptor no encontrado. Valores: " +
-          constanteService.tipoReceptor.map((a: any) => a.codigo + '-' + a.descripcion),
+          constanteService.receptorTypes.map((a: any) => a.codigo + '-' + a.descripcion),
       );
     }
 
@@ -571,13 +571,13 @@ class JSonEventoMainService {
 
     if (+data['tipoReceptor'] == 2) {
       if (
-        constanteService.tiposDocumentosIdentidades.filter((um: any) => um.codigo === data['documentoTipo']).length == 0
+        constanteService.identityDocuments.filter((um: any) => um.codigo === data['documentoTipo']).length == 0
       ) {
         throw new Error(
           "Tipo de Documento '" +
             data['documentoTipo'] +
             "' en data.documentoTipo no encontrado. Valores: " +
-            constanteService.tiposDocumentosIdentidades.map((a: any) => a.codigo + '-' + a.descripcion),
+            constanteService.identityDocuments.map((a: any) => a.codigo + '-' + a.descripcion),
         );
       }
 
@@ -627,7 +627,7 @@ class JSonEventoMainService {
     if (!(data['pais'].length >= 3 && data['pais'].length <= 3)) {
       throw new Error('El Pais del Receptor en data.pais debe tener una longitud de 3 caracteres');
     }
-    let paisDescripcion: any = constanteService.paises.filter((pais) => pais.codigo === data['pais'])[0].descripcion;
+    let paisDescripcion: any = constanteService.countries.filter((pais) => pais.code === data['pais'])[0].description;
 
     if (!data['tipoOperacion']) {
       throw new Error('Debe especificar el Tipo de Operación en data.tipoOperacion 1-B2B, 2-B2C o 4-B2F');
@@ -719,14 +719,14 @@ class JSonEventoMainService {
     let ciudadDescripcion = null;
 
     if (data['departamento']) {
-      let objDepartamento: any = constanteService.departamentos.filter((dep) => dep.codigo === +data['departamento']);
+      let objDepartamento: any = constanteService.departments.filter((dep) => dep.code === +data['departamento']);
 
       if (objDepartamento.legth <= 0) {
         throw new Error("No se encontro el Departamento '" + data['departamento'] + "'");
       }
 
       let errorsDepDisCiu = new Array();
-      constanteService.validateDepartamentoDistritoCiudad(
+      constanteService.validateLocation(
         'data',
         +data['departamento'],
         +data['distrito'],
@@ -739,8 +739,8 @@ class JSonEventoMainService {
       }
 
       departamentoDescripcion = objDepartamento[0].descripcion;
-      distritoDescripcion = constanteService.distritos.filter((dep) => dep.codigo === +data['distrito'])[0].descripcion;
-      ciudadDescripcion = constanteService.ciudades.filter((dep) => dep.codigo === +data['ciudad'])[0].descripcion;
+      distritoDescripcion = constanteService.districts.filter((dep) => dep.code === +data['distrito'])[0].description;
+      ciudadDescripcion = constanteService.cities.filter((dep) => dep.code === +data['ciudad'])[0].description;
     }
 
     if (data['telefono']) {
@@ -791,21 +791,21 @@ class JSonEventoMainService {
 
     if (!data['contribuyente']) {
       if (
-        constanteService.tiposDocumentosReceptorInnominado.filter((um: any) => um.codigo === data['documentoTipo'])
+        constanteService.typesOfDocumentsInnominateReceptors.filter((um: any) => um.codigo === data['documentoTipo'])
           .length == 0
       ) {
         throw new Error(
           "Tipo de Documento '" +
             data['documentoTipo'] +
             "' en data.documentoTipo no encontrado. Valores: " +
-            constanteService.tiposDocumentosReceptorInnominado.map((a: any) => a.codigo + '-' + a.descripcion),
+            constanteService.typesOfDocumentsInnominateReceptors.map((a: any) => a.codigo + '-' + a.descripcion),
         );
       }
 
       jsonResult['rGEveNom']['iTipIDRec'] = data['documentoTipo'];
-      jsonResult['rGEveNom']['dDTipIDRec'] = constanteService.tiposDocumentosReceptorInnominado.filter(
+      jsonResult['rGEveNom']['dDTipIDRec'] = constanteService.typesOfDocumentsInnominateReceptors.filter(
         (um: any) => um.codigo === data['documentoTipo'],
-      )[0].descripcion;
+      )[0].description;
 
       if (data['documentoTipo'] == 9) {
         jsonResult['rGEveNom']['dDTipIDRec'] = data['documentoTipoDescripcion'];
@@ -898,13 +898,13 @@ class JSonEventoMainService {
         errorDepDisCiu = true;
       } else {
         if (
-          constanteService.ciudades.filter((ciudad: any) => ciudad.codigo === +data['entrega']['ciudad']).length == 0
+          constanteService.cities.filter((ciudad: any) => ciudad.codigo === +data['entrega']['ciudad']).length == 0
         ) {
           errors.push(
             "Ciudad '" +
               data['entrega']['ciudad'] +
               "' del Cliente en data.entrega.ciudad no encontrado. Valores: " +
-              constanteService.ciudades.map((a: any) => a.codigo + '-' + a.descripcion),
+              constanteService.cities.map((a: any) => a.codigo + '-' + a.descripcion),
           );
           errorDepDisCiu = true;
         }
@@ -912,13 +912,13 @@ class JSonEventoMainService {
         //De acuerdo a la Ciudad pasada como parametro, buscar el distrito y departamento y asignar dichos
         //valores de forma predeterminada, aunque este valor sera sobre-escrito caso el usuario envie
         //data['entrega']['distrito'] y data['entrega']['departamento']
-        let objCiudad: any = constanteService.ciudades.filter((ciu) => ciu.codigo === +data['entrega']['ciudad']);
+        let objCiudad: any = constanteService.cities.filter((ciu) => ciu.code === +data['entrega']['ciudad']);
 
         if (objCiudad && objCiudad[0]) {
-          let objDistrito: any = constanteService.distritos.filter((dis) => dis.codigo === +objCiudad[0]['distrito']);
+          let objDistrito: any = constanteService.districts.filter((dis) => dis.code === +objCiudad[0]['distrito']);
 
-          let objDepartamento: any = constanteService.departamentos.filter(
-            (dep) => dep.codigo === +objDistrito[0]['departamento'],
+          let objDepartamento: any = constanteService.departments.filter(
+            (dep) => dep.code === +objDistrito[0]['departamento'],
           );
 
           //Solo actualiza si no tiene valor
@@ -940,7 +940,7 @@ class JSonEventoMainService {
       }
 
       if (!errorDepDisCiu) {
-        constanteService.validateDepartamentoDistritoCiudad(
+        constanteService.validateLocation(
           'data.entrega',
           +data['entrega']['departamento'],
           +data['entrega']['distrito'],
@@ -989,23 +989,23 @@ class JSonEventoMainService {
 
     if (data['entrega'] && data['entrega']['departamento']) {
       jsonResult['rGeVeTr']['cDepEnt'] = data['entrega']['departamento'];
-      jsonResult['rGeVeTr']['dDesDepEnt'] = constanteService.departamentos.filter(
-        (td) => td.codigo === data['entrega']['departamento'],
-      )[0]['descripcion'];
+      jsonResult['rGeVeTr']['dDesDepEnt'] = constanteService.departments.filter(
+        (td) => td.code === data['entrega']['departamento'],
+      )[0]['description'];
     }
 
     if (data['entrega'] && data['entrega']['distrito']) {
       jsonResult['rGeVeTr']['cDisEnt'] = data['entrega']['distrito'];
-      jsonResult['rGeVeTr']['dDesDisEnt'] = constanteService.distritos.filter(
-        (td) => td.codigo === data['entrega']['distrito'],
-      )[0]['descripcion'];
+      jsonResult['rGeVeTr']['dDesDisEnt'] = constanteService.districts.filter(
+        (td) => td.code === data['entrega']['distrito'],
+      )[0]['description'];
     }
 
     if (data['entrega'] && data['entrega']['ciudad']) {
       jsonResult['rGeVeTr']['cCiuEnt'] = data['entrega']['ciudad'];
-      jsonResult['rGeVeTr']['dDesCiuEnt'] = constanteService.ciudades.filter(
-        (td) => td.codigo === data['entrega']['ciudad'],
-      )[0]['descripcion'];
+      jsonResult['rGeVeTr']['dDesCiuEnt'] = constanteService.cities.filter(
+        (td) => td.code === data['entrega']['ciudad'],
+      )[0]['description'];
     }
 
     if (data['entrega'] && data['entrega']['direccion']) {
@@ -1044,7 +1044,7 @@ class JSonEventoMainService {
         jsonResult['rGeVeTr']['dDTipIDTrans'] = data['entrega']['transportista']['documentoTipo'];
 
         if (
-          constanteService.tiposDocumentosIdentidadesTransportistas.filter(
+          constanteService.typesOfIdentityDocumentsCarriers.filter(
             (um: any) => um.codigo === +data['entrega']['transportista']['documentoTipo'],
           ).length == 0
         ) {
@@ -1052,7 +1052,7 @@ class JSonEventoMainService {
             "Tipo de Documento '" +
               data['entrega']['transportista']['documentoTipo'] +
               "' en data.entrega.transportista.documentoTipo no encontrado. Valores: " +
-              constanteService.tiposDocumentosIdentidadesTransportistas.map((a: any) => a.codigo + '-' + a.descripcion),
+              constanteService.typesOfIdentityDocumentsCarriers.map((a: any) => a.codigo + '-' + a.descripcion),
           );
         }
 
@@ -1068,16 +1068,16 @@ class JSonEventoMainService {
     if (data['motivo'] == 4) {
       if (data['entrega'] && data['entrega']['tipoTransporte']) {
         jsonResult['rGeVeTr']['iTipTrans'] = data['entrega']['tipoTransporte'];
-        jsonResult['rGeVeTr']['dDesTipTrans'] = constanteService.tiposTransportes.filter(
-          (td) => td.codigo === data['entrega']['tipoTransporte'],
-        )[0]['descripcion'];
+        jsonResult['rGeVeTr']['dDesTipTrans'] = constanteService.transportTypes.filter(
+          (td) => td.code === data['entrega']['tipoTransporte'],
+        )[0]['description'];
       }
 
       if (data['entrega'] && data['entrega']['modalidadTransporte']) {
         jsonResult['rGeVeTr']['iModTrans'] = data['entrega']['modalidadTransporte'];
-        jsonResult['rGeVeTr']['dDesModTrans'] = constanteService.modalidadesTransportes.filter(
-          (td) => td.codigo === data['entrega']['modalidadTransporte'],
-        )[0]['descripcion'];
+        jsonResult['rGeVeTr']['dDesModTrans'] = constanteService.transportModalities.filter(
+          (td) => td.code === data['entrega']['modalidadTransporte'],
+        )[0]['description'];
       }
 
       if (data['entrega'] && data['entrega']['vehiculo']['tipo']) {

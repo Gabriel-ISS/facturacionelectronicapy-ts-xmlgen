@@ -1,4 +1,4 @@
-import { XmlgenConfig } from './type.interface.';
+import { XmlGenConfig } from './type.interface';
 
 class JSonDteTotalesService {
   /**
@@ -8,8 +8,8 @@ class JSonDteTotalesService {
    * @param data
    * @param options
    */
-  public generateDatosTotales(params: any, data: any, items: any[], config: XmlgenConfig) {
-    let moneda = data['moneda'];
+  public generateDatosTotales(params: any, data: any, items: any[], config: XmlGenConfig) {
+    let moneda = data.moneda;
     if (!moneda && config.defaultValues === true) {
       moneda = 'PYG';
     }
@@ -107,7 +107,7 @@ class JSonDteTotalesService {
         }
       }
       //---
-      if (data['tipoDocumento'] == 4) {
+      if (data.tipoDocumento == 4) {
         dTotOpe += item['gValorItem']['gValorRestaItem']['dTotOpeItem'];
       }
 
@@ -142,7 +142,7 @@ class JSonDteTotalesService {
       data['tipoImpuesto'] == 4 ||
       data['tipoImpuesto'] == 5
     ) {
-      if (data['tipoDocumento'] != 4) {
+      if (data.tipoDocumento != 4) {
         dTotOpe = dSubExe + dSubExo + dSub5 + dSub10; // Suma (F002, F003, F004 y F005)
       }
     }
@@ -196,7 +196,7 @@ class JSonDteTotalesService {
     }
     //dTotOpe + dRedon + dComi;
     //Si C002 = 1, 5 o 6, entonces dTotGralOpe(F014) = F008 - F011 - F012 - F013
-    /*if (data['tipoDocumento'] == 1 || data['tipoDocumento'] == 5 || data['tipoDocumento'] == 6) {
+    /*if (data.tipoDocumento == 1 || data.tipoDocumento == 5 || data.tipoDocumento == 6) {
       dTotGralOpe = dTotOpe - dDescTotal - dAnticipo - dRedon;
     }*/
     //---
@@ -402,7 +402,7 @@ class JSonDteTotalesService {
     if (moneda != 'PYG') {
       //Si es en otra moneda que no sea PYG
       //Utiliza el Decimales en Guaranies pygDecimals
-      if (data['condicionTipoCambio'] == 1) {
+      if (data.condicionTipoCambio == 1) {
         //Por el Global
         jsonResult['dTotalGs'] = parseFloat((dTotGralOpe * data['cambio']).toFixed(config.pygDecimals));
       } else {
