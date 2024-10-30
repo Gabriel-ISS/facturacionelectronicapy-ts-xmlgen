@@ -28,7 +28,16 @@ import { UsuarioSchema } from './EDoc/usuario.schema';
 
 // TODO: BUSCAR COGIGOS INVENTADOS POR LA IA
 // TODO: VALIDAR LONGITUD DE STRINGS
+// TODO: NÚMEROS Y DECIMALES (Tabla C del manual)
 // TODO: VALIDAR FECHAS DE INICIO Y FIN
+// TODO: VALIDAR CORREOS Y NÚMEROS DE TELÉFONOS
+
+/**
+ * TODO: ASEGURARSE DE QUE TODOS LOS TRANSFORMS RETORNEN UN VALOR
+ * - agregar valores perdidos
+ * - algunas descripciones no permiten el valor "otro", que se agreguen
+ * solo en el transform
+ */
 
 // TODO: VALIDAR DATOS RELACIONADOS A TIMBRADO
 
@@ -154,6 +163,7 @@ export const EDocDataSchema = z
     transporte: TransporteSchema.optional(),
     dncp: DncpSchema.optional(),
     
+    // Oscar, esto lo dejo en tus manos
     // Campos complementarios comerciales de uso específico
     sectorEnergiaElectrica: SectorEnergiaElectricaSchema.optional(),
     sectorSeguros: SectorSegurosSchema.optional(),

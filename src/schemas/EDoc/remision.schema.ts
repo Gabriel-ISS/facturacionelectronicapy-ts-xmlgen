@@ -3,6 +3,7 @@ import { FreightResponsible } from '../../constants/freightResponsibles.constant
 import { RemissionReason } from '../../constants/remissionReasons.constants';
 import DateHelper from '../../helpers/DateHelper';
 import { enumToZodUnion } from '../../helpers/zod.helpers';
+import constantsService from '../../services/constants.service';
 
 export const RemisionSchema = z.object({
   // E501
@@ -13,7 +14,7 @@ export const RemisionSchema = z.object({
   // E502
   motivoDescripcion: z.string().optional(),
 
-  // E503, E504
+  // E503, 
   tipoResponsable: z.union(enumToZodUnion(FreightResponsible), {
     required_error: 'El tipo de responsable es requerido',
   }),
@@ -21,23 +22,37 @@ export const RemisionSchema = z.object({
   // E505
   kms: z.number({
     required_error: 'Los kilómetros estimados de recorrido son requeridos',
-  }),
+  }).min(1).max(99999).optional(),
 
   // E506
   fechaFactura: z
-    .string()
+    .coerce.date()
     .optional()
-    .refine(
+    .transform(
       (date) => {
-        if (!date) return true;
-        return DateHelper.isIsoDate(date);
-      },
-      {
-        message: 'La fecha debe estar en el formato ISO 8601',
-      },
+        if (!date) return date;
+        return DateHelper.getIsoDateString(date);
+      }
     ),
 
-  // E507
+  // E507: TODO: CÓDIGO NO ENCONTRADO
   costoFlete: z.number().optional(),
+}).transform((data, ctx) => {
+  const motive = constantsService.remissionReasons.find(
+    d => d.code = data.motivo
+  )
+
+  const responsibleType = constantsService.freightResponsibles.find(
+    d => d.code == data.tipoResponsable
+  )
+
+  return {
+    ...data,
+    motivoDescripcion: motive?.description || '',
+
+    // E504
+    descripcionTipoResponsable: responsibleType?.description || ''
+  };
 });
+
 export type Remision = z.infer<typeof RemisionSchema>;

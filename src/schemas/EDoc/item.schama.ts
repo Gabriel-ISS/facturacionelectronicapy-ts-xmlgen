@@ -1,68 +1,98 @@
 import { z } from 'zod';
 import { ItemDncpSchema } from './itemDncp.schema';
 import { SectorAutomotorSchema } from './sectorAutomotor.schema';
+import { validateNumberLength } from '../../helpers/zod.helpers';
 
 export const ItemSchema = z.object({
   // E701
   codigo: z
-    .string()
-    .min(1, { message: 'El código es requerido' })
-    .describe(
-      'Código interno de identificación de la mercadería o servicio de responsabilidad del emisor',
-    ),
+    .string({
+      required_error: 'El código es requerido'
+    })
+    .min(1)
+    .max(20, { message: 'El código no puede tener más de 20 caracteres' }),
+
+  // E702
+  partidaArancelaria: z.number().min(1000).max(9999).optional(),
+
+  // E703
+  ncm: z.number().min(100000).max(99999999).optional(),
 
   // E708
   descripcion: z
-    .string()
-    .min(1, { message: 'La descripción es requerida' })
-    .describe(
-      'Descripción del producto y/o servicio. Equivalente a nombre del producto establecido en la RG 24/2019',
-    ),
+    .string({
+      required_error: 'La descripción es requerida',
+    })
+    .min(1)
+    .max(120),
+
+  // E709: TODO: ver con mas cuidado
+  unidadMedida: z
+    .number({
+      required_error: 'La unidad de medida es requerida',
+    })
+    .min(1)
+    .max(99999),
+
+  // E711
+  cantidad: z
+    .number({
+      required_error: 'La cantidad es requerida'
+    })
+    .min(1)
+    .max(9999999999),
 
   // E714
   observacion: z
     .string()
-    .optional()
-    .describe('Información de interés acerca del ítem'),
-
-  // E702
-  partidaArancelaria: z.string().optional().describe('Partida arancelaria'),
-
-  // E703
-  ncm: z.string().optional().describe('Nomenclatura común del Mercosur (NCM)'),
-
-  // E709
-  unidadMedida: z
-    .string()
-    .min(1, { message: 'La unidad de medida es requerida' })
-    .describe('Es la unidad de medida del producto'),
-
-  // E711
-  cantidad: z
-    .number()
-    .min(1, { message: 'La cantidad es requerida' })
-    .describe('Cantidad del producto y/o servicio'),
+    .min(1)
+    .max(500)
+    .optional(),
 
   // E721
   precioUnitario: z
     .number()
-    .positive({
-      message: 'El precio unitario es requerido y debe ser positivo',
-    })
-    .describe(
-      'Precio unitario del producto y/o servicio (incluidos impuestos)',
-    ),
+    .superRefine((data, ctx) => {
+      validateNumberLength({
+        value: data,
+        min: 1,
+        max: 15,
+        maxDecimals: 8,
+        ctx,
+        fieldName: 'precioUnitario',
+      })
+    }),
 
   // E725
-  cambio: z.string().optional().describe('Tipo de cambio por ítem'),
+  cambio: z.number().optional().superRefine((data, ctx) => {
+    if (data == undefined) return;
+
+    validateNumberLength({
+      value: data,
+      min: 1,
+      max: 5,
+      maxDecimals: 4,
+      ctx,
+      fieldName: 'cambio',
+    })
+  }),
 
   // EA002
   descuento: z
     .number()
     .optional()
-    .describe(
-      'Descuento particular sobre el precio unitario por ítem (incluidos impuestos)',
-    ),
+    .superRefine((data, ctx) => {
+      if (data == undefined) return;
+
+      validateNumberLength({
+        value: data,
+        min: 1,
+        max: 15,
+        maxDecimals: 8,
+        ctx,
+        fieldName: 'descuento',
+      })
+    }),
 
   // EA006
   anticipo: z

@@ -2,13 +2,15 @@
 
 Módulo NodeJS que genera el **archivo XML** para enviar a la **SET** _(Subsecretaria de Estado de Tributación del Ministerio de Hacienda)_ para el proceso y generación del documento electrónico, a partir de una estructura de datos en formato JSON.
 
-Versión del Manual Técnico: **150**
+Versión del Manual Técnico: **150**.
+
+Basado en la [documentación técnica de e-kuatia](https://www.dnit.gov.py/web/e-kuatia/documentacion-tecnica)
 
 Este paquete pretende servir de **modelo de transferencia estandarizado** para la **comunicación** con la **SET** contemplando la totalidad de los campos exigidos para cada bloque y tipos de documentos electrónicos.
 
 El mismo es utilizado y mantenido por el autor y otorgado a la comunidad de desarrolladores de forma gratuita bajo licencia **MIT**
 
-El módulo está preparado de forma a proveer una fácil integración dentro de su entorno **NodeJS** y para con cualquier otro lenguaje, sistema o librería que requiera, por ejemplo publicando el médoto desde un REST.
+El módulo está preparado de forma a proveer una fácil integración dentro de su entorno **NodeJS** y con cualquier otro lenguaje, sistema o librería que lo requiera, por ejemplo publicando el médoto desde un REST.
 
 ## Características
 - Genera el CDC automáticamente de acuerdo a los datos del documento electrónico
@@ -28,20 +30,6 @@ El método requiere 2 argumentos tipo **JSON** para general el XML. El primero e
 La promesa devuelve el documento XML con los datos generados.
 
 Ejemplos de Uso:
-
-Javascript:
-``` js
-  const xmlgen = require('facturacionelectronicapy-xmlgen');
-  //O const xmlgen = require('facturacionelectronicapy-xmlgen').default;
-  
-  xmlgen.generateXMLDE(params, data, options).then(xml => {
-      console.log(xml);
-  }).catch(error => {
-      console.log(error);
-  });     
-```
-
-TypeScript:
 ``` ts
   import xmlgen from 'facturacionelectronicapy-xmlgen';
 
@@ -497,19 +485,6 @@ El segundo parámetro `data` debe ser pasado en el siguiente formato, dependiend
 ```
 
 Ejemplos de Uso de invocación de evento de Cancelación:
-
-Javascript:
-``` js
-  const xmlgen = require('facturacionelectronicapy-xmlgen');
-  // O const xmlgen = require('facturacionelectronicapy-xmlgen').default;
-  
-  xmlgen.generateXMLEventoCancelacion(id, params, data).then(xml => {
-      console.log(xml);
-  }).catch(error => {
-      console.log(error);
-  });
-```
-
 TypeScript:
 ``` ts
   import xmlgen from 'facturacionelectronicapy-xmlgen';
@@ -532,30 +507,9 @@ generateXMLEventoDesconocimiento(id, params, data);
 
 generateXMLEventoNotificacion(id, params, data);
 
-
-## Serie Técnica sobre Facturación Electrónica - YouTube
-
-Para más información sobre el proceso que llevó a la generación de éste módulo visite la lista de reproducción "Serie técnica sobre Facturación Electrónica" en el canal de youtube del autor  https://www.youtube.com/channel/UC05xmdC5i3Ob7XnYbQDiBTQ
-
-
-## Todos los proyectos
-[Generación de XML](https://www.npmjs.com/package/facturacionelectronicapy-xmlgen)<br/>
+## Proyectos relacionados
+[Generación de XML (proyecto original)](https://www.npmjs.com/package/facturacionelectronicapy-xmlgen)<br/>
 [Firma de XML](https://www.npmjs.com/package/facturacionelectronicapy-xmlsign)<br/>
 [Generación de QR](https://www.npmjs.com/package/facturacionelectronicapy-qrgen)<br/>
 [API de la SET](https://www.npmjs.com/package/facturacionelectronicapy-setapi)<br/>
 [Generación KUDE](https://www.npmjs.com/package/facturacionelectronicapy-kude)<br/>
-
-
-## Empresas que utilizan éstos proyectos
-[FacturaSend](https://www.facturasend.com.py/)<br/>
-[JHF Ingeniería Informática](https://jhf.com.py/)<br/>
-[JR Ingeniería y Servicios](https://jringenieriayservicios.com/)<br/>
-[Datamex](https://www.datamex.com.py/)<br/>
-[Factupar](https://factupar.com.py/)<br/>
-[Globe Informatica](https://globeinformatica.com.py/)<br/>
-[FZ Sistemas de Gestion](https://fz-gestion.com.py/)<br/>
-
-
-* * * *
-
-Todos los derechos reservados - 2021
