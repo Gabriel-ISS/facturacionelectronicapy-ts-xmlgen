@@ -7,11 +7,11 @@ export enum ComplianceEventType {
 
 export const complianceEventTypes: BasicData<ComplianceEventType>[] = [
   {
-    code: ComplianceEventType.CONFORMIDAD_TOTAL_DEL_DTE,
+    id: ComplianceEventType.CONFORMIDAD_TOTAL_DEL_DTE,
     description: 'Conformidad Total del DTE',
   },
   {
-    code: ComplianceEventType.CONFORMIDAD_PARCIAL_DEL_DTE,
+    id: ComplianceEventType.CONFORMIDAD_PARCIAL_DEL_DTE,
     description: 'Conformidad Parcial del DTE',
   },
 ];

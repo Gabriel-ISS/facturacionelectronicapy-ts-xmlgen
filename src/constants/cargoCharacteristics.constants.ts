@@ -8,15 +8,15 @@ export enum CargoCharacteristic {
 
 export const cargoCharacteristics: BasicData<CargoCharacteristic>[] = [
   {
-    code: CargoCharacteristic.MERCADERIA_CON_CADENA_DE_FRIO,
+    id: CargoCharacteristic.MERCADERIA_CON_CADENA_DE_FRIO,
     description: 'Mercadería con cadena de frio',
   },
   {
-    code: CargoCharacteristic.CARGA_PELIGROSA,
+    id: CargoCharacteristic.CARGA_PELIGROSA,
     description: 'Carga peligrosa',
   },
   {
-    code: CargoCharacteristic.OTRO,
+    id: CargoCharacteristic.OTRO,
     description: 'Otro',
   },
 ];

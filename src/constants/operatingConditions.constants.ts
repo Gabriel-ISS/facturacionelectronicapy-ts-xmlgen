@@ -7,11 +7,11 @@ export enum OperatingCondition {
 
 export const operatingConditions: BasicData<OperatingCondition>[] = [
   {
-    code: OperatingCondition.CONTADO,
+    id: OperatingCondition.CONTADO,
     description: 'Contado',
   },
   {
-    code: OperatingCondition.CREDITO,
+    id: OperatingCondition.CREDITO,
     description: 'Crédito',
   },
 ];

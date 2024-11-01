@@ -10,27 +10,27 @@ export enum TaxType {
 
 export const taxTypes: DataWithState<TaxType>[] = [
   {
-    code: TaxType.IVA,
+    id: TaxType.IVA,
     description: 'IVA',
     state: 0,
   },
   {
-    code: TaxType.ISC,
+    id: TaxType.ISC,
     description: 'ISC',
     state: 1,
   },
   {
-    code: TaxType.RENTA,
+    id: TaxType.RENTA,
     description: 'Renta',
     state: 1,
   },
   {
-    code: TaxType.NINGUNO,
+    id: TaxType.NINGUNO,
     description: 'Ninguno',
     state: 0,
   },
   {
-    code: TaxType.IVA___RENTA,
+    id: TaxType.IVA___RENTA,
     description: 'IVA - Renta',
     state: 0,
   },

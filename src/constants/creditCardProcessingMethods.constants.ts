@@ -8,15 +8,15 @@ export enum CreditCardProcessingMethod {
 
 export const creditCardProcessingMethods: BasicData<CreditCardProcessingMethod>[] = [
   {
-    code: CreditCardProcessingMethod.POS,
+    id: CreditCardProcessingMethod.POS,
     description: 'POS',
   },
   {
-    code: CreditCardProcessingMethod.PAGO_ELECTRONICO,
+    id: CreditCardProcessingMethod.PAGO_ELECTRONICO,
     description: 'Pago Electrónico',
   },
   {
-    code: CreditCardProcessingMethod.OTRO,
+    id: CreditCardProcessingMethod.OTRO,
     description: 'Otro',
   },
 ];

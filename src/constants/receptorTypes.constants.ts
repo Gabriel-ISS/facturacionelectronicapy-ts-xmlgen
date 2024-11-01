@@ -7,11 +7,11 @@ export enum Receptor {
 
 export const receptorTypes: BasicData<Receptor>[] = [
   {
-    code: Receptor.CONTRIBUYENTE,
+    id: Receptor.CONTRIBUYENTE,
     description: 'Contribuyente',
   },
   {
-    code: Receptor.NO_CONTRIBUYENTE,
+    id: Receptor.NO_CONTRIBUYENTE,
     description: 'No Contribuyente',
   },
 ];

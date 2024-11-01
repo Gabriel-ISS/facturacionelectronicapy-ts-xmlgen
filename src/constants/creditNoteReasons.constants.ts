@@ -13,35 +13,35 @@ export enum CreditNoteReason {
 
 export const creditNoteReasons: BasicData<CreditNoteReason>[] = [
   {
-    code: CreditNoteReason.DEVOLUCION_Y_AJUSTE_DE_PRECIOS,
+    id: CreditNoteReason.DEVOLUCION_Y_AJUSTE_DE_PRECIOS,
     description: 'Devolución y Ajuste de precios',
   },
   {
-    code: CreditNoteReason.DEVOLUCION,
+    id: CreditNoteReason.DEVOLUCION,
     description: 'Devolución',
   },
   {
-    code: CreditNoteReason.DESCUENTO,
+    id: CreditNoteReason.DESCUENTO,
     description: 'Descuento',
   },
   {
-    code: CreditNoteReason.BONIFICACION,
+    id: CreditNoteReason.BONIFICACION,
     description: 'Bonificación',
   },
   {
-    code: CreditNoteReason.CREDITO_INCOBRABLE,
+    id: CreditNoteReason.CREDITO_INCOBRABLE,
     description: 'Crédito incobrable',
   },
   {
-    code: CreditNoteReason.RECUPERO_DE_COSTO,
+    id: CreditNoteReason.RECUPERO_DE_COSTO,
     description: 'Recupero de costo',
   },
   {
-    code: CreditNoteReason.RECUPERO_DE_GASTO,
+    id: CreditNoteReason.RECUPERO_DE_GASTO,
     description: 'Recupero de gasto',
   },
   {
-    code: CreditNoteReason.AJUSTE_DE_PRECIO,
+    id: CreditNoteReason.AJUSTE_DE_PRECIO,
     description: 'Ajuste de precio',
   },
 ];

@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { CargoCharacteristic } from '../../constants/cargoCharacteristics.constants';
 import { MeasurementUnit } from '../../constants/measurementUnits.constants';
-import { enumToZodUnion } from '../../helpers/zod.helpers';
+import { enumToZodUnion, validateNumberLength } from '../../helpers/zod.helpers';
 
 export const CargaSchema = z
   .object({
@@ -11,7 +11,15 @@ export const CargaSchema = z
       .optional(),
 
     // G053
-    volumenTotal: z.number().optional(),
+    volumenTotal: z.number().optional().superRefine((data, ctx) => {
+      if (data == undefined) return;
+      validateNumberLength({
+        value: data,
+        fieldName: 'volumenTotal',
+        max: 20,
+        ctx,
+      })
+    }),
 
     // G054
     unidadMedidaPesoTotal: z.union(enumToZodUnion(MeasurementUnit)).optional(),

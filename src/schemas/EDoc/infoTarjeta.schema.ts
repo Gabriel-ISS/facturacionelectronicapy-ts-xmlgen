@@ -45,7 +45,7 @@ export const InfoTarjetaSchema = z
       }
     } else {
       const foundCreditCard = constantsService.creditCards.find(
-        (d) => d.code == data.tipo,
+        (d) => d.id == data.tipo,
       );
 
       data.tipoDescripcion = foundCreditCard?.description;

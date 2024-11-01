@@ -39,11 +39,11 @@ export const RemisionSchema = z.object({
   costoFlete: z.number().optional(),
 }).transform((data, ctx) => {
   const motive = constantsService.remissionReasons.find(
-    d => d.code = data.motivo
+    d => d.id = data.motivo
   )
 
   const responsibleType = constantsService.freightResponsibles.find(
-    d => d.code == data.tipoResponsable
+    d => d.id == data.tipoResponsable
   )
 
   return {

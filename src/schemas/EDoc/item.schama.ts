@@ -1,222 +1,299 @@
 import { z } from 'zod';
 import { ItemDncpSchema } from './itemDncp.schema';
 import { SectorAutomotorSchema } from './sectorAutomotor.schema';
-import { validateNumberLength } from '../../helpers/zod.helpers';
+import {
+  enumToZodEnum,
+  enumToZodUnion,
+  validateNumberLength,
+} from '../../helpers/zod.helpers';
+import constantsService from '../../services/constants.service';
+import dbService from '../../services/db.service';
+import { Country } from '../../constants/countries.constants';
+import { MerchandiseRelevance } from '../../constants/merchandiseRelevances.constants';
+import { TaxTreatment } from '../../constants/taxTreatments.constants';
+import { TaxRate } from './taxRate.constants';
+import DateHelper from '../../helpers/DateHelper';
 
-export const ItemSchema = z.object({
-  // E701
-  codigo: z
-    .string({
-      required_error: 'El código es requerido'
-    })
-    .min(1)
-    .max(20, { message: 'El código no puede tener más de 20 caracteres' }),
+export const ItemSchema = z
+  .object({
+    // E701
+    codigo: z
+      .string({
+        required_error: 'El código es requerido',
+      })
+      .min(1)
+      .max(20, { message: 'El código no puede tener más de 20 caracteres' }),
 
-  // E702
-  partidaArancelaria: z.number().min(1000).max(9999).optional(),
+    // E702
+    partidaArancelaria: z.number().min(1000).max(9999).optional(),
 
-  // E703
-  ncm: z.number().min(100000).max(99999999).optional(),
+    // E703
+    ncm: z.number().min(100000).max(99999999).optional(),
 
-  // E708
-  descripcion: z
-    .string({
-      required_error: 'La descripción es requerida',
-    })
-    .min(1)
-    .max(120),
+    // E708
+    descripcion: z
+      .string({
+        required_error: 'La descripción es requerida',
+      })
+      .min(1)
+      .max(120),
 
-  // E709: TODO: ver con mas cuidado
-  unidadMedida: z
-    .number({
-      required_error: 'La unidad de medida es requerida',
-    })
-    .min(1)
-    .max(99999),
+    // E709: TODO: ver con mas cuidado
+    unidadMedida: z
+      .number({
+        required_error: 'La unidad de medida es requerida',
+      })
+      .min(1)
+      .max(99999),
 
-  // E711
-  cantidad: z
-    .number({
-      required_error: 'La cantidad es requerida'
-    })
-    .min(1)
-    .max(9999999999),
+    // E711
+    cantidad: z
+      .number({
+        required_error: 'La cantidad es requerida',
+      })
+      .min(1)
+      .max(9999999999),
 
-  // E714
-  observacion: z
-    .string()
-    .min(1)
-    .max(500)
-    .optional(),
+    // E714
+    observacion: z.string().min(1).max(500).optional(),
 
-  // E721
-  precioUnitario: z
-    .number()
-    .superRefine((data, ctx) => {
+    // E721
+    precioUnitario: z.number().superRefine((data, ctx) => {
       validateNumberLength({
         value: data,
-        min: 1,
         max: 15,
         maxDecimals: 8,
         ctx,
         fieldName: 'precioUnitario',
-      })
+      });
     }),
 
-  // E725
-  cambio: z.number().optional().superRefine((data, ctx) => {
-    if (data == undefined) return;
+    // E725
+    cambio: z
+      .number()
+      .optional()
+      .superRefine((data, ctx) => {
+        if (data == undefined) return;
 
-    validateNumberLength({
-      value: data,
-      min: 1,
-      max: 5,
-      maxDecimals: 4,
-      ctx,
-      fieldName: 'cambio',
-    })
-  }),
+        validateNumberLength({
+          value: data,
+          max: 5,
+          maxDecimals: 4,
+          ctx,
+          fieldName: 'cambio',
+        });
+      }),
 
-  // EA002
-  descuento: z
-    .number()
-    .optional()
-    .superRefine((data, ctx) => {
+    // EA002
+    descuento: z
+      .number()
+      .optional()
+      .superRefine((data, ctx) => {
+        if (data == undefined) return;
+
+        validateNumberLength({
+          value: data,
+          max: 15,
+          maxDecimals: 8,
+          ctx,
+          fieldName: 'descuento',
+        });
+      }),
+
+    // EA006
+    anticipo: z
+      .number()
+      .optional()
+      .superRefine((data, ctx) => {
+        if (data == undefined) return;
+        validateNumberLength({
+          value: data,
+          max: 15,
+          maxDecimals: 8,
+          ctx,
+          fieldName: 'anticipo',
+        });
+      }),
+
+    // E712
+    pais: z.enum(enumToZodEnum<typeof Country, Country>(Country)).optional(),
+
+    // E713
+    paisDescripcion: z.string().optional(),
+
+    // E715
+    tolerancia: z.union(enumToZodUnion(MerchandiseRelevance)).optional(),
+
+    // E717
+    toleranciaCantidad: z
+      .number()
+      .optional()
+      .superRefine((data, ctx) => {
+        if (data == undefined) return;
+        validateNumberLength({
+          value: data,
+          max: 10,
+          maxDecimals: 4,
+          ctx,
+          fieldName: 'toleranciaCantidad',
+        });
+      }),
+
+    // E718
+    toleranciaPorcentaje: z
+      .number()
+      .optional()
+      .superRefine((data, ctx) => {
+        if (data == undefined) return;
+        validateNumberLength({
+          value: data,
+          max: 3,
+          maxDecimals: 8,
+          ctx,
+          fieldName: 'toleranciaPorcentaje',
+        });
+      }),
+
+    // E719: TODO: A ARTIR DE AQUI VOLVER EN REVERSA PARA VERIFICAR LOS VALORES QUE DEPENDEN DE VALORES GLOBALES
+    cdcAnticipo: z.string().length(44).optional(),
+
+    // E731
+    ivaTipo: z.union(enumToZodUnion(TaxTreatment), {
+      required_error: 'El tipo de IVA es requerido',
+    }),
+
+    // E734
+    iva: z.union(enumToZodUnion(TaxRate), {
+      required_error: 'La tasa del IVA es requerida',
+    }),
+
+    // E735
+    ivaBase: z.number().superRefine((data, ctx) => {
       if (data == undefined) return;
-
       validateNumberLength({
         value: data,
-        min: 1,
         max: 15,
         maxDecimals: 8,
         ctx,
-        fieldName: 'descuento',
-      })
+        fieldName: 'ivaBase',
+      });
     }),
 
-  // EA006
-  anticipo: z
-    .number()
-    .optional()
-    .describe(
-      'Anticipo particular sobre el precio unitario por ítem (incluidos impuestos)',
-    ),
+    // E751
+    lote: z
+      .string()
+      .min(1)
+      .max(80, {
+        message:
+          'El número de lote debe tener una longitud máxima de 80 caracteres',
+      })
+      .optional()
+      .describe('Número de Lote del producto'),
 
-  // E712
-  pais: z
-    .string()
-    .optional()
-    .describe('Código del país de origen del producto'),
+    // E752
+    vencimiento: z.coerce
+      .date()
+      .optional()
+      .transform((value) => {
+        if (!value) return value;
+        return DateHelper.getIsoDateString(value);
+      }),
 
-  // E713
-  paisDescripcion: z
-    .string()
-    .optional()
-    .describe('Nombre del país de origen del producto'),
+    // E753
+    numeroSerie: z
+      .string()
+      .min(1)
+      .max(10, {
+        message:
+          'El número de serie debe tener una longitud máxima de 10 caracteres',
+      })
+      .optional(),
 
-  // E715
-  tolerancia: z
-    .enum(['1', '2'])
-    .optional()
-    .describe(
-      'Código de tolerancia de merma de los productos. 1=Tolerancia de quiebra, 2= Tolerancia de merma',
-    ),
+    // E754
+    numeroPedido: z.string().min(1).max(20).optional(),
 
-  // E717
-  toleranciaCantidad: z
-    .number()
-    .optional()
-    .describe(
-      'Cantidad de quiebra o merma. Obligatorio si se envía la tolerancia',
-    ),
+    // E755
+    numeroSeguimiento: z.string().min(1).max(20).optional(),
 
-  // E718
-  toleranciaPorcentaje: z
-    .number()
-    .optional()
-    .describe(
-      'Porcentaje de quiebra o merma. Obligatorio si se envía la tolerancia',
-    ),
+    // E759
+    registroSenave: z.string().length(20).optional(),
 
-  // E719
-  cdcAnticipo: z.string().optional().describe('CDC del anticipo'),
+    // E760
+    registroEntidadComercial: z
+      .string()
+      .length(20)
+      .optional(),
 
-  // E731
-  ivaTipo: z
-    .enum(['1', '2', '3', '4'], {
-      required_error: 'El tipo de IVA es requerido',
-    })
-    .describe(
-      'Forma de afectación tributaria del IVA. 1= Gravado IVA, 2= Exonerado, 3= Exento, 4= Gravado parcial',
-    ),
 
-  // E735
-  ivaBase: z
-    .number()
-    .positive({
-      message: 'La base gravada del IVA es requerida y debe ser positiva',
-    })
-    .describe('Base gravada del IVA por ítem'),
+    // E761: TODO: OTRO DESAPARECIDO
+    /* nombreProducto: z
+      .string()
+      .optional()
+      .describe('Obligados por el Art. 1 de la RG N° 106/2021 – Agroquímicos'), */
 
-  // E734
-  iva: z
-    .enum(['0', '5', '10'], {
-      required_error: 'La tasa del IVA es requerida',
-    })
-    .describe('Tasa del IVA. Posibles valores = 0, 5 o 10'),
-  // E751
-  lote: z
-    .string()
-    .max(80, {
-      message:
-        'El número de lote debe tener una longitud máxima de 80 caracteres',
-    })
-    .optional()
-    .describe('Número de Lote del producto'),
+    // E762: ES BROMA? EL MANUAL SOLO LO MENCIONA EN UNA OBSERVACIÓN
+    dncp: ItemDncpSchema.optional(),
 
-  // E752
-  vencimiento: z
-    .string()
-    .optional()
-    .describe('Fecha de vencimiento del producto. Formato AAAA-MM-DD'),
+    sectorAutomotor: SectorAutomotorSchema.optional(),
+  })
+  .transform((data, ctx) => {
+    if (data.pais) {
+      const foundCountry = dbService.select('countries').findById(data.pais);
 
-  // E753
-  numeroSerie: z
-    .string()
-    .max(10, {
-      message:
-        'El número de serie debe tener una longitud máxima de 10 caracteres',
-    })
-    .optional()
-    .describe('Número de serie'),
+      data.paisDescripcion = foundCountry?.description;
 
-  // E754
-  numeroPedido: z.string().optional().describe('Número de pedido'),
+      if (!foundCountry) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'El pais no es válido',
+          path: ['pais'],
+        });
+      }
+    }
 
-  // E755
-  numeroSeguimiento: z
-    .string()
-    .optional()
-    .describe('Número de seguimiento del envío'),
+    if (data.tolerancia) {
+      if (!data.toleranciaCantidad) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Debe indicar la cantidad de quiebra o merma',
+          path: ['toleranciaCantidad'],
+        });
+      }
 
-  // E760
-  registroEntidadComercial: z
-    .string()
-    .optional()
-    .describe('Número de registro de entidad comercial otorgado por el SENAVE'),
+      if (!data.toleranciaPorcentaje) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Debe indicar el porcentaje de quiebra o merma',
+          path: ['toleranciaPorcentaje'],
+        });
+      }
+    }
 
-  // E759
-  registroSenave: z.string(),
+    if (
+      (data.ivaTipo == TaxTreatment.GRAVADO_IVA ||
+        data.ivaTipo == TaxTreatment.GRAVADO_PARCIAL__GRAV__EXENTO_) &&
+      data.iva != TaxRate.CINCO &&
+      data.iva != TaxRate.DIEZ
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'El IVA debe ser cinco o diez',
+        path: ['iva'],
+      });
+    }
 
-  // E761
-  nombreProducto: z
-    .string()
-    .optional()
-    .describe('Obligados por el Art. 1 de la RG N° 106/2021 – Agroquímicos'),
+    if (
+      (data.ivaTipo == TaxTreatment.EXENTO ||
+        data.ivaTipo == TaxTreatment.EXONERADO__ART__100___LEY_6380_2019_) &&
+      data.iva != TaxRate.CERO
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'El IVA debe ser cero',
+        path: ['iva'],
+      });
+    }
 
-  // E762
-  dncp: ItemDncpSchema.optional(),
-
-  sectorAutomotor: SectorAutomotorSchema.optional(),
-});
+    return data;
+  });
 export type Item = z.infer<typeof ItemSchema>;

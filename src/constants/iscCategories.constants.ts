@@ -10,23 +10,23 @@ export enum IscCategory {
 
 export const iscCategories: BasicData<IscCategory>[] = [
   {
-    code: IscCategory.SECCION_I____CIGARRILLOS__TABACOS__ESENCIAS_Y_OTROS_DERIVADOS_DEL_TABACO_,
+    id: IscCategory.SECCION_I____CIGARRILLOS__TABACOS__ESENCIAS_Y_OTROS_DERIVADOS_DEL_TABACO_,
     description: 'Sección I - (Cigarrillos, Tabacos, Esencias y Otros derivados del Tabaco)',
   },
   {
-    code: IscCategory.SECCION_II____BEBIDAS_CON_Y_SIN_ALCOHOL_,
+    id: IscCategory.SECCION_II____BEBIDAS_CON_Y_SIN_ALCOHOL_,
     description: 'Sección II - (Bebidas con y sin alcohol)',
   },
   {
-    code: IscCategory.SECCION_III____ALCOHOLES_Y_DERIVADOS_DEL_ALCOHOL_,
+    id: IscCategory.SECCION_III____ALCOHOLES_Y_DERIVADOS_DEL_ALCOHOL_,
     description: 'Sección III - (Alcoholes y Derivados del alcohol)',
   },
   {
-    code: IscCategory.SECCION_IV___COMBUSTIBLES_,
+    id: IscCategory.SECCION_IV___COMBUSTIBLES_,
     description: 'Sección IV- (Combustibles)',
   },
   {
-    code: IscCategory.SECCION_V___ARTICULOS_CONSIDERADOS_DE_LUJO_,
+    id: IscCategory.SECCION_V___ARTICULOS_CONSIDERADOS_DE_LUJO_,
     description: 'Sección V- (Artículos considerados de lujo)',
   },
 ];

@@ -81,11 +81,11 @@ class GenericValidator {
     return isValid;
   }
 
-  oneOf<T extends string | number>(validValues: { code: T; description: string }[], value: T, error: string): boolean {
-    const foundValue = validValues.find((v) => v.code === value);
+  oneOf<T extends string | number>(validValues: { id: T; description: string }[], value: T, error: string): boolean {
+    const foundValue = validValues.find((v) => v.id === value);
     const isValid = !!foundValue;
     if (!isValid) {
-      const validValuesStr = validValues.map(({ code, description }) => `${code} - ${description}`).join(', \n');
+      const validValuesStr = validValues.map(({ id, description }) => `${id} - ${description}`).join(', \n');
       let err = error;
       err = this.replace('$value', value, err);
       err = this.replace('$validValues', validValuesStr, err);
@@ -165,10 +165,10 @@ class EDocumentMainValidateService {
   public validateValues(params: EDocumentParams, data: EDocumentData, config: XmlGenConfig) {
     this.validator.clearErrors();
 
-    const documentTypeFound = constanteService.documentTypes.find((dt) => dt.code == data.tipoDocumento);
+    const documentTypeFound = constanteService.documentTypes.find((dt) => dt.id == data.tipoDocumento);
 
     if (!documentTypeFound) {
-      const validDocumentTypes = constanteService.documentTypes.map((a) => a.code + '-' + a.description);
+      const validDocumentTypes = constanteService.documentTypes.map((a) => a.id + '-' + a.description);
       this.validator.errors.push(
         `Tipo de Documento '${data.tipoDocumento}' en data.tipoDocumento no válido. Valores: ${validDocumentTypes}`,
       );
@@ -480,12 +480,12 @@ class EDocumentMainValidateService {
       this.validator.errors.push('RUC debe contener dígito verificador en params.ruc');
     }*/
 
-    if (constanteService.emissionTypes.filter((um) => um.code === data.tipoEmision).length == 0) {
+    if (constanteService.emissionTypes.filter((um) => um.id === data.tipoEmision).length == 0) {
       this.validator.errors.push(
         "Tipo de Emisión '" +
           data.tipoEmision +
           "' en data.tipoEmision no válido. Valores: " +
-          constanteService.emissionTypes.map((a) => a.code + '-' + a.description),
+          constanteService.emissionTypes.map((a) => a.id + '-' + a.description),
       );
     }
 
@@ -529,12 +529,12 @@ class EDocumentMainValidateService {
     if (!data['tipoImpuesto']) {
       this.validator.errors.push('Debe especificar el Tipo de Impuesto en data.tipoImpuesto');
     } else {
-      if (constanteService.taxTypes.filter((um) => um.code === +data['tipoImpuesto']).length == 0) {
+      if (constanteService.taxTypes.filter((um) => um.id === +data['tipoImpuesto']).length == 0) {
         this.validator.errors.push(
           "Tipo de Impuesto '" +
             data['tipoImpuesto'] +
             "' en data.tipoImpuesto no válido. Valores: " +
-            constanteService.taxTypes.map((a) => a.code + '-' + a.description),
+            constanteService.taxTypes.map((a) => a.id + '-' + a.description),
         );
       }
     }
@@ -544,34 +544,34 @@ class EDocumentMainValidateService {
       moneda = 'PYG';
     }
 
-    if (constanteService.currencies.filter((um) => um.code === moneda).length == 0) {
+    if (constanteService.currencies.filter((um) => um.id === moneda).length == 0) {
       this.validator.errors.push(
         "Moneda '" +
           moneda +
           "' en data.moneda no válido. Valores: " +
-          constanteService.currencies.map((a) => a.code + '-' + a.description),
+          constanteService.currencies.map((a) => a.id + '-' + a.description),
       );
     }
 
     if (data['condicionAnticipo']) {
-      if (constanteService.advancePaymentConditions.filter((um) => um.code === data['condicionAnticipo']).length == 0) {
+      if (constanteService.advancePaymentConditions.filter((um) => um.id === data['condicionAnticipo']).length == 0) {
         this.validator.errors.push(
           "Condición de Anticipo '" +
             data['condicionAnticipo'] +
             "' en data.condicionAnticipo no válido. Valores: " +
-            constanteService.advancePaymentConditions.map((a) => a.code + '-Anticipo ' + a.description),
+            constanteService.advancePaymentConditions.map((a) => a.id + '-Anticipo ' + a.description),
         );
       }
     } else {
       //condicionAnticipo - si no tiene condicion anticipo, pero tipo transaccion es 9, que de un error.
     }
 
-    if (constanteService.transactionTypes.filter((um) => um.code === data['tipoTransaccion']).length == 0) {
+    if (constanteService.transactionTypes.filter((um) => um.id === data['tipoTransaccion']).length == 0) {
       this.validator.errors.push(
         "Tipo de Transacción '" +
           data['tipoTransaccion'] +
           "' en data.tipoTransaccion no válido. Valores: " +
-          constanteService.transactionTypes.map((a) => a.code + '-' + a.description),
+          constanteService.transactionTypes.map((a) => a.id + '-' + a.description),
       );
     }
 
@@ -605,14 +605,14 @@ class EDocumentMainValidateService {
             this.validator.errors.push('No fue especificado un código en data.obligaciones[' + i + '].codigo');
           } else {
             //Verificar cada item
-            if (constanteService.obligations.filter((um) => um.code === +obligacion.codigo).length == 0) {
+            if (constanteService.obligations.filter((um) => um.id === +obligacion.codigo).length == 0) {
               this.validator.errors.push(
                 "Obligación '" +
                   obligacion.codigo +
                   "' en data.obligaciones[" +
                   i +
                   '].codigo no válido. Valores: ' +
-                  constanteService.obligations.map((a) => a.code + '-' + a.description),
+                  constanteService.obligations.map((a) => a.id + '-' + a.description),
               );
             }
           }
@@ -956,13 +956,13 @@ class EDocumentMainValidateService {
         //De acuerdo a la Ciudad pasada como parametro, buscar el distrito y departamento y asignar dichos
         //valores de forma predeterminada, aunque este valor sera sobre-escrito caso el usuario envie
         //data['cliente']['distrito'] y data['cliente']['departamento']
-        let objCiudad: any = constanteService.cities.filter((ciu) => ciu.code === +data['cliente']['ciudad']);
+        let objCiudad: any = constanteService.cities.filter((ciu) => ciu.id === +data['cliente']['ciudad']);
 
         if (objCiudad && objCiudad[0]) {
-          let objDistrito: any = constanteService.districts.filter((dis) => dis.code === +objCiudad[0]['distrito']);
+          let objDistrito: any = constanteService.districts.filter((dis) => dis.id === +objCiudad[0]['distrito']);
 
           let objDepartamento: any = constanteService.departments.filter(
-            (dep) => dep.code === +objDistrito[0]['departamento'],
+            (dep) => dep.id === +objDistrito[0]['departamento'],
           );
 
           data['cliente']['distrito'] = objDistrito[0]['codigo'];
@@ -1290,13 +1290,13 @@ class EDocumentMainValidateService {
       //De acuerdo a la Ciudad pasada como parametro, buscar el distrito y departamento y asignar dichos
       //valores de forma predeterminada, aunque este valor sera sobre-escrito caso el usuario envie
       //data['autoFactura']['ciudad']['distrito'] y data['autoFactura']['ciudad']['departamento']
-      let objCiudad: any = constanteService.cities.filter((ciu) => ciu.code === +data['autoFactura']['ciudad']);
+      let objCiudad: any = constanteService.cities.filter((ciu) => ciu.id === +data['autoFactura']['ciudad']);
 
       if (objCiudad && objCiudad[0]) {
-        let objDistrito: any = constanteService.districts.filter((dis) => dis.code === +objCiudad[0]['distrito']);
+        let objDistrito: any = constanteService.districts.filter((dis) => dis.id === +objCiudad[0]['distrito']);
 
         let objDepartamento: any = constanteService.departments.filter(
-          (dep) => dep.code === +objDistrito[0]['departamento'],
+          (dep) => dep.id === +objDistrito[0]['departamento'],
         );
 
         //Solo actualiza si no tiene valor
@@ -1340,14 +1340,14 @@ class EDocumentMainValidateService {
       //valores de forma predeterminada, aunque este valor sera sobre-escrito caso el usuario envie
       //data['autoFactura']['ubicacion']['ciudad']['distrito'] y data['autoFactura']['ubicacion']['ciudad']['departamento']
       let objCiudad: any = constanteService.cities.filter(
-        (ciu) => ciu.code === +data['autoFactura']['ubicacion']['ciudad'],
+        (ciu) => ciu.id === +data['autoFactura']['ubicacion']['ciudad'],
       );
 
       if (objCiudad && objCiudad[0]) {
-        let objDistrito: any = constanteService.districts.filter((dis) => dis.code === +objCiudad[0]['distrito']);
+        let objDistrito: any = constanteService.districts.filter((dis) => dis.id === +objCiudad[0]['distrito']);
 
         let objDepartamento: any = constanteService.departments.filter(
-          (dep) => dep.code === +objDistrito[0]['departamento'],
+          (dep) => dep.id === +objDistrito[0]['departamento'],
         );
 
         //Solo actualiza si no tiene valor
@@ -1646,12 +1646,12 @@ class EDocumentMainValidateService {
           this.validator.errors.push('Moneda es obligatorio en data.condicion.entregas[' + i + '].moneda');
         }
 
-        if (constanteService.currencies.filter((um) => um.code === dataEntrega['moneda']).length == 0) {
+        if (constanteService.currencies.filter((um) => um.id === dataEntrega['moneda']).length == 0) {
           this.validator.errors.push("Moneda '" + dataEntrega['moneda']) +
             "' data.condicion.entregas[" +
             i +
             '].moneda no válido. Valores: ' +
-            constanteService.currencies.map((a) => a.code + '-' + a.description);
+            constanteService.currencies.map((a) => a.id + '-' + a.description);
         }
 
         //Verificar si el Pago es con Tarjeta de crédito
@@ -2160,22 +2160,22 @@ class EDocumentMainValidateService {
       }
     }
 
-    if (constanteService.transportTypes.filter((um) => um.code === data.detalleTransporte['tipo']).length == 0) {
+    if (constanteService.transportTypes.filter((um) => um.id === data.detalleTransporte['tipo']).length == 0) {
       this.validator.errors.push(
         "Tipo de Transporte '" +
           data.detalleTransporte['tipo'] +
           "' en data.transporte.tipo no encontrado. Valores: " +
-          constanteService.transportTypes.map((a) => a.code + '-' + a.description),
+          constanteService.transportTypes.map((a) => a.id + '-' + a.description),
       );
     }
     if (
-      constanteService.transportModalities.filter((um) => um.code === data.detalleTransporte['modalidad']).length == 0
+      constanteService.transportModalities.filter((um) => um.id === data.detalleTransporte['modalidad']).length == 0
     ) {
       this.validator.errors.push(
         "Modalidad de Transporte '" +
           data.detalleTransporte['modalidad'] +
           "' en data.transporte.modalidad no encontrado. Valores: " +
-          constanteService.transportModalities.map((a) => a.code + '-' + a.description),
+          constanteService.transportModalities.map((a) => a.id + '-' + a.description),
       );
     }
 
@@ -2239,14 +2239,14 @@ class EDocumentMainValidateService {
       //valores de forma predeterminada, aunque este valor sera sobre-escrito caso el usuario envie
       //data.detalleTransporte['salida']['distrito'] y data.detalleTransporte['salida']['departamento']
       let objCiudad: any = constanteService.cities.filter(
-        (ciu) => ciu.code === +data.detalleTransporte['salida']['ciudad'],
+        (ciu) => ciu.id === +data.detalleTransporte['salida']['ciudad'],
       );
 
       if (objCiudad && objCiudad[0]) {
-        let objDistrito: any = constanteService.districts.filter((dis) => dis.code === +objCiudad[0]['distrito']);
+        let objDistrito: any = constanteService.districts.filter((dis) => dis.id === +objCiudad[0]['distrito']);
 
         let objDepartamento: any = constanteService.departments.filter(
-          (dep) => dep.code === +objDistrito[0]['departamento'],
+          (dep) => dep.id === +objDistrito[0]['departamento'],
         );
 
         //Solo actualiza si no tiene valor
@@ -2383,14 +2383,14 @@ class EDocumentMainValidateService {
       //valores de forma predeterminada, aunque este valor sera sobre-escrito caso el usuario envie
       //data.detalleTransporte['entrega']['distrito'] y data.detalleTransporte['entrega']['departamento']
       let objCiudad: any = constanteService.cities.filter(
-        (ciu) => ciu.code === +data.detalleTransporte['entrega']['ciudad'],
+        (ciu) => ciu.id === +data.detalleTransporte['entrega']['ciudad'],
       );
 
       if (objCiudad && objCiudad[0]) {
-        let objDistrito: any = constanteService.districts.filter((dis) => dis.code === +objCiudad[0]['distrito']);
+        let objDistrito: any = constanteService.districts.filter((dis) => dis.id === +objCiudad[0]['distrito']);
 
         let objDepartamento: any = constanteService.departments.filter(
-          (dep) => dep.code === +objDistrito[0]['departamento'],
+          (dep) => dep.id === +objDistrito[0]['departamento'],
         );
 
         //Solo actualiza si no tiene valor
@@ -2716,14 +2716,14 @@ class EDocumentMainValidateService {
         } else {
           if (
             constanteService.identityDocuments.filter(
-              (um) => um.code === data.detalleTransporte['transportista']['documentoTipo'],
+              (um) => um.id === data.detalleTransporte['transportista']['documentoTipo'],
             ).length == 0
           ) {
             this.validator.errors.push(
               "Tipo de Documento '" +
                 data.detalleTransporte['transportista']['documentoTipo'] +
                 "' en data.transporte.transportista.documentoTipo no encontrado. Valores: " +
-                constanteService.identityDocuments.map((a) => a.code + '-' + a.description),
+                constanteService.identityDocuments.map((a) => a.id + '-' + a.description),
             );
           }
         }
@@ -3008,14 +3008,14 @@ class EDocumentMainValidateService {
     ) {
       if (
         constanteService.measurementUnits.filter(
-          (um) => um.code === data.complementarios['carga']['unidadMedidaVolumenTotal'],
+          (um) => um.id === data.complementarios['carga']['unidadMedidaVolumenTotal'],
         ).length == 0
       ) {
         this.validator.errors.push(
           "Unidad de Medida '" +
             data.complementarios['carga']['unidadMedidaVolumenTotal'] +
             "' en data.complementarios.carga.unidadMedidaVolumenTotal no válido. Valores: " +
-            constanteService.measurementUnits.map((a) => a.code + '-' + a.description.trim()),
+            constanteService.measurementUnits.map((a) => a.id + '-' + a.description.trim()),
         );
       }
     }
@@ -3027,14 +3027,14 @@ class EDocumentMainValidateService {
     ) {
       if (
         constanteService.measurementUnits.filter(
-          (um) => um.code === data.complementarios['carga']['unidadMedidaPesoTotal'],
+          (um) => um.id === data.complementarios['carga']['unidadMedidaPesoTotal'],
         ).length == 0
       ) {
         this.validator.errors.push(
           "Unidad de Medida '" +
             data.complementarios['carga']['unidadMedidaPesoTotal'] +
             "' en data.complementarios.carga.unidadMedidaPesoTotal no válido. Valores: " +
-            constanteService.measurementUnits.map((a) => a.code + '-' + a.description.trim()),
+            constanteService.measurementUnits.map((a) => a.id + '-' + a.description.trim()),
         );
       }
     }
@@ -3042,14 +3042,14 @@ class EDocumentMainValidateService {
     if (data.complementarios && data.complementarios['carga'] && data.complementarios['carga']['caracteristicaCarga']) {
       if (
         constanteService.cargoCharacteristics.filter(
-          (um) => um.code === data.complementarios['carga']['caracteristicaCarga'],
+          (um) => um.id === data.complementarios['carga']['caracteristicaCarga'],
         ).length == 0
       ) {
         this.validator.errors.push(
           "Característica de Carga '" +
             data.complementarios['carga']['caracteristicaCarga'] +
             "' en data.complementarios.carga.caracteristicaCarga no válido. Valores: " +
-            constanteService.cargoCharacteristics.map((a) => a.code + '-' + a.description),
+            constanteService.cargoCharacteristics.map((a) => a.id + '-' + a.description),
         );
       }
 
@@ -3081,26 +3081,26 @@ class EDocumentMainValidateService {
 
     //Validaciones
     if (
-      constanteService.associatedDocumentTypes.filter((um) => um.code === +dataDocumentoAsociado['formato']).length == 0
+      constanteService.associatedDocumentTypes.filter((um) => um.id === +dataDocumentoAsociado['formato']).length == 0
     ) {
       this.validator.errors.push(
         "Formato de Documento Asociado '" +
           dataDocumentoAsociado['formato'] +
           "' en data.documentoAsociado.formato no encontrado. Valores: " +
-          constanteService.associatedDocumentTypes.map((a) => a.code + '-' + a.description),
+          constanteService.associatedDocumentTypes.map((a) => a.id + '-' + a.description),
       );
     }
 
     if (dataDocumentoAsociado['tipo'] == 2) {
       if (
-        constanteService.printedDocumentTypes.filter((um) => um.code === dataDocumentoAsociado['tipoDocumentoImpreso'])
+        constanteService.printedDocumentTypes.filter((um) => um.id === dataDocumentoAsociado['tipoDocumentoImpreso'])
           .length == 0
       ) {
         this.validator.errors.push(
           "Tipo de Documento impreso '" +
             dataDocumentoAsociado['tipoDocumentoImpreso'] +
             "' en data.documentoAsociado.tipoDocumentoImpreso no encontrado. Valores: " +
-            constanteService.printedDocumentTypes.map((a) => a.code + '-' + a.description),
+            constanteService.printedDocumentTypes.map((a) => a.id + '-' + a.description),
         );
       }
     }
@@ -3165,14 +3165,14 @@ class EDocumentMainValidateService {
         this.validator.errors.push('Debe especificar el Tipo de Constancia data.documentoAsociado.constanciaTipo');
       } else {
         if (
-          constanteService.constancyTypes.filter((um) => um.code === dataDocumentoAsociado['constanciaTipo']).length ==
+          constanteService.constancyTypes.filter((um) => um.id === dataDocumentoAsociado['constanciaTipo']).length ==
           0
         ) {
           this.validator.errors.push(
             "Tipo de Constancia '" +
               dataDocumentoAsociado['constanciaTipo'] +
               "' en data.documentoAsociado.constanciaTipo no encontrado. Valores: " +
-              constanteService.constancyTypes.map((a) => a.code + '-' + a.description),
+              constanteService.constancyTypes.map((a) => a.id + '-' + a.description),
           );
         }
       }

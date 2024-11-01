@@ -9,19 +9,19 @@ export enum OperationType {
 
 export const operationTypes: BasicData<OperationType>[] = [
   {
-    code: OperationType.B2B,
+    id: OperationType.B2B,
     description: 'B2B',
   },
   {
-    code: OperationType.B2C,
+    id: OperationType.B2C,
     description: 'B2C',
   },
   {
-    code: OperationType.B2G,
+    id: OperationType.B2G,
     description: 'B2G',
   },
   {
-    code: OperationType.B2F,
+    id: OperationType.B2F,
     description: 'B2F',
   },
 ];

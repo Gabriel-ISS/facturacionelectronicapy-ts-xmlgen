@@ -54,14 +54,14 @@ class JSonDteItemValidateService {
           }
         }
 
-        if (constanteService.measurementUnits.filter((um) => um.code === +unidadMedida).length == 0) {
+        if (constanteService.measurementUnits.filter((um) => um.id === +unidadMedida).length == 0) {
           this.validator.errors.push(
             "Unidad de Medida '" +
               unidadMedida +
               "' en data.items[" +
               i +
               '].unidadMedida no encontrado. Valores: ' +
-              constanteService.measurementUnits.map((a) => a.code + '-' + a.description.trim()),
+              constanteService.measurementUnits.map((a) => a.id + '-' + a.description.trim()),
           );
         }
         if (data.tipoDocumento === 7) {
@@ -72,14 +72,14 @@ class JSonDteItemValidateService {
             //No es obligatorio
           } else {
             //Si tiene tolerancia, entonces valida
-            if (constanteService.merchandiseRelevances.filter((um) => um.code === +item['tolerancia']).length == 0) {
+            if (constanteService.merchandiseRelevances.filter((um) => um.id === +item['tolerancia']).length == 0) {
               this.validator.errors.push(
                 "Tolerancia de Mercaderia '" +
                   item['tolerancia'] +
                   "' en data.items[" +
                   i +
                   '].tolerancia no encontrado. Valores: ' +
-                  constanteService.merchandiseRelevances.map((a) => a.code + '-' + a.description),
+                  constanteService.merchandiseRelevances.map((a) => a.id + '-' + a.description),
               );
             }
 
@@ -428,14 +428,14 @@ class JSonDteItemValidateService {
    * @param items Es el item actual del array de items de "data" que se está iterando
    */
   private generateDatosItemsOperacionIVAValidate(params: any, data: any, item: any, i: number) {
-    if (constanteService.taxTreatments.filter((um) => um.code === +item['ivaTipo']).length == 0) {
+    if (constanteService.taxTreatments.filter((um) => um.id === +item['ivaTipo']).length == 0) {
       this.validator.errors.push(
         "Tipo de IVA '" +
           item['ivaTipo'] +
           "' en data.items[" +
           i +
           '].ivaTipo no encontrado. Valores: ' +
-          constanteService.taxTreatments.map((a) => a.code + '-' + a.description),
+          constanteService.taxTreatments.map((a) => a.id + '-' + a.description),
       );
     }
 
@@ -564,7 +564,7 @@ class JSonDteItemValidateService {
     }
 
     if (
-      constanteService.vehicleOperationTypes.filter((um) => um.code === item['sectorAutomotor']['tipo']).length ==
+      constanteService.vehicleOperationTypes.filter((um) => um.id === item['sectorAutomotor']['tipo']).length ==
       0
     ) {
       this.validator.errors.push(
@@ -573,11 +573,11 @@ class JSonDteItemValidateService {
           "' en data.items[" +
           i +
           '].sectorAutomotor.tipo no encontrado. Valores: ' +
-          constanteService.vehicleOperationTypes.map((a) => a.code + '-' + a.description),
+          constanteService.vehicleOperationTypes.map((a) => a.id + '-' + a.description),
       );
     }
     if (
-      constanteService.fuelTypes.filter((um) => um.code === item['sectorAutomotor']['tipoCombustible'])
+      constanteService.fuelTypes.filter((um) => um.id === item['sectorAutomotor']['tipoCombustible'])
         .length == 0
     ) {
       this.validator.errors.push(
@@ -586,7 +586,7 @@ class JSonDteItemValidateService {
           "' en data.items[" +
           i +
           '].sectorAutomotor.tipoCombustible no encontrado. Valores: ' +
-          constanteService.fuelTypes.map((a) => a.code + '-' + a.description),
+          constanteService.fuelTypes.map((a) => a.id + '-' + a.description),
       );
     }
 

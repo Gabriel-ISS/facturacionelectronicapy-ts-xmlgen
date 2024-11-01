@@ -255,1003 +255,1003 @@ export enum Country {
 
 export const countries: BasicData<Country>[] = [
   {
-    code: Country.MACEDONIA_DEL_NORTE,
+    id: Country.MACEDONIA_DEL_NORTE,
     description: 'Macedonia del Norte',
   },
   {
-    code: Country.TAIWAN__PROVINCIA_DE_CHINA_,
+    id: Country.TAIWAN__PROVINCIA_DE_CHINA_,
     description: 'Taiwán (Provincia de China)',
   },
   {
-    code: Country.ARGELIA,
+    id: Country.ARGELIA,
     description: 'Argelia',
   },
   {
-    code: Country.EGIPTO,
+    id: Country.EGIPTO,
     description: 'Egipto',
   },
   {
-    code: Country.LIBIA,
+    id: Country.LIBIA,
     description: 'Libia',
   },
   {
-    code: Country.MARRUECOS,
+    id: Country.MARRUECOS,
     description: 'Marruecos',
   },
   {
-    code: Country.SUDAN,
+    id: Country.SUDAN,
     description: 'Sudán',
   },
   {
-    code: Country.TUNEZ,
+    id: Country.TUNEZ,
     description: 'Túnez',
   },
   {
-    code: Country.SAHARA_OCCIDENTAL,
+    id: Country.SAHARA_OCCIDENTAL,
     description: 'Sáhara Occidental',
   },
   {
-    code: Country.TERRITORIO_BRITANICO_DEL_OCEANO_INDICO,
+    id: Country.TERRITORIO_BRITANICO_DEL_OCEANO_INDICO,
     description: 'Territorio Británico del Océano Índico',
   },
   {
-    code: Country.BURUNDI,
+    id: Country.BURUNDI,
     description: 'Burundi',
   },
   {
-    code: Country.COMORAS,
+    id: Country.COMORAS,
     description: 'Comoras',
   },
   {
-    code: Country.DJIBOUTI,
+    id: Country.DJIBOUTI,
     description: 'Djibouti',
   },
   {
-    code: Country.ERITREA,
+    id: Country.ERITREA,
     description: 'Eritrea',
   },
   {
-    code: Country.ETIOPIA,
+    id: Country.ETIOPIA,
     description: 'Etiopía',
   },
   {
-    code: Country.TERRITORIO_DE_LAS_TIERRAS_AUSTRALES_FRANCESAS,
+    id: Country.TERRITORIO_DE_LAS_TIERRAS_AUSTRALES_FRANCESAS,
     description: 'Territorio de las Tierras Australes Francesas',
   },
   {
-    code: Country.KENYA,
+    id: Country.KENYA,
     description: 'Kenya',
   },
   {
-    code: Country.MADAGASCAR,
+    id: Country.MADAGASCAR,
     description: 'Madagascar',
   },
   {
-    code: Country.MALAWI,
+    id: Country.MALAWI,
     description: 'Malawi',
   },
   {
-    code: Country.MAURICIO,
+    id: Country.MAURICIO,
     description: 'Mauricio',
   },
   {
-    code: Country.MAYOTTE,
+    id: Country.MAYOTTE,
     description: 'Mayotte',
   },
   {
-    code: Country.MOZAMBIQUE,
+    id: Country.MOZAMBIQUE,
     description: 'Mozambique',
   },
   {
-    code: Country.REUNION,
+    id: Country.REUNION,
     description: 'Reunión',
   },
   {
-    code: Country.RWANDA,
+    id: Country.RWANDA,
     description: 'Rwanda',
   },
   {
-    code: Country.SEYCHELLES,
+    id: Country.SEYCHELLES,
     description: 'Seychelles',
   },
   {
-    code: Country.SOMALIA,
+    id: Country.SOMALIA,
     description: 'Somalia',
   },
   {
-    code: Country.SUDAN_DEL_SUR,
+    id: Country.SUDAN_DEL_SUR,
     description: 'Sudán del Sur',
   },
   {
-    code: Country.UGANDA,
+    id: Country.UGANDA,
     description: 'Uganda',
   },
   {
-    code: Country.REPUBLICA_UNIDA_DE_TANZANIA,
+    id: Country.REPUBLICA_UNIDA_DE_TANZANIA,
     description: 'República Unida de Tanzanía',
   },
   {
-    code: Country.ZAMBIA,
+    id: Country.ZAMBIA,
     description: 'Zambia',
   },
   {
-    code: Country.ZIMBABWE,
+    id: Country.ZIMBABWE,
     description: 'Zimbabwe',
   },
   {
-    code: Country.ANGOLA,
+    id: Country.ANGOLA,
     description: 'Angola',
   },
   {
-    code: Country.CAMERUN,
+    id: Country.CAMERUN,
     description: 'Camerún',
   },
   {
-    code: Country.REPUBLICA_CENTROAFRICANA,
+    id: Country.REPUBLICA_CENTROAFRICANA,
     description: 'República Centroafricana',
   },
   {
-    code: Country.CHAD,
+    id: Country.CHAD,
     description: 'Chad',
   },
   {
-    code: Country.CONGO,
+    id: Country.CONGO,
     description: 'Congo',
   },
   {
-    code: Country.REPUBLICA_DEMOCRATICA_DEL_CONGO,
+    id: Country.REPUBLICA_DEMOCRATICA_DEL_CONGO,
     description: 'República Democrática del Congo',
   },
   {
-    code: Country.GUINEA_ECUATORIAL,
+    id: Country.GUINEA_ECUATORIAL,
     description: 'Guinea Ecuatorial',
   },
   {
-    code: Country.GABON,
+    id: Country.GABON,
     description: 'Gabón',
   },
   {
-    code: Country.SANTO_TOME_Y_PRINCIPE,
+    id: Country.SANTO_TOME_Y_PRINCIPE,
     description: 'Santo Tomé y Príncipe',
   },
   {
-    code: Country.BOTSWANA,
+    id: Country.BOTSWANA,
     description: 'Botswana',
   },
   {
-    code: Country.LESOTHO,
+    id: Country.LESOTHO,
     description: 'Lesotho',
   },
   {
-    code: Country.NAMIBIA,
+    id: Country.NAMIBIA,
     description: 'Namibia',
   },
   {
-    code: Country.SUDAFRICA,
+    id: Country.SUDAFRICA,
     description: 'Sudáfrica',
   },
   {
-    code: Country.SWAZILANDIA,
+    id: Country.SWAZILANDIA,
     description: 'Swazilandia',
   },
   {
-    code: Country.BENIN,
+    id: Country.BENIN,
     description: 'Benin',
   },
   {
-    code: Country.BURKINA_FASO,
+    id: Country.BURKINA_FASO,
     description: 'Burkina Faso',
   },
   {
-    code: Country.CABO_VERDE,
+    id: Country.CABO_VERDE,
     description: 'Cabo Verde',
   },
   {
-    code: Country.C_TE_D_IVOIRE,
+    id: Country.C_TE_D_IVOIRE,
     description: "Côte d'Ivoire",
   },
   {
-    code: Country.GAMBIA,
+    id: Country.GAMBIA,
     description: 'Gambia',
   },
   {
-    code: Country.GHANA,
+    id: Country.GHANA,
     description: 'Ghana',
   },
   {
-    code: Country.GUINEA,
+    id: Country.GUINEA,
     description: 'Guinea',
   },
   {
-    code: Country.GUINEA_BISSAU,
+    id: Country.GUINEA_BISSAU,
     description: 'Guinea-Bissau',
   },
   {
-    code: Country.LIBERIA,
+    id: Country.LIBERIA,
     description: 'Liberia',
   },
   {
-    code: Country.MALI,
+    id: Country.MALI,
     description: 'Malí',
   },
   {
-    code: Country.MAURITANIA,
+    id: Country.MAURITANIA,
     description: 'Mauritania',
   },
   {
-    code: Country.NIGER,
+    id: Country.NIGER,
     description: 'Níger',
   },
   {
-    code: Country.NIGERIA,
+    id: Country.NIGERIA,
     description: 'Nigeria',
   },
   {
-    code: Country.SANTA_ELENA,
+    id: Country.SANTA_ELENA,
     description: 'Santa Elena',
   },
   {
-    code: Country.SENEGAL,
+    id: Country.SENEGAL,
     description: 'Senegal',
   },
   {
-    code: Country.SIERRA_LEONA,
+    id: Country.SIERRA_LEONA,
     description: 'Sierra Leona',
   },
   {
-    code: Country.TOGO,
+    id: Country.TOGO,
     description: 'Togo',
   },
   {
-    code: Country.ANGUILA,
+    id: Country.ANGUILA,
     description: 'Anguila',
   },
   {
-    code: Country.ANTIGUA_Y_BARBUDA,
+    id: Country.ANTIGUA_Y_BARBUDA,
     description: 'Antigua y Barbuda',
   },
   {
-    code: Country.ARUBA,
+    id: Country.ARUBA,
     description: 'Aruba',
   },
   {
-    code: Country.BAHAMAS,
+    id: Country.BAHAMAS,
     description: 'Bahamas',
   },
   {
-    code: Country.BARBADOS,
+    id: Country.BARBADOS,
     description: 'Barbados',
   },
   {
-    code: Country.BONAIRE__SAN_EUSTAQUIO_Y_SABA,
+    id: Country.BONAIRE__SAN_EUSTAQUIO_Y_SABA,
     description: 'Bonaire, San Eustaquio y Saba',
   },
   {
-    code: Country.ISLAS_VIRGENES_BRITANICAS,
+    id: Country.ISLAS_VIRGENES_BRITANICAS,
     description: 'Islas Vírgenes Británicas',
   },
   {
-    code: Country.ISLAS_CAIMAN,
+    id: Country.ISLAS_CAIMAN,
     description: 'Islas Caimán',
   },
   {
-    code: Country.CUBA,
+    id: Country.CUBA,
     description: 'CUBA',
   },
   {
-    code: Country.CURA_AO,
+    id: Country.CURA_AO,
     description: 'Curaçao',
   },
   {
-    code: Country.DOMINICA,
+    id: Country.DOMINICA,
     description: 'Dominica',
   },
   {
-    code: Country.REPUBLICA_DOMINICANA,
+    id: Country.REPUBLICA_DOMINICANA,
     description: 'República Dominicana',
   },
   {
-    code: Country.GRANADA,
+    id: Country.GRANADA,
     description: 'Granada',
   },
   {
-    code: Country.GUADALUPE,
+    id: Country.GUADALUPE,
     description: 'Guadalupe',
   },
   {
-    code: Country.HAITI,
+    id: Country.HAITI,
     description: 'Haití',
   },
   {
-    code: Country.JAMAICA,
+    id: Country.JAMAICA,
     description: 'Jamaica',
   },
   {
-    code: Country.MARTINICA,
+    id: Country.MARTINICA,
     description: 'Martinica',
   },
   {
-    code: Country.MONTSERRAT,
+    id: Country.MONTSERRAT,
     description: 'Montserrat',
   },
   {
-    code: Country.PUERTO_RICO,
+    id: Country.PUERTO_RICO,
     description: 'Puerto Rico',
   },
   {
-    code: Country.SAN_BARTOLOME,
+    id: Country.SAN_BARTOLOME,
     description: 'San Bartolomé',
   },
   {
-    code: Country.SAINT_KITTS_Y_NEVIS,
+    id: Country.SAINT_KITTS_Y_NEVIS,
     description: 'Saint Kitts y Nevis',
   },
   {
-    code: Country.SANTA_LUCIA,
+    id: Country.SANTA_LUCIA,
     description: 'Santa Lucía',
   },
   {
-    code: Country.SAN_MARTIN__PARTE_FRANCESA_,
+    id: Country.SAN_MARTIN__PARTE_FRANCESA_,
     description: 'San Martín (parte francesa)',
   },
   {
-    code: Country.SAN_VICENTE_Y_LAS_GRANADINAS,
+    id: Country.SAN_VICENTE_Y_LAS_GRANADINAS,
     description: 'San Vicente y las Granadinas',
   },
   {
-    code: Country.SAN_MARTIN__PARTE_HOLANDES_,
+    id: Country.SAN_MARTIN__PARTE_HOLANDES_,
     description: 'San Martín (parte holandés)',
   },
   {
-    code: Country.TRINIDAD_Y_TABAGO,
+    id: Country.TRINIDAD_Y_TABAGO,
     description: 'Trinidad y Tabago',
   },
   {
-    code: Country.ISLAS_TURCAS_Y_CAICOS,
+    id: Country.ISLAS_TURCAS_Y_CAICOS,
     description: 'Islas Turcas y Caicos',
   },
   {
-    code: Country.ISLAS_VIRGENES_DE_LOS_ESTADOS_UNIDOS,
+    id: Country.ISLAS_VIRGENES_DE_LOS_ESTADOS_UNIDOS,
     description: 'Islas Vírgenes de los Estados Unidos',
   },
   {
-    code: Country.BELICE,
+    id: Country.BELICE,
     description: 'Belice',
   },
   {
-    code: Country.COSTA_RICA,
+    id: Country.COSTA_RICA,
     description: 'Costa Rica',
   },
   {
-    code: Country.EL_SALVADOR,
+    id: Country.EL_SALVADOR,
     description: 'El Salvador',
   },
   {
-    code: Country.GUATEMALA,
+    id: Country.GUATEMALA,
     description: 'Guatemala',
   },
   {
-    code: Country.HONDURAS,
+    id: Country.HONDURAS,
     description: 'Honduras',
   },
   {
-    code: Country.MEXICO,
+    id: Country.MEXICO,
     description: 'México',
   },
   {
-    code: Country.NICARAGUA,
+    id: Country.NICARAGUA,
     description: 'Nicaragua',
   },
   {
-    code: Country.PANAMA,
+    id: Country.PANAMA,
     description: 'Panamá',
   },
   {
-    code: Country.ARGENTINA,
+    id: Country.ARGENTINA,
     description: 'Argentina',
   },
   {
-    code: Country.BOLIVIA__ESTADO_PLURINACIONAL_DE_,
+    id: Country.BOLIVIA__ESTADO_PLURINACIONAL_DE_,
     description: 'Bolivia (Estado Plurinacional de)',
   },
   {
-    code: Country.BRASIL,
+    id: Country.BRASIL,
     description: 'Brasil',
   },
   {
-    code: Country.CHILE,
+    id: Country.CHILE,
     description: 'Chile',
   },
   {
-    code: Country.COLOMBIA,
+    id: Country.COLOMBIA,
     description: 'Colombia',
   },
   {
-    code: Country.ECUADOR,
+    id: Country.ECUADOR,
     description: 'Ecuador',
   },
   {
-    code: Country.ISLAS_MALVINAS__FALKLAND_,
+    id: Country.ISLAS_MALVINAS__FALKLAND_,
     description: 'Islas Malvinas (Falkland)',
   },
   {
-    code: Country.GUAYANA_FRANCESA,
+    id: Country.GUAYANA_FRANCESA,
     description: 'Guayana Francesa',
   },
   {
-    code: Country.GUYANA,
+    id: Country.GUYANA,
     description: 'Guyana',
   },
   {
-    code: Country.PARAGUAY,
+    id: Country.PARAGUAY,
     description: 'Paraguay',
   },
   {
-    code: Country.PERU,
+    id: Country.PERU,
     description: 'Perú',
   },
   {
-    code: Country.GEORGIA_DEL_SUR_Y_LAS_ISLAS_SANDWICH_DEL_SUR,
+    id: Country.GEORGIA_DEL_SUR_Y_LAS_ISLAS_SANDWICH_DEL_SUR,
     description: 'Georgia del Sur y las Islas Sandwich del Sur',
   },
   {
-    code: Country.SURINAME,
+    id: Country.SURINAME,
     description: 'Suriname',
   },
   {
-    code: Country.URUGUAY,
+    id: Country.URUGUAY,
     description: 'Uruguay',
   },
   {
-    code: Country.VENEZUELA__REPUBLICA_BOLIVARIANA_DE_,
+    id: Country.VENEZUELA__REPUBLICA_BOLIVARIANA_DE_,
     description: 'Venezuela (República Bolivariana de)',
   },
   {
-    code: Country.BERMUDA,
+    id: Country.BERMUDA,
     description: 'Bermuda',
   },
   {
-    code: Country.CANADA,
+    id: Country.CANADA,
     description: 'Canadá',
   },
   {
-    code: Country.GROENLANDIA,
+    id: Country.GROENLANDIA,
     description: 'Groenlandia',
   },
   {
-    code: Country.SAINT_PIERRE_Y_MIQUELON,
+    id: Country.SAINT_PIERRE_Y_MIQUELON,
     description: 'Saint Pierre y Miquelon',
   },
   {
-    code: Country.ESTADOS_UNIDOS_DE_AMERICA,
+    id: Country.ESTADOS_UNIDOS_DE_AMERICA,
     description: 'Estados Unidos de América',
   },
   {
-    code: Country.ANTARTIDA,
+    id: Country.ANTARTIDA,
     description: 'Antártida',
   },
   {
-    code: Country.KAZAJSTAN,
+    id: Country.KAZAJSTAN,
     description: 'Kazajstán',
   },
   {
-    code: Country.KIRGUISTAN,
+    id: Country.KIRGUISTAN,
     description: 'Kirguistán',
   },
   {
-    code: Country.TAYIKISTAN,
+    id: Country.TAYIKISTAN,
     description: 'Tayikistán',
   },
   {
-    code: Country.TURKMENISTAN,
+    id: Country.TURKMENISTAN,
     description: 'Turkmenistán',
   },
   {
-    code: Country.UZBEKISTAN,
+    id: Country.UZBEKISTAN,
     description: 'Uzbekistán',
   },
   {
-    code: Country.CHINA,
+    id: Country.CHINA,
     description: 'China',
   },
   {
-    code: Country.CHINA__REGION_ADMINISTRATIVA_ESPECIAL_DE_HONG_KONG,
+    id: Country.CHINA__REGION_ADMINISTRATIVA_ESPECIAL_DE_HONG_KONG,
     description: 'China, región administrativa especial de Hong Kong',
   },
   {
-    code: Country.CHINA__REGION_ADMINISTRATIVA_ESPECIAL_DE_MACAO,
+    id: Country.CHINA__REGION_ADMINISTRATIVA_ESPECIAL_DE_MACAO,
     description: 'China, región administrativa especial de Macao',
   },
   {
-    code: Country.REPUBLICA_POPULAR_DEMOCRATICA_DE_COREA,
+    id: Country.REPUBLICA_POPULAR_DEMOCRATICA_DE_COREA,
     description: 'República Popular Democrática de Corea',
   },
   {
-    code: Country.JAPON,
+    id: Country.JAPON,
     description: 'Japón',
   },
   {
-    code: Country.MONGOLIA,
+    id: Country.MONGOLIA,
     description: 'Mongolia',
   },
   {
-    code: Country.REPUBLICA_DE_COREA,
+    id: Country.REPUBLICA_DE_COREA,
     description: 'República de Corea',
   },
   {
-    code: Country.BRUNEI_DARUSSALAM,
+    id: Country.BRUNEI_DARUSSALAM,
     description: 'Brunei Darussalam',
   },
   {
-    code: Country.CAMBOYA,
+    id: Country.CAMBOYA,
     description: 'Camboya',
   },
   {
-    code: Country.INDONESIA,
+    id: Country.INDONESIA,
     description: 'Indonesia',
   },
   {
-    code: Country.REPUBLICA_DEMOCRATICA_POPULAR_LAO,
+    id: Country.REPUBLICA_DEMOCRATICA_POPULAR_LAO,
     description: 'República Democrática Popular Lao',
   },
   {
-    code: Country.MALASIA,
+    id: Country.MALASIA,
     description: 'Malasia',
   },
   {
-    code: Country.MYANMAR,
+    id: Country.MYANMAR,
     description: 'Myanmar',
   },
   {
-    code: Country.FILIPINAS,
+    id: Country.FILIPINAS,
     description: 'Filipinas',
   },
   {
-    code: Country.SINGAPUR,
+    id: Country.SINGAPUR,
     description: 'Singapur',
   },
   {
-    code: Country.TAILANDIA,
+    id: Country.TAILANDIA,
     description: 'Tailandia',
   },
   {
-    code: Country.TIMOR_LESTE,
+    id: Country.TIMOR_LESTE,
     description: 'Timor-Leste',
   },
   {
-    code: Country.VIET_NAM,
+    id: Country.VIET_NAM,
     description: 'Viet Nam',
   },
   {
-    code: Country.AFGANISTAN,
+    id: Country.AFGANISTAN,
     description: 'Afganistán',
   },
   {
-    code: Country.BANGLADESH,
+    id: Country.BANGLADESH,
     description: 'Bangladesh',
   },
   {
-    code: Country.BHUTAN,
+    id: Country.BHUTAN,
     description: 'Bhután',
   },
   {
-    code: Country.INDIA,
+    id: Country.INDIA,
     description: 'India',
   },
   {
-    code: Country.IRAN__REPUBLICA_ISLAMICA_DE_,
+    id: Country.IRAN__REPUBLICA_ISLAMICA_DE_,
     description: 'Irán (República Islámica de)',
   },
   {
-    code: Country.MALDIVAS,
+    id: Country.MALDIVAS,
     description: 'Maldivas',
   },
   {
-    code: Country.NEPAL,
+    id: Country.NEPAL,
     description: 'Nepal',
   },
   {
-    code: Country.PAKISTAN,
+    id: Country.PAKISTAN,
     description: 'Pakistán',
   },
   {
-    code: Country.SRI_LANKA,
+    id: Country.SRI_LANKA,
     description: 'Sri Lanka',
   },
   {
-    code: Country.ARMENIA,
+    id: Country.ARMENIA,
     description: 'Armenia',
   },
   {
-    code: Country.AZERBAIYAN,
+    id: Country.AZERBAIYAN,
     description: 'Azerbaiyán',
   },
   {
-    code: Country.BAHREIN,
+    id: Country.BAHREIN,
     description: 'Bahrein',
   },
   {
-    code: Country.CHIPRE,
+    id: Country.CHIPRE,
     description: 'Chipre',
   },
   {
-    code: Country.GEORGIA,
+    id: Country.GEORGIA,
     description: 'Georgia',
   },
   {
-    code: Country.IRAQ,
+    id: Country.IRAQ,
     description: 'Iraq',
   },
   {
-    code: Country.ISRAEL,
+    id: Country.ISRAEL,
     description: 'Israel',
   },
   {
-    code: Country.JORDANIA,
+    id: Country.JORDANIA,
     description: 'Jordania',
   },
   {
-    code: Country.KUWAIT,
+    id: Country.KUWAIT,
     description: 'Kuwait',
   },
   {
-    code: Country.LIBANO,
+    id: Country.LIBANO,
     description: 'Líbano',
   },
   {
-    code: Country.OMAN,
+    id: Country.OMAN,
     description: 'Omán',
   },
   {
-    code: Country.QATAR,
+    id: Country.QATAR,
     description: 'Qatar',
   },
   {
-    code: Country.ARABIA_SAUDITA,
+    id: Country.ARABIA_SAUDITA,
     description: 'Arabia Saudita',
   },
   {
-    code: Country.ESTADO_DE_PALESTINA,
+    id: Country.ESTADO_DE_PALESTINA,
     description: 'Estado de Palestina',
   },
   {
-    code: Country.REPUBLICA_ARABE_SIRIA,
+    id: Country.REPUBLICA_ARABE_SIRIA,
     description: 'República Árabe Siria',
   },
   {
-    code: Country.TURQUIA,
+    id: Country.TURQUIA,
     description: 'Turquía',
   },
   {
-    code: Country.EMIRATOS_ARABES_UNIDOS,
+    id: Country.EMIRATOS_ARABES_UNIDOS,
     description: 'Emiratos Árabes Unidos',
   },
   {
-    code: Country.YEMEN,
+    id: Country.YEMEN,
     description: 'Yemen',
   },
   {
-    code: Country.BELARUS,
+    id: Country.BELARUS,
     description: 'Belarús',
   },
   {
-    code: Country.BULGARIA,
+    id: Country.BULGARIA,
     description: 'Bulgaria',
   },
   {
-    code: Country.CHEQUIA,
+    id: Country.CHEQUIA,
     description: 'Chequia',
   },
   {
-    code: Country.HUNGRIA,
+    id: Country.HUNGRIA,
     description: 'Hungría',
   },
   {
-    code: Country.POLONIA,
+    id: Country.POLONIA,
     description: 'Polonia',
   },
   {
-    code: Country.REPUBLICA_DE_MOLDOVA,
+    id: Country.REPUBLICA_DE_MOLDOVA,
     description: 'República de Moldova',
   },
   {
-    code: Country.RUMANIA,
+    id: Country.RUMANIA,
     description: 'Rumania',
   },
   {
-    code: Country.FEDERACION_DE_RUSIA,
+    id: Country.FEDERACION_DE_RUSIA,
     description: 'Federación de Rusia',
   },
   {
-    code: Country.ESLOVAQUIA,
+    id: Country.ESLOVAQUIA,
     description: 'Eslovaquia',
   },
   {
-    code: Country.UCRANIA,
+    id: Country.UCRANIA,
     description: 'Ucrania',
   },
   {
-    code: Country.ISLAS__LAND,
+    id: Country.ISLAS__LAND,
     description: 'Islas Åland',
   },
   {
-    code: Country.GUERNSEY,
+    id: Country.GUERNSEY,
     description: 'Guernsey',
   },
   {
-    code: Country.JERSEY,
+    id: Country.JERSEY,
     description: 'Jersey',
   },
   {
-    code: Country.DINAMARCA,
+    id: Country.DINAMARCA,
     description: 'Dinamarca',
   },
   {
-    code: Country.ESTONIA,
+    id: Country.ESTONIA,
     description: 'Estonia',
   },
   {
-    code: Country.ISLAS_FEROE,
+    id: Country.ISLAS_FEROE,
     description: 'Islas Feroe',
   },
   {
-    code: Country.FINLANDIA,
+    id: Country.FINLANDIA,
     description: 'Finlandia',
   },
   {
-    code: Country.ISLANDIA,
+    id: Country.ISLANDIA,
     description: 'Islandia',
   },
   {
-    code: Country.IRLANDA,
+    id: Country.IRLANDA,
     description: 'Irlanda',
   },
   {
-    code: Country.ISLA_DE_MAN,
+    id: Country.ISLA_DE_MAN,
     description: 'Isla de Man',
   },
   {
-    code: Country.LETONIA,
+    id: Country.LETONIA,
     description: 'Letonia',
   },
   {
-    code: Country.LITUANIA,
+    id: Country.LITUANIA,
     description: 'Lituania',
   },
   {
-    code: Country.NORUEGA,
+    id: Country.NORUEGA,
     description: 'Noruega',
   },
   {
-    code: Country.ISLAS_SVALBARD_Y_JAN_MAYEN,
+    id: Country.ISLAS_SVALBARD_Y_JAN_MAYEN,
     description: 'Islas Svalbard y Jan Mayen',
   },
   {
-    code: Country.SUECIA,
+    id: Country.SUECIA,
     description: 'Suecia',
   },
   {
-    code: Country.REINO_UNIDO_DE_GRAN_BRETANA_E_IRLANDA_DEL_NORTE,
+    id: Country.REINO_UNIDO_DE_GRAN_BRETANA_E_IRLANDA_DEL_NORTE,
     description: 'Reino Unido de Gran Bretaña e Irlanda del Norte',
   },
   {
-    code: Country.ALBANIA,
+    id: Country.ALBANIA,
     description: 'Albania',
   },
   {
-    code: Country.ANDORRA,
+    id: Country.ANDORRA,
     description: 'Andorra',
   },
   {
-    code: Country.BOSNIA_Y_HERZEGOVINA,
+    id: Country.BOSNIA_Y_HERZEGOVINA,
     description: 'Bosnia y Herzegovina',
   },
   {
-    code: Country.CROACIA,
+    id: Country.CROACIA,
     description: 'Croacia',
   },
   {
-    code: Country.GIBRALTAR,
+    id: Country.GIBRALTAR,
     description: 'Gibraltar',
   },
   {
-    code: Country.GRECIA,
+    id: Country.GRECIA,
     description: 'Grecia',
   },
   {
-    code: Country.SANTA_SEDE,
+    id: Country.SANTA_SEDE,
     description: 'Santa Sede',
   },
   {
-    code: Country.ITALIA,
+    id: Country.ITALIA,
     description: 'Italia',
   },
   {
-    code: Country.MALTA,
+    id: Country.MALTA,
     description: 'Malta',
   },
   {
-    code: Country.MONTENEGRO,
+    id: Country.MONTENEGRO,
     description: 'Montenegro',
   },
   {
-    code: Country.PORTUGAL,
+    id: Country.PORTUGAL,
     description: 'Portugal',
   },
   {
-    code: Country.SAN_MARINO,
+    id: Country.SAN_MARINO,
     description: 'San Marino',
   },
   {
-    code: Country.SERBIA,
+    id: Country.SERBIA,
     description: 'Serbia',
   },
   {
-    code: Country.ESLOVENIA,
+    id: Country.ESLOVENIA,
     description: 'Eslovenia',
   },
   {
-    code: Country.ESPANA,
+    id: Country.ESPANA,
     description: 'España',
   },
   {
-    code: Country.EX_REPUBLICA_YUGOSLAVA_DE_MACEDONIA,
+    id: Country.EX_REPUBLICA_YUGOSLAVA_DE_MACEDONIA,
     description: 'ex República Yugoslava de Macedonia',
   },
   {
-    code: Country.AUSTRIA,
+    id: Country.AUSTRIA,
     description: 'Austria',
   },
   {
-    code: Country.BELGICA,
+    id: Country.BELGICA,
     description: 'Bélgica',
   },
   {
-    code: Country.FRANCIA,
+    id: Country.FRANCIA,
     description: 'Francia',
   },
   {
-    code: Country.ALEMANIA,
+    id: Country.ALEMANIA,
     description: 'Alemania',
   },
   {
-    code: Country.LIECHTENSTEIN,
+    id: Country.LIECHTENSTEIN,
     description: 'Liechtenstein',
   },
   {
-    code: Country.LUXEMBURGO,
+    id: Country.LUXEMBURGO,
     description: 'Luxemburgo',
   },
   {
-    code: Country.MONACO,
+    id: Country.MONACO,
     description: 'Mónaco',
   },
   {
-    code: Country.PAISES_BAJOS,
+    id: Country.PAISES_BAJOS,
     description: 'Países Bajos',
   },
   {
-    code: Country.SUIZA,
+    id: Country.SUIZA,
     description: 'Suiza',
   },
   {
-    code: Country.AUSTRALIA,
+    id: Country.AUSTRALIA,
     description: 'Australia',
   },
   {
-    code: Country.ISLA_DE_NAVIDAD,
+    id: Country.ISLA_DE_NAVIDAD,
     description: 'Isla de Navidad',
   },
   {
-    code: Country.ISLAS_COCOS__KEELING_,
+    id: Country.ISLAS_COCOS__KEELING_,
     description: 'Islas Cocos (Keeling)',
   },
   {
-    code: Country.ISLAS_HEARD_Y_MCDONALD,
+    id: Country.ISLAS_HEARD_Y_MCDONALD,
     description: 'Islas Heard y McDonald',
   },
   {
-    code: Country.NUEVA_ZELANDIA,
+    id: Country.NUEVA_ZELANDIA,
     description: 'Nueva Zelandia',
   },
   {
-    code: Country.ISLAS_NORFOLK,
+    id: Country.ISLAS_NORFOLK,
     description: 'Islas Norfolk',
   },
   {
-    code: Country.FIJI,
+    id: Country.FIJI,
     description: 'Fiji',
   },
   {
-    code: Country.NUEVA_CALEDONIA,
+    id: Country.NUEVA_CALEDONIA,
     description: 'Nueva Caledonia',
   },
   {
-    code: Country.PAPUA_NUEVA_GUINEA,
+    id: Country.PAPUA_NUEVA_GUINEA,
     description: 'Papua Nueva Guinea',
   },
   {
-    code: Country.ISLAS_SALOMON,
+    id: Country.ISLAS_SALOMON,
     description: 'Islas Salomón',
   },
   {
-    code: Country.VANUATU,
+    id: Country.VANUATU,
     description: 'Vanuatu',
   },
   {
-    code: Country.GUAM,
+    id: Country.GUAM,
     description: 'Guam',
   },
   {
-    code: Country.KIRIBATI,
+    id: Country.KIRIBATI,
     description: 'Kiribati',
   },
   {
-    code: Country.ISLAS_MARSHALL,
+    id: Country.ISLAS_MARSHALL,
     description: 'Islas Marshall',
   },
   {
-    code: Country.MICRONESIA__ESTADOS_FEDERADOS_DE_,
+    id: Country.MICRONESIA__ESTADOS_FEDERADOS_DE_,
     description: 'Micronesia (Estados Federados de)',
   },
   {
-    code: Country.NAURU,
+    id: Country.NAURU,
     description: 'Nauru',
   },
   {
-    code: Country.ISLAS_MARIANAS_SEPTENTRIONALES,
+    id: Country.ISLAS_MARIANAS_SEPTENTRIONALES,
     description: 'Islas Marianas Septentrionales',
   },
   {
-    code: Country.PALAU,
+    id: Country.PALAU,
     description: 'Palau',
   },
   {
-    code: Country.ISLAS_MENORES_ALEJADAS_DE_ESTADOS_UNIDOS,
+    id: Country.ISLAS_MENORES_ALEJADAS_DE_ESTADOS_UNIDOS,
     description: 'Islas menores alejadas de Estados Unidos',
   },
   {
-    code: Country.SAMOA_AMERICANA,
+    id: Country.SAMOA_AMERICANA,
     description: 'Samoa Americana',
   },
   {
-    code: Country.ISLAS_COOK,
+    id: Country.ISLAS_COOK,
     description: 'Islas Cook',
   },
   {
-    code: Country.POLINESIA_FRANCESA,
+    id: Country.POLINESIA_FRANCESA,
     description: 'Polinesia Francesa',
   },
   {
-    code: Country.NIUE,
+    id: Country.NIUE,
     description: 'Niue',
   },
   {
-    code: Country.PITCAIRN,
+    id: Country.PITCAIRN,
     description: 'Pitcairn',
   },
   {
-    code: Country.SAMOA,
+    id: Country.SAMOA,
     description: 'Samoa',
   },
   {
-    code: Country.TOKELAU,
+    id: Country.TOKELAU,
     description: 'Tokelau',
   },
   {
-    code: Country.TONGA,
+    id: Country.TONGA,
     description: 'Tonga',
   },
   {
-    code: Country.TUVALU,
+    id: Country.TUVALU,
     description: 'Tuvalu',
   },
   {
-    code: Country.ISLAS_WALLIS_Y_FUTUNA,
+    id: Country.ISLAS_WALLIS_Y_FUTUNA,
     description: 'Islas Wallis y Futuna',
   },
   {
-    code: Country.NO_EXISTE,
+    id: Country.NO_EXISTE,
     description: 'NO EXISTE',
   },
 ];

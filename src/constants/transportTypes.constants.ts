@@ -7,11 +7,11 @@ export enum TransportType {
 
 export const transportTypes: BasicData<TransportType>[] = [
   {
-    code: TransportType.PROPIO,
+    id: TransportType.PROPIO,
     description: 'Propio',
   },
   {
-    code: TransportType.TERCERO,
+    id: TransportType.TERCERO,
     description: 'Tercero',
   },
 ];

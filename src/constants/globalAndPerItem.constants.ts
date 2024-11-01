@@ -7,11 +7,11 @@ export enum GlobalAndPerItem {
 
 export const globalAndPerItem: BasicData<GlobalAndPerItem>[] = [
   {
-    code: GlobalAndPerItem.GLOBAL,
+    id: GlobalAndPerItem.GLOBAL,
     description: 'Global',
   },
   {
-    code: GlobalAndPerItem.POR_ITEM,
+    id: GlobalAndPerItem.POR_ITEM,
     description: 'Por item',
   },
 ];

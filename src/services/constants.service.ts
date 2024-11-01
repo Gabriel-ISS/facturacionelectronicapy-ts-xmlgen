@@ -46,7 +46,7 @@ import { vehicleOperationTypes } from '../constants/vehicleOperationTypes.consta
 import { exchangeRateConditions } from '../constants/exchangeRateConditions.constants';
 
 export type BasicData<Code = number> = {
-  code: Code;
+  id: Code;
   description: string;
 };
 
@@ -156,7 +156,7 @@ export default Object.freeze({
     errors: string[],
   ) {
     if (cityId) {
-      let foundCity = this.cities.find((c) => c.code === cityId);
+      let foundCity = this.cities.find((c) => c.id === cityId);
 
       if (!foundCity) {
         errors.push(`No se encontro la ciudad con el Id "${cityId}"`);
@@ -170,11 +170,11 @@ export default Object.freeze({
     }
 
     if (districtId) {
-      let districtFound = this.districts.find((d) => d.code === districtId);
+      let districtFound = this.districts.find((d) => d.id === districtId);
 
       if (!districtFound) {
         errors.push(`No se encontro el distrito con el Id "${districtId}"`);
-      } else if (districtFound.departamento != departmentId) {
+      } else if (districtFound.department != departmentId) {
         errors.push(
           `El departamento con id "${departmentId}" no pertenece al distrito con id "${districtId}"`,
         );

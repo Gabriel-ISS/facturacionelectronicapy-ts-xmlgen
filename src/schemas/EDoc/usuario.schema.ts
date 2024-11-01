@@ -29,7 +29,7 @@ export const UsuarioSchema = z
         });
       }
     } else {
-      const correctDescription = userIdentityDocuments.find(uid => uid.code == user.documentoTipo)?.description;
+      const correctDescription = userIdentityDocuments.find(uid => uid.id == user.documentoTipo)?.description;
       if (correctDescription != user.documentoTipoDescripcion) {
         ctx.addIssue({
           path: ['documentoTipoDescripcion'],

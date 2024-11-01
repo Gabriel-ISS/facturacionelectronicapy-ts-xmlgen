@@ -7,11 +7,11 @@ export enum SellerNatureSelfInvoicing {
 
 export const sellerNatureSelfInvoicingCases: BasicData<SellerNatureSelfInvoicing>[] = [
   {
-    code: SellerNatureSelfInvoicing.NO_CONTRIBUYENTE,
+    id: SellerNatureSelfInvoicing.NO_CONTRIBUYENTE,
     description: 'No contribuyente',
   },
   {
-    code: SellerNatureSelfInvoicing.EXTRANJERO,
+    id: SellerNatureSelfInvoicing.EXTRANJERO,
     description: 'Extranjero',
   },
 ];

@@ -126,7 +126,7 @@ export const EDocDataSchema = z
     tipoImpuesto: z.union(enumToZodUnion(TaxType)),
 
     // D015
-    moneda: z.enum(enumToZodEnum(Currency)),
+    moneda: z.enum(enumToZodEnum<typeof Currency, Currency>(Currency)),
 
     // D019
     condicionAnticipo: z.union(enumToZodUnion(GlobalAndPerItem)).optional(),
@@ -307,6 +307,18 @@ export const EDocDataSchema = z
         code: z.ZodIssueCode.custom,
         message: 'Debe informar la Dirección del Cliente',
       });
+    }
+
+    if (EDoc.tipoTransaccion == TransactionType.ANTICIPO) {
+      EDoc.items.forEach((item, i) => {
+        if (!item.cdcAnticipo) {
+          ctx.addIssue({
+            path: ['items', i, 'cdcAnticipo'],
+            code: z.ZodIssueCode.custom,
+            message: 'Debe indicar el CDC del anticipo',
+          });
+        }
+      })
     }
   });
 

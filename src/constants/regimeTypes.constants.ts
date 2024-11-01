@@ -13,35 +13,35 @@ export enum RegimeType {
 
 export const regimeTypes: BasicData<RegimeType>[] = [
   {
-    code: RegimeType.REGIMEN_DE_TURISMO,
+    id: RegimeType.REGIMEN_DE_TURISMO,
     description: 'Régimen de Turismo',
   },
   {
-    code: RegimeType.IMPORTADOR,
+    id: RegimeType.IMPORTADOR,
     description: 'Importador',
   },
   {
-    code: RegimeType.EXPORTADOR,
+    id: RegimeType.EXPORTADOR,
     description: 'Exportador',
   },
   {
-    code: RegimeType.MAQUILA,
+    id: RegimeType.MAQUILA,
     description: 'Maquila',
   },
   {
-    code: RegimeType.LEY_N__60_90,
+    id: RegimeType.LEY_N__60_90,
     description: 'Ley N° 60/90',
   },
   {
-    code: RegimeType.REGIMEN_DEL_PEQUENO_PRODUCTOR,
+    id: RegimeType.REGIMEN_DEL_PEQUENO_PRODUCTOR,
     description: 'Régimen del Pequeño Productor',
   },
   {
-    code: RegimeType.REGIMEN_DEL_MEDIANO_PRODUCTOR,
+    id: RegimeType.REGIMEN_DEL_MEDIANO_PRODUCTOR,
     description: 'Régimen del Mediano Productor',
   },
   {
-    code: RegimeType.REGIMEN_CONTABLE,
+    id: RegimeType.REGIMEN_CONTABLE,
     description: 'Régimen Contable',
   },
 ];

@@ -7,11 +7,11 @@ export enum EmissionType {
 
 export const emissionTypes: BasicData<EmissionType>[] = [
   {
-    code: EmissionType.NORMAL,
+    id: EmissionType.NORMAL,
     description: 'Normal',
   },
   {
-    code: EmissionType.CONTINGENCIA,
+    id: EmissionType.CONTINGENCIA,
     description: 'Contingencia',
   },
 ];

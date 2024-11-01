@@ -22,42 +22,42 @@ export const documentTypes: DataWithState<
   FutureDocumentType | ValidDocumentType
 >[] = [
   {
-    code: ValidDocumentType.FACTURA_ELECTRONICA,
+    id: ValidDocumentType.FACTURA_ELECTRONICA,
     description: 'Factura electrónica',
     state: State.NORMAL,
   },
   {
-    code: FutureDocumentType.FACTURA_ELECTRONICA_DE_EXPORTACION,
+    id: FutureDocumentType.FACTURA_ELECTRONICA_DE_EXPORTACION,
     description: 'Factura electrónica de exportación',
     state: State.A_FUTURO,
   },
   {
-    code: FutureDocumentType.FACTURA_ELECTRONICA_DE_IMPORTACION,
+    id: FutureDocumentType.FACTURA_ELECTRONICA_DE_IMPORTACION,
     description: 'Factura electrónica de importación',
     state: State.A_FUTURO,
   },
   {
-    code: ValidDocumentType.AUTOFACTURA_ELECTRONICA,
+    id: ValidDocumentType.AUTOFACTURA_ELECTRONICA,
     description: 'Autofactura electrónica',
     state: State.NORMAL,
   },
   {
-    code: ValidDocumentType.NOTA_DE_CREDITO_ELECTRONICA,
+    id: ValidDocumentType.NOTA_DE_CREDITO_ELECTRONICA,
     description: 'Nota de crédito electrónica',
     state: State.NORMAL,
   },
   {
-    code: ValidDocumentType.NOTA_DE_DEBITO_ELECTRONICA,
+    id: ValidDocumentType.NOTA_DE_DEBITO_ELECTRONICA,
     description: 'Nota de débito electrónica',
     state: State.NORMAL,
   },
   {
-    code: ValidDocumentType.NOTA_DE_REMISION_ELECTRONICA,
+    id: ValidDocumentType.NOTA_DE_REMISION_ELECTRONICA,
     description: 'Nota de remisión electrónica',
     state: State.NORMAL,
   },
   {
-    code: FutureDocumentType.COMPROBANTE_DE_RETENCION_ELECTRONICO,
+    id: FutureDocumentType.COMPROBANTE_DE_RETENCION_ELECTRONICO,
     description: 'Comprobante de retención electrónico',
     state: State.A_FUTURO,
   },

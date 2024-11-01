@@ -12,31 +12,31 @@ export enum CreditCard {
 
 export const creditCards: BasicData<CreditCard>[] = [
   {
-    code: CreditCard.VISA,
+    id: CreditCard.VISA,
     description: 'Visa',
   },
   {
-    code: CreditCard.MASTERCARD,
+    id: CreditCard.MASTERCARD,
     description: 'Mastercard',
   },
   {
-    code: CreditCard.AMERICAN_EXPRESS,
+    id: CreditCard.AMERICAN_EXPRESS,
     description: 'American Express',
   },
   {
-    code: CreditCard.MAESTRO,
+    id: CreditCard.MAESTRO,
     description: 'Maestro',
   },
   {
-    code: CreditCard.PANAL,
+    id: CreditCard.PANAL,
     description: 'Panal',
   },
   {
-    code: CreditCard.CABAL,
+    id: CreditCard.CABAL,
     description: 'Cabal',
   },
   {
-    code: CreditCard.OTRO,
+    id: CreditCard.OTRO,
     description: 'Otro',
   },
 ];

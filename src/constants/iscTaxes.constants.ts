@@ -1,52 +1,52 @@
 
-type Data = { code: number, percentage: number };
+type Data = { id: number, percentage: number };
 export const iscTaxes: Data[] = [
   {
-    code: 1,
+    id: 1,
     percentage: 1,
   },
   {
-    code: 2,
+    id: 2,
     percentage: 5,
   },
   {
-    code: 3,
+    id: 3,
     percentage: 9,
   },
   {
-    code: 4,
+    id: 4,
     percentage: 10,
   },
   {
-    code: 5,
+    id: 5,
     percentage: 11,
   },
   {
-    code: 6,
+    id: 6,
     percentage: 13,
   },
   {
-    code: 7,
+    id: 7,
     percentage: 16,
   },
   {
-    code: 8,
+    id: 8,
     percentage: 18,
   },
   {
-    code: 9,
+    id: 9,
     percentage: 20,
   },
   {
-    code: 10,
+    id: 10,
     percentage: 24,
   },
   {
-    code: 11,
+    id: 11,
     percentage: 34,
   },
   {
-    code: 12,
+    id: 12,
     percentage: 38,
   },
 ]

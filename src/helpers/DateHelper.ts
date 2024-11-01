@@ -3,18 +3,13 @@ class DateHelper {
    * @returns {string} la fecha en formato AAAAMMDD
    */
   getCDCFormatDateString(date: Date) {
-    const year = date.getFullYear().toString();
-    // getMonth retorna 0 a 11, por eso se suma 1
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const day = date.getDate().toString().padStart(2, '0');
-
-    const dateAsCdcDate = year + month + day;
-    return dateAsCdcDate;
+    const [dateStr] = date.toISOString().split('T')
+    return dateStr.split('-').join('');
   }
   
   getIsoDateString(date: Date) {
-    const [validISO] = date.toISOString().split('T');
-    return validISO;
+    const [dateStr] = date.toISOString().split('T');
+    return dateStr;
   }
 
   getISODateTimeString(date: Date) {

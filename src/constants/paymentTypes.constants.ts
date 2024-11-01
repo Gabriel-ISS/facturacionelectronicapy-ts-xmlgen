@@ -27,91 +27,91 @@ export enum PaymentType {
 
 export const paymentTypes: BasicData<PaymentType>[] = [
   {
-    code: PaymentType.EFECTIVO,
+    id: PaymentType.EFECTIVO,
     description: 'Efectivo',
   },
   {
-    code: PaymentType.CHEQUE,
+    id: PaymentType.CHEQUE,
     description: 'Cheque',
   },
   {
-    code: PaymentType.TARJETA_DE_CREDITO,
+    id: PaymentType.TARJETA_DE_CREDITO,
     description: 'Tarjeta de crédito',
   },
   {
-    code: PaymentType.TARJETA_DE_DEBITO,
+    id: PaymentType.TARJETA_DE_DEBITO,
     description: 'Tarjeta de débito',
   },
   {
-    code: PaymentType.TRANSFERENCIA,
+    id: PaymentType.TRANSFERENCIA,
     description: 'Transferencia',
   },
   {
-    code: PaymentType.GIRO,
+    id: PaymentType.GIRO,
     description: 'Giro',
   },
   {
-    code: PaymentType.BILLETERA_ELECTRONICA,
+    id: PaymentType.BILLETERA_ELECTRONICA,
     description: 'Billetera electrónica',
   },
   {
-    code: PaymentType.TARJETA_EMPRESARIAL,
+    id: PaymentType.TARJETA_EMPRESARIAL,
     description: 'Tarjeta empresarial',
   },
   {
-    code: PaymentType.VALE,
+    id: PaymentType.VALE,
     description: 'Vale',
   },
   {
-    code: PaymentType.RETENCION,
+    id: PaymentType.RETENCION,
     description: 'Retención',
   },
   {
-    code: PaymentType.PAGO_POR_ANTICIPO,
+    id: PaymentType.PAGO_POR_ANTICIPO,
     description: 'Pago por anticipo',
   },
   {
-    code: PaymentType.VALOR_FISCAL,
+    id: PaymentType.VALOR_FISCAL,
     description: 'Valor fiscal',
   },
   {
-    code: PaymentType.VALOR_COMERCIAL,
+    id: PaymentType.VALOR_COMERCIAL,
     description: 'Valor comercial',
   },
   {
-    code: PaymentType.COMPENSACION,
+    id: PaymentType.COMPENSACION,
     description: 'Compensación',
   },
   {
-    code: PaymentType.PERMUTA,
+    id: PaymentType.PERMUTA,
     description: 'Permuta',
   },
   {
-    code: PaymentType.PAGO_BANCARIO,
+    id: PaymentType.PAGO_BANCARIO,
     description: 'Pago bancario',
   },
   {
-    code: PaymentType.PAGO_MOVIL,
+    id: PaymentType.PAGO_MOVIL,
     description: 'Pago Móvil',
   },
   {
-    code: PaymentType.DONACION,
+    id: PaymentType.DONACION,
     description: 'Donación',
   },
   {
-    code: PaymentType.PROMOCION,
+    id: PaymentType.PROMOCION,
     description: 'Promoción',
   },
   {
-    code: PaymentType.CONSUMO_INTERNO,
+    id: PaymentType.CONSUMO_INTERNO,
     description: 'Consumo Interno',
   },
   {
-    code: PaymentType.PAGO_ELECTRONICO,
+    id: PaymentType.PAGO_ELECTRONICO,
     description: 'Pago Electrónico',
   },
   {
-    code: PaymentType.OTRO,
+    id: PaymentType.OTRO,
     description: 'Otro',
   },
 ];

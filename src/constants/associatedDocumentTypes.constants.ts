@@ -8,15 +8,15 @@ export enum AssociatedDocumentType {
 
 export const associatedDocumentTypes: BasicData<AssociatedDocumentType>[] = [
   {
-    code: AssociatedDocumentType.ELECTRONICO,
+    id: AssociatedDocumentType.ELECTRONICO,
     description: 'Electrónico',
   },
   {
-    code: AssociatedDocumentType.IMPRESO,
+    id: AssociatedDocumentType.IMPRESO,
     description: 'Impreso',
   },
   {
-    code: AssociatedDocumentType.CONSTANCIA_ELECTRONICA,
+    id: AssociatedDocumentType.CONSTANCIA_ELECTRONICA,
     description: 'Constancia Electrónica',
   },
 ];

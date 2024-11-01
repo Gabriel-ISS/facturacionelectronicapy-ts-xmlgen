@@ -9,19 +9,19 @@ export enum TaxTreatment {
 
 export const taxTreatments: BasicData<TaxTreatment>[] = [
   {
-    code: TaxTreatment.GRAVADO_IVA,
+    id: TaxTreatment.GRAVADO_IVA,
     description: 'Gravado IVA',
   },
   {
-    code: TaxTreatment.EXONERADO__ART__100___LEY_6380_2019_,
+    id: TaxTreatment.EXONERADO__ART__100___LEY_6380_2019_,
     description: 'Exonerado (Art. 100 - Ley 6380/2019)',
   },
   {
-    code: TaxTreatment.EXENTO,
+    id: TaxTreatment.EXENTO,
     description: 'Exento',
   },
   {
-    code: TaxTreatment.GRAVADO_PARCIAL__GRAV__EXENTO_,
+    id: TaxTreatment.GRAVADO_PARCIAL__GRAV__EXENTO_,
     description: 'Gravado parcial (Grav- Exento)',
   },
 ];
