@@ -25,6 +25,9 @@ import { SectorSegurosSchema } from './EDoc/sectorSeguros.schema';
 import { SectorSupermercadosSchema } from './EDoc/sectorSupermercados.schema';
 import { TransporteSchema } from './EDoc/transporte.schema';
 import { UsuarioSchema } from './EDoc/usuario.schema';
+import { PaymentType } from '../constants/paymentTypes.constants';
+import ZodValidator from '../helpers/ZodValidator';
+import { Path } from '../helpers/Path';
 
 // TODO: BUSCAR COGIGOS INVENTADOS POR LA IA
 // TODO: VALIDAR LONGITUD DE STRINGS
@@ -108,10 +111,9 @@ export const EDocDataSchema = z
     observacion: z.string().min(1).max(3000).optional(),
 
     // D002
-    fecha: z.coerce.date().transform(value => {
+    fecha: z.coerce.date().transform((value) => {
       return DateHelper.getISODateTimeString(value);
     }),
-
 
     // B002
     tipoEmision: z
@@ -119,8 +121,7 @@ export const EDocDataSchema = z
       .default(EmissionType.NORMAL),
 
     // D011
-    tipoTransaccion: z
-      .union(enumToZodUnion(TransactionType)),
+    tipoTransaccion: z.union(enumToZodUnion(TransactionType)),
 
     // D013
     tipoImpuesto: z.union(enumToZodUnion(TaxType)),
@@ -162,7 +163,7 @@ export const EDocDataSchema = z
     documentoAsociado: DocumentoAsociadoSchema.optional(),
     transporte: TransporteSchema.optional(),
     dncp: DncpSchema.optional(),
-    
+
     // Oscar, esto lo dejo en tus manos
     // Campos complementarios comerciales de uso específico
     sectorEnergiaElectrica: SectorEnergiaElectricaSchema.optional(),
@@ -172,154 +173,70 @@ export const EDocDataSchema = z
     // listo bro (corregido por mi) :)
   })
   .superRefine((EDoc, ctx) => {
-    if (EDoc.tipoDocumento == ValidDocumentType.FACTURA_ELECTRONICA || EDoc.tipoDocumento == ValidDocumentType.AUTOFACTURA_ELECTRONICA) {
-      if (!EDoc.tipoTransaccion) {
-        ctx.addIssue({
-          path: ['tipoTransaccion'],
-          code: z.ZodIssueCode.custom,
-          message: 'Debe informar el tipo de transacción',
-        });
-      }
-    } else {
-      if (EDoc.tipoTransaccion) {
-        ctx.addIssue({
-          path: ['tipoTransaccion'],
-          code: z.ZodIssueCode.custom,
-          message: 'No debe informar el tipo de transacción',
-        });
-      }
-    }
-    
-    if (EDoc.tipoDocumento == ValidDocumentType.NOTA_DE_REMISION_ELECTRONICA) {
-      if (!EDoc.descripcion) {
-        ctx.addIssue({
-          path: ['descripcion'],
-          code: z.ZodIssueCode.custom,
-          message: 'Debe informar la descripción de la nota de remisión',
-        });
-      }
+    type ParserEDoc = z.infer<typeof EDocDataSchema>;
 
-      if (!EDoc.transporte?.tipo) {
-        ctx.addIssue({
-          path: ['transporte', 'tipo'],
-          code: z.ZodIssueCode.custom,
-          message: 'Debe informar el tipo de transporte',
-        });
-      }
-      if (!EDoc.transporte?.salida) {
-        ctx.addIssue({
-          path: ['salida'],
-          message: 'El campo salida es requerido si tipoDocumento = 7.',
-          code: z.ZodIssueCode.custom,
-        });
-      }
-      if (!EDoc.transporte?.entrega) {
-        ctx.addIssue({
-          path: ['entrega'],
-          message: 'El campo entrega es requerido si tipoDocumento = 7.',
-          code: z.ZodIssueCode.custom,
-        });
-      }
-      if (!EDoc.transporte?.vehiculo) {
-        ctx.addIssue({
-          path: ['vehiculo'],
-          message: 'El campo vehiculo es requerido si tipoDocumento = 7.',
-          code: z.ZodIssueCode.custom,
-        });
-      }
-      if (!EDoc.transporte?.transportista) {
-        ctx.addIssue({
-          path: ['transportista'],
-          message: 'El campo transportista es requerido si tipoDocumento = 7.',
-          code: z.ZodIssueCode.custom,
-        });
-      }
+    const validator = new ZodValidator(ctx, EDoc, []);
+
+    if (
+      EDoc.tipoDocumento == ValidDocumentType.FACTURA_ELECTRONICA ||
+      EDoc.tipoDocumento == ValidDocumentType.AUTOFACTURA_ELECTRONICA
+    ) {
+      validator.requiredField('tipoTransaccion');
+    } else {
+      validator.undesiredField('tipoTransaccion');
+    }
+
+    if (EDoc.tipoDocumento == ValidDocumentType.NOTA_DE_REMISION_ELECTRONICA) {
+      const transportPath = new Path<ParserEDoc>('transporte');
+
+      validator.requiredField('descripcion');
+      validator.requiredField('transporte');
+      validator.requiredField(transportPath.concat('tipo'));
+      validator.requiredField(transportPath.concat('salida'));
+      validator.requiredField(transportPath.concat('entrega'));
+      validator.requiredField(transportPath.concat('vehiculo'));
+      validator.requiredField(transportPath.concat('transportista'));
     }
 
     if (EDoc.moneda != Currency.GUARANI) {
-      if (!EDoc.condicionTipoCambio) {
-        ctx.addIssue({
-          path: ['condicionTipoCambio'],
-          code: z.ZodIssueCode.custom,
-          message: 'Debe informar el Tipo de Cambio',
-        });
-      }
-
-      if (!EDoc.cambio) {
-        ctx.addIssue({
-          path: ['cambio'],
-          code: z.ZodIssueCode.custom,
-          message: 'Debe informar el Cambio',
-        });
-      }
-
+      validator.requiredField('condicionTipoCambio');
+      validator.requiredField('cambio');
     } else {
-      if (EDoc.condicionTipoCambio) {
-        ctx.addIssue({
-          path: ['condicionTipoCambio'],
-          code: z.ZodIssueCode.custom,
-          message: 'No debe informar el Tipo de Cambio si la moneda es GUARANI',
-        });
-      }
-
-      if (EDoc.cambio != undefined) {
-        ctx.addIssue({
-          path: ['cambio'],
-          code: z.ZodIssueCode.custom,
-          message: 'No debe informar el Cambio si la moneda es GUARANI',
-        });
-      }
+      validator.undesiredField('condicionTipoCambio');
+      validator.undesiredField('cambio');
     }
 
     if (EDoc.condicionTipoCambio == GlobalAndPerItem.GLOBAL) {
-      if (!EDoc.cambio) {
-        ctx.addIssue({
-          path: ['cambio'],
-          code: z.ZodIssueCode.custom,
-          message: 'Debe informar el Cambio si la condición de tipo de cambio es GLOBAL',
-        });
-      }
+      validator.requiredField('cambio');
     } else if (EDoc.condicionTipoCambio == GlobalAndPerItem.POR_ITEM) {
-      if (EDoc.cambio) {
-        ctx.addIssue({
-          path: ['cambio'],
-          code: z.ZodIssueCode.custom,
-          message: 'No debe informar el Cambio si la condición de tipo de cambio es POR_ITEM',
-        });
-      }
+      validator.undesiredField('cambio');
     }
 
     // TODO: VALIDAR CDC
 
-    if (EDoc.cliente.tipoOperacion == OperationType.B2G && !EDoc.dncp) {
-      ctx.addIssue({
-        path: ['dncp'],
-        code: z.ZodIssueCode.custom,
-        message: 'Debe informar el DNCP si el tipo de operación es B2G',
-      });
+    if (EDoc.cliente.tipoOperacion == OperationType.B2G) {
+      validator.requiredField('dncp');
     }
 
-    if (
-      EDoc.tipoDocumento == ValidDocumentType.NOTA_DE_REMISION_ELECTRONICA &&
-      !EDoc.cliente.direccion
-    ) {
-      ctx.addIssue({
-        path: ['cliente', 'direccion'],
-        code: z.ZodIssueCode.custom,
-        message: 'Debe informar la Dirección del Cliente',
-      });
+    if (EDoc.tipoDocumento == ValidDocumentType.NOTA_DE_REMISION_ELECTRONICA) {
+      const clientePath = new Path<ParserEDoc>('cliente');
+      validator.requiredField(clientePath.concat('direccion'));
     }
 
     if (EDoc.tipoTransaccion == TransactionType.ANTICIPO) {
-      EDoc.items.forEach((item, i) => {
-        if (!item.cdcAnticipo) {
-          ctx.addIssue({
-            path: ['items', i, 'cdcAnticipo'],
-            code: z.ZodIssueCode.custom,
-            message: 'Debe indicar el CDC del anticipo',
-          });
-        }
-      })
+      const itemsPath = new Path<ParserEDoc>('items');
+      EDoc.items.forEach((_item, i) => {
+        validator.requiredField(itemsPath.concat(i).concat('cdcAnticipo'));
+      });
+    }
+
+    const associatedDocumentPath = new Path<ParserEDoc>('documentoAsociado');
+    if (EDoc.condicion?.entregas?.[0].tipo == PaymentType.RETENCION) {
+      validator.requiredField(associatedDocumentPath.concat('numeroRetencion'));
+    } else {
+      validator.undesiredField(
+        associatedDocumentPath.concat('numeroRetencion'),
+      );
     }
   });
 

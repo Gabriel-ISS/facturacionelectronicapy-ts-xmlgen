@@ -13,4 +13,5 @@ export const ComplementariosSchema = z.object({
 
   carga: CargaSchema.optional(),
 });
+
 export type Complementarios = z.infer<typeof ComplementariosSchema>;

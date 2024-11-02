@@ -3,6 +3,7 @@ import { AssociatedDocumentType } from '../../constants/associatedDocumentTypes.
 import { PrintedDocumentType } from '../../constants/printedDocumentTypes.constants';
 import DateHelper from '../../helpers/DateHelper';
 import { enumToZodUnion } from '../../helpers/zod.helpers';
+import ZodValidator from '../../helpers/ZodValidator';
 
 export const DocumentoAsociadoSchema = z
   .object({
@@ -12,35 +13,57 @@ export const DocumentoAsociadoSchema = z
     }),
 
     // H004
-    cdc: z.string().optional(),
-
-    // H009
-    tipoDocumentoImpreso: z.union(enumToZodUnion(PrintedDocumentType), {
-      required_error: 'El campo tipoDocumentoImpreso es requerido',
-    }),
+    cdc: z.string().length(44).optional(),
 
     // H005
-    timbrado: z.string(),
+    timbrado: z.string().length(8).optional(),
 
     // H005
-    establecimiento: z.string(),
+    establecimiento: z
+      .number()
+      .optional()
+      .transform((value) => {
+        if (value == undefined) return value;
+        return value.toString().padStart(3, '0');
+      }),
 
     // H007
-    punto: z.string(),
+    punto: z
+      .number()
+      .optional()
+      .transform((value) => {
+        if (!value) return value;
+        return value.toString().padStart(3, '0');
+      }),
 
     // H008
-    numero: z.string(),
+    numero: z
+      .number()
+      .optional()
+      .transform((value) => {
+        if (!value) return value;
+        return value.toString().padStart(7, '0');
+      }),
+
+    // H009
+    tipoDocumentoImpreso: z
+      .union(enumToZodUnion(PrintedDocumentType))
+      .optional(),
 
     // H011
-    fecha: z.string().refine((date) => DateHelper.isIsoDate(date), {
-      message: 'El formato de fecha debe ser ISO 8601',
-    }),
+    fecha: z.coerce
+      .date()
+      .optional()
+      .transform((value) => {
+        if (!value) return value;
+        return DateHelper.getIsoDateString(value);
+      }),
 
     // H012
-    numeroRetencion: z.string().optional(),
+    numeroRetencion: z.string().length(15).optional(),
 
     // H013
-    resolucionCreditoFiscal: z.string().optional(),
+    resolucionCreditoFiscal: z.string().length(15).optional(),
 
     // H014
     constanciaTipo: z.string().optional(),
@@ -54,13 +77,32 @@ export const DocumentoAsociadoSchema = z
     // H018
     rucFusionado: z.string().optional(),
   })
-  .superRefine((associatedDocument, ctx) => {
-    if (associatedDocument.establecimiento && !associatedDocument.fecha) {
-      ctx.addIssue({
-        path: ['fecha'],
-        code: z.ZodIssueCode.custom,
-        message: 'Debe proporcionar la fecha de emisión del documento impreso',
-      });
+  .superRefine((data, ctx) => {
+    const validator = new ZodValidator(ctx, data, ['associatedDocument']);
+
+    if (data.formato == AssociatedDocumentType.IMPRESO) {
+      validator.requiredField('cdc');
+      validator.requiredField('timbrado');
+      validator.requiredField('establecimiento');
+      validator.requiredField('punto');
+      validator.requiredField('numero');
+      validator.requiredField('tipoDocumentoImpreso');
+    } else if (
+      data.formato == AssociatedDocumentType.ELECTRONICO ||
+      data.formato ==
+        AssociatedDocumentType.CONSTANCIA_ELECTRONICA
+    ) {
+      validator.undesiredField('cdc');
+      validator.undesiredField('timbrado');
+      validator.undesiredField('establecimiento');
+      validator.undesiredField('punto');
+    }
+
+    if (data.establecimiento) {
+      validator.requiredField('fecha');
+    } else {
+      validator.undesiredField('fecha');
     }
   });
+
 export type DocumentoAsociado = z.infer<typeof DocumentoAsociadoSchema>;

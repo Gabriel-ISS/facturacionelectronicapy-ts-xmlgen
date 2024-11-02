@@ -10,7 +10,10 @@ export function enumToZodUnion<T extends Record<string, any>>(
   return Object.values(enumObj).map((value) => z.literal(value)) as any;
 }
 
-export function enumToZodEnum<T extends Record<string, string>, V extends T[string]>(enumObj: T) {
+export function enumToZodEnum<
+  T extends Record<string, string>,
+  V extends T[string],
+>(enumObj: T) {
   return Object.values(enumObj) as any as readonly [V, ...V[]];
 }
 

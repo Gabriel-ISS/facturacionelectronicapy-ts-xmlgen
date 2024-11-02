@@ -22,7 +22,7 @@ export const EntregasSchema = z
     }).min(1).max(999999999999999),
 
     // E609: TODO: "Se requiere la misma moneda para todos los ítems del DE"
-    moneda: z.enum(enumToZodEnum(Currency), {
+    moneda: z.enum(enumToZodEnum<typeof Currency, Currency>(Currency), {
       required_error: 'La moneda por tipo de pago es requerida',
     }),
 

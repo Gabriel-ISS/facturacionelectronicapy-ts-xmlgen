@@ -109,7 +109,7 @@ export default Object.freeze({
   obligations,
   currencies,
   regimeTypes,
-  identityDocuments: userIdentityDocuments,
+  userIdentityDocuments,
   typesOfIdentityDocumentsCarriers: identityDocumentsCarriers,
   typesOfDocumentsReceptors: identityDocumentsReceptors,
   typesOfDocumentsInnominateReceptors: identityDocumentsInnominateReceptors,

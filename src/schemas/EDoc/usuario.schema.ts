@@ -1,6 +1,8 @@
 import { z } from 'zod';
 import { UserIdentityDocument, userIdentityDocuments } from '../../constants/userIdentityDocuments.constants';
 import { enumToZodUnion } from '../../helpers/zod.helpers';
+import ZodValidator from '../../helpers/ZodValidator';
+import dbService from '../../services/db.service';
 
 export const UsuarioSchema = z
   .object({
@@ -8,9 +10,7 @@ export const UsuarioSchema = z
     documentoTipo: z.union(enumToZodUnion(UserIdentityDocument)),
 
     // D142
-    documentoTipoDescripcion: z.string().min(9).max(41),
-    // correccion david: no es opcional
-
+    documentoTipoDescripcion: z.string().min(9).max(41).optional(),
     
     // D143
     documentoNumero: z.string().min(1).max(20),
@@ -21,24 +21,17 @@ export const UsuarioSchema = z
     // D145
     cargo: z.string().min(4).max(100),
   })
-  .superRefine((user, ctx) => {
+  .transform((user, ctx) => {
+    const validator = new ZodValidator(ctx, user, ['user']);
+
     if (user.documentoTipo == UserIdentityDocument.OTRO) {
-      if (!user.documentoTipoDescripcion) {
-        ctx.addIssue({
-          path: ['documentoTipoDescripcion'],
-          code: z.ZodIssueCode.custom,
-          message: 'Debe proporcionar la descripción del documento',
-        });
-      }
+      validator.requiredField('documentoTipoDescripcion');
     } else {
-      const correctDescription = userIdentityDocuments.find(uid => uid.id == user.documentoTipo)?.description;
-      if (correctDescription != user.documentoTipoDescripcion) {
-        ctx.addIssue({
-          path: ['documentoTipoDescripcion'],
-          code: z.ZodIssueCode.custom,
-          message: 'La descripción del documento no coincide con el codigo de documento',
-        });
-      }
+      const identityDocument = dbService.select('userIdentityDocuments').findById(user.documentoTipo) 
+      user.documentoTipoDescripcion = identityDocument?.description;
     }
+
+    return user;
   });
+
 export type Usuario = z.infer<typeof UsuarioSchema>;

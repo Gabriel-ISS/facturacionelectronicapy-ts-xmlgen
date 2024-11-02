@@ -241,7 +241,7 @@ class JSonDteTransporteService {
 
     if (!data.detalleTransporte['transportista']['contribuyente']) {
       jsonResult['iTipIDTrans'] = data.detalleTransporte['transportista']['documentoTipo'];
-      jsonResult['dDTipIDTrans'] = constanteService.identityDocuments.filter(
+      jsonResult['dDTipIDTrans'] = constanteService.userIdentityDocuments.filter(
         (td) => td.id === data.detalleTransporte['transportista']['documentoTipo'],
       )[0]['description'];
       jsonResult['dNumIDTrans'] = data.detalleTransporte['transportista']['documentoNumero'].substring(0, 20);

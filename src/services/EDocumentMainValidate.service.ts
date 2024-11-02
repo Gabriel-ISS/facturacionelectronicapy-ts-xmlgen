@@ -687,14 +687,14 @@ class EDocumentMainValidateService {
 
   private generateDatosGeneralesResponsableGeneracionDEValidate(params: EDocumentParams, data: EDocumentData) {
     if (
-      constanteService.identityDocuments.filter((um: any) => um.codigo === +data['usuario']['documentoTipo'])
+      constanteService.userIdentityDocuments.filter((um: any) => um.codigo === +data['usuario']['documentoTipo'])
         .length == 0
     ) {
       this.validator.errors.push(
         "Tipo de Documento '" +
           data['usuario']['documentoTipo'] +
           "' no encontrado en data.usuario.documentoTipo. Valores: " +
-          constanteService.identityDocuments.map((a: any) => a.codigo + '-' + a.descripcion),
+          constanteService.userIdentityDocuments.map((a: any) => a.codigo + '-' + a.descripcion),
       );
     }
 
@@ -1238,14 +1238,14 @@ class EDocumentMainValidateService {
     }
 
     if (
-      constanteService.identityDocuments.filter((um: any) => um.codigo === data['autoFactura']['documentoTipo'])
+      constanteService.userIdentityDocuments.filter((um: any) => um.codigo === data['autoFactura']['documentoTipo'])
         .length == 0
     ) {
       this.validator.errors.push(
         "Tipo de Documento '" +
           data['autoFactura']['documentoTipo'] +
           "' en data.autoFactura.documentoTipo no encontrado. Valores: " +
-          constanteService.identityDocuments.map((a: any) => a.codigo + '-' + a.descripcion),
+          constanteService.userIdentityDocuments.map((a: any) => a.codigo + '-' + a.descripcion),
       );
     }
 
@@ -2715,7 +2715,7 @@ class EDocumentMainValidateService {
           );
         } else {
           if (
-            constanteService.identityDocuments.filter(
+            constanteService.userIdentityDocuments.filter(
               (um) => um.id === data.detalleTransporte['transportista']['documentoTipo'],
             ).length == 0
           ) {
@@ -2723,7 +2723,7 @@ class EDocumentMainValidateService {
               "Tipo de Documento '" +
                 data.detalleTransporte['transportista']['documentoTipo'] +
                 "' en data.transporte.transportista.documentoTipo no encontrado. Valores: " +
-                constanteService.identityDocuments.map((a) => a.id + '-' + a.description),
+                constanteService.userIdentityDocuments.map((a) => a.id + '-' + a.description),
             );
           }
         }

@@ -1201,7 +1201,7 @@ class JSonDeMainService {
   private generateDatosGeneralesResponsableGeneracionDE(params: any, data: any) {
     this.json['rDE']['DE']['gDatGralOpe']['gEmis']['gRespDE'] = {
       iTipIDRespDE: data['usuario']['documentoTipo'],
-      dDTipIDRespDE: constantService.identityDocuments.filter(
+      dDTipIDRespDE: constantService.userIdentityDocuments.filter(
         (td) => td.id === +data['usuario']['documentoTipo'],
       )[0]['description'],
     };
@@ -1463,7 +1463,7 @@ class JSonDeMainService {
         (nv) => nv.id === data['autoFactura']['tipoVendedor'],
       )[0]['description'],
       iTipIDVen: data['autoFactura']['documentoTipo'],
-      dDTipIDVen: constantService.identityDocuments.filter(
+      dDTipIDVen: constantService.userIdentityDocuments.filter(
         (td) => td.id === data['autoFactura']['documentoTipo'],
       )[0]['description'],
       dNumIDVen: data['autoFactura']['documentoNumero'],

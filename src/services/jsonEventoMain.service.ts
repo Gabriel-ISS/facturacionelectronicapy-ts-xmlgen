@@ -492,13 +492,13 @@ class JSonEventoMainService {
 
     if (+data['tipoReceptor'] == 2) {
       if (
-        constanteService.identityDocuments.filter((um: any) => um.codigo === data['documentoTipo']).length == 0
+        constanteService.userIdentityDocuments.filter((um: any) => um.codigo === data['documentoTipo']).length == 0
       ) {
         throw new Error(
           "Tipo de Documento '" +
             data['documentoTipo'] +
             "' en data.documentoTipo no encontrado. Valores: " +
-            constanteService.identityDocuments.map((a: any) => a.codigo + '-' + a.descripcion),
+            constanteService.userIdentityDocuments.map((a: any) => a.codigo + '-' + a.descripcion),
         );
       }
 
@@ -571,13 +571,13 @@ class JSonEventoMainService {
 
     if (+data['tipoReceptor'] == 2) {
       if (
-        constanteService.identityDocuments.filter((um: any) => um.codigo === data['documentoTipo']).length == 0
+        constanteService.userIdentityDocuments.filter((um: any) => um.codigo === data['documentoTipo']).length == 0
       ) {
         throw new Error(
           "Tipo de Documento '" +
             data['documentoTipo'] +
             "' en data.documentoTipo no encontrado. Valores: " +
-            constanteService.identityDocuments.map((a: any) => a.codigo + '-' + a.descripcion),
+            constanteService.userIdentityDocuments.map((a: any) => a.codigo + '-' + a.descripcion),
         );
       }
 
