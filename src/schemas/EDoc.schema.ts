@@ -55,6 +55,7 @@ import { Path } from '../helpers/Path';
  */
 export const EDocDataSchema = z
   .object({
+    // TODO DAVITD: APLICAR ZodValidator
     // C002
     tipoDocumento: z.union(enumToZodUnion(ValidDocumentType)),
 
@@ -164,30 +165,27 @@ export const EDocDataSchema = z
     transporte: TransporteSchema.optional(),
     dncp: DncpSchema.optional(),
 
-    // Oscar, esto lo dejo en tus manos
     // Campos complementarios comerciales de uso específico
     sectorEnergiaElectrica: SectorEnergiaElectricaSchema.optional(),
     sectorSeguros: SectorSegurosSchema.optional(),
     sectorSupermercados: SectorSupermercadosSchema.optional(),
     sectorAdicional: SectorAdicionalSchema.optional(),
-    // listo bro (corregido por mi) :)
   })
-  .superRefine((EDoc, ctx) => {
-    type ParserEDoc = z.infer<typeof EDocDataSchema>;
-
-    const validator = new ZodValidator(ctx, EDoc);
+  .superRefine((data, ctx) => {
+    type Data = typeof data;
+    const validator = new ZodValidator(ctx, data);
 
     if (
-      EDoc.tipoDocumento == ValidDocumentType.FACTURA_ELECTRONICA ||
-      EDoc.tipoDocumento == ValidDocumentType.AUTOFACTURA_ELECTRONICA
+      data.tipoDocumento == ValidDocumentType.FACTURA_ELECTRONICA ||
+      data.tipoDocumento == ValidDocumentType.AUTOFACTURA_ELECTRONICA
     ) {
       validator.requiredField('tipoTransaccion');
     } else {
       validator.undesiredField('tipoTransaccion');
     }
 
-    if (EDoc.tipoDocumento == ValidDocumentType.NOTA_DE_REMISION_ELECTRONICA) {
-      const transportPath = new Path<ParserEDoc>('transporte');
+    if (data.tipoDocumento == ValidDocumentType.NOTA_DE_REMISION_ELECTRONICA) {
+      const transportPath = new Path<Data>('transporte');
 
       validator.requiredField('descripcion');
       validator.requiredField('transporte');
@@ -198,7 +196,7 @@ export const EDocDataSchema = z
       validator.requiredField(transportPath.concat('transportista'));
     }
 
-    if (EDoc.moneda != Currency.GUARANI) {
+    if (data.moneda != Currency.GUARANI) {
       validator.requiredField('condicionTipoCambio');
       validator.requiredField('cambio');
     } else {
@@ -206,32 +204,32 @@ export const EDocDataSchema = z
       validator.undesiredField('cambio');
     }
 
-    if (EDoc.condicionTipoCambio == GlobalAndPerItem.GLOBAL) {
+    if (data.condicionTipoCambio == GlobalAndPerItem.GLOBAL) {
       validator.requiredField('cambio');
-    } else if (EDoc.condicionTipoCambio == GlobalAndPerItem.POR_ITEM) {
+    } else if (data.condicionTipoCambio == GlobalAndPerItem.POR_ITEM) {
       validator.undesiredField('cambio');
     }
 
     // TODO: VALIDAR CDC
 
-    if (EDoc.cliente.tipoOperacion == OperationType.B2G) {
+    if (data.cliente.tipoOperacion == OperationType.B2G) {
       validator.requiredField('dncp');
     }
 
-    if (EDoc.tipoDocumento == ValidDocumentType.NOTA_DE_REMISION_ELECTRONICA) {
-      const clientePath = new Path<ParserEDoc>('cliente');
+    if (data.tipoDocumento == ValidDocumentType.NOTA_DE_REMISION_ELECTRONICA) {
+      const clientePath = new Path<Data>('cliente');
       validator.requiredField(clientePath.concat('direccion'));
     }
 
-    if (EDoc.tipoTransaccion == TransactionType.ANTICIPO) {
-      const itemsPath = new Path<ParserEDoc>('items');
-      EDoc.items.forEach((_item, i) => {
+    if (data.tipoTransaccion == TransactionType.ANTICIPO) {
+      const itemsPath = new Path<Data>('items');
+      data.items.forEach((_item, i) => {
         validator.requiredField(itemsPath.concat(i).concat('cdcAnticipo'));
       });
     }
 
-    const associatedDocumentPath = new Path<ParserEDoc>('documentoAsociado');
-    if (EDoc.condicion?.entregas?.[0].tipo == PaymentType.RETENCION) {
+    const associatedDocumentPath = new Path<Data>('documentoAsociado');
+    if (data.condicion?.entregas?.[0].tipo == PaymentType.RETENCION) {
       validator.requiredField(associatedDocumentPath.concat('numeroRetencion'));
     } else {
       validator.undesiredField(
