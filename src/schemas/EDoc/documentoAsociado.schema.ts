@@ -78,7 +78,7 @@ export const DocumentoAsociadoSchema = z
     rucFusionado: z.string().optional(),
   })
   .superRefine((data, ctx) => {
-    const validator = new ZodValidator(ctx, data, ['associatedDocument']);
+    const validator = new ZodValidator(ctx, data);
 
     if (data.formato == AssociatedDocumentType.IMPRESO) {
       validator.requiredField('cdc');

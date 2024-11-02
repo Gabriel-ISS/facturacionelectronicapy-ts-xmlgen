@@ -6,7 +6,6 @@ export default class ZodValidator<T extends Record<string, any>> {
   constructor(
     readonly ctx: z.RefinementCtx,
     readonly object: T,
-    readonly objPath: string[],
   ) {}
 
   validate(
@@ -18,7 +17,7 @@ export default class ZodValidator<T extends Record<string, any>> {
       this.ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message,
-        path: this.objPath.concat(fieldNameOrPath.toString()),
+        path: this.ctx.path.concat(fieldNameOrPath.toString()),
       });
     }
   }

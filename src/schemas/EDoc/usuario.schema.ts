@@ -22,7 +22,7 @@ export const UsuarioSchema = z
     cargo: z.string().min(4).max(100),
   })
   .transform((user, ctx) => {
-    const validator = new ZodValidator(ctx, user, ['user']);
+    const validator = new ZodValidator(ctx, user);
 
     if (user.documentoTipo == UserIdentityDocument.OTRO) {
       validator.requiredField('documentoTipoDescripcion');

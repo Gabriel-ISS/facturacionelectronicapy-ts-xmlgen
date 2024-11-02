@@ -175,7 +175,7 @@ export const EDocDataSchema = z
   .superRefine((EDoc, ctx) => {
     type ParserEDoc = z.infer<typeof EDocDataSchema>;
 
-    const validator = new ZodValidator(ctx, EDoc, []);
+    const validator = new ZodValidator(ctx, EDoc);
 
     if (
       EDoc.tipoDocumento == ValidDocumentType.FACTURA_ELECTRONICA ||
