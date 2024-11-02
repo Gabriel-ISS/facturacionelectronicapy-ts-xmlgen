@@ -174,19 +174,19 @@ export const EDocDataSchema = z
   .superRefine((data, ctx) => {
     type Data = typeof data;
     const validator = new ZodValidator(ctx, data);
+    const transportPath = new Path<Data>('transporte');
+    const associatedDocumentPath = new Path<Data>('documentoAsociado');
+    const clientePath = new Path<Data>('cliente');
 
+    // POR EL TIPO DE DOCUMENTO
     if (
       data.tipoDocumento == ValidDocumentType.FACTURA_ELECTRONICA ||
       data.tipoDocumento == ValidDocumentType.AUTOFACTURA_ELECTRONICA
     ) {
       validator.requiredField('tipoTransaccion');
-    } else {
-      validator.undesiredField('tipoTransaccion');
-    }
-
-    if (data.tipoDocumento == ValidDocumentType.NOTA_DE_REMISION_ELECTRONICA) {
-      const transportPath = new Path<Data>('transporte');
-
+    } else if (
+      data.tipoDocumento == ValidDocumentType.NOTA_DE_REMISION_ELECTRONICA
+    ) {
       validator.requiredField('descripcion');
       validator.requiredField('transporte');
       validator.requiredField(transportPath.concat('tipo'));
@@ -194,8 +194,12 @@ export const EDocDataSchema = z
       validator.requiredField(transportPath.concat('entrega'));
       validator.requiredField(transportPath.concat('vehiculo'));
       validator.requiredField(transportPath.concat('transportista'));
+      validator.requiredField(clientePath.concat('direccion'));
+    } else {
+      validator.undesiredField('tipoTransaccion');
     }
 
+    // POR EL TIPO DE MONEDA
     if (data.moneda != Currency.GUARANI) {
       validator.requiredField('condicionTipoCambio');
       validator.requiredField('cambio');
@@ -204,6 +208,7 @@ export const EDocDataSchema = z
       validator.undesiredField('cambio');
     }
 
+    // POR EL TIPO DE CAMBIO
     if (data.condicionTipoCambio == GlobalAndPerItem.GLOBAL) {
       validator.requiredField('cambio');
     } else if (data.condicionTipoCambio == GlobalAndPerItem.POR_ITEM) {
@@ -212,30 +217,41 @@ export const EDocDataSchema = z
 
     // TODO: VALIDAR CDC
 
+    // POR EL TIPO DE OPERACIÓN
     if (data.cliente.tipoOperacion == OperationType.B2G) {
       validator.requiredField('dncp');
     }
 
-    if (data.tipoDocumento == ValidDocumentType.NOTA_DE_REMISION_ELECTRONICA) {
-      const clientePath = new Path<Data>('cliente');
-      validator.requiredField(clientePath.concat('direccion'));
-    }
-
+    // POR EL TIPO DE TRANSACCIÓN
     if (data.tipoTransaccion == TransactionType.ANTICIPO) {
       const itemsPath = new Path<Data>('items');
       data.items.forEach((_item, i) => {
         validator.requiredField(itemsPath.concat(i).concat('cdcAnticipo'));
       });
+    } else if (
+      data.tipoTransaccion == TransactionType.VENTA_DE_CREDITO_FISCAL
+    ) {
+      validator.requiredField(
+        associatedDocumentPath.concat('resolucionCreditoFiscal'),
+      );
+    } else {
+      validator.undesiredField(
+        associatedDocumentPath.concat('resolucionCreditoFiscal'),
+      );
     }
 
-    const associatedDocumentPath = new Path<Data>('documentoAsociado');
-    if (data.condicion?.entregas?.[0].tipo == PaymentType.RETENCION) {
+    // POR LA CONDICIÓN DE ENTREGA
+    if (
+      data.condicion?.entregas?.some((d) => d.tipo == PaymentType.RETENCION)
+    ) {
       validator.requiredField(associatedDocumentPath.concat('numeroRetencion'));
     } else {
       validator.undesiredField(
         associatedDocumentPath.concat('numeroRetencion'),
       );
     }
+
+    // Y POR LA GLORIA!!! (TODO: ELIMINAR ESTO)
   });
 
 /** Estructura de los datos de un Documento Electrónico.

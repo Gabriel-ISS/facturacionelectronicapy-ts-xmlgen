@@ -20,13 +20,20 @@ export const TransporteSchema = z.object({
   tipoResponsable: z.union(enumToZodUnion(FreightResponsible)),
 
   // E906
-  condicionNegociacion: z.enum(enumToZodEnum(TradingCondition)).optional(),
+  condicionNegociacion: z
+    .enum(
+      enumToZodEnum<typeof TradingCondition, TradingCondition>(
+        TradingCondition,
+      ),
+    )
+    .optional(),
 
   // E907
-  numeroManifiesto: z.string().optional(),
+  numeroManifiesto: z.string().min(1).max(15).optional(),
 
   // E908
-  numeroDespachoImportacion: z.string().optional(),
+  // Obligatorio si Motivo de emisión  = 5
+  numeroDespachoImportacion: z.string().length(16).optional(),
 
   // E909
   inicioEstimadoTranslado: z.string().optional(),

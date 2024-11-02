@@ -48,10 +48,10 @@ export const RemisionSchema = z.object({
 
   return {
     ...data,
-    motivoDescripcion: motive?.description || '',
+    motivoDescripcion: motive?.description as string,
 
     // E504
-    descripcionTipoResponsable: responsibleType?.description || ''
+    descripcionTipoResponsable: responsibleType?.description as string
   };
 });
 

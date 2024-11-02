@@ -4,6 +4,7 @@ import { PrintedDocumentType } from '../../constants/printedDocumentTypes.consta
 import DateHelper from '../../helpers/DateHelper';
 import { enumToZodUnion } from '../../helpers/zod.helpers';
 import ZodValidator from '../../helpers/ZodValidator';
+import { ConstancyType } from '../../constants/constancyTypes.constants';
 
 export const DocumentoAsociadoSchema = z
   .object({
@@ -66,7 +67,7 @@ export const DocumentoAsociadoSchema = z
     resolucionCreditoFiscal: z.string().length(15).optional(),
 
     // H014
-    constanciaTipo: z.string().optional(),
+    constanciaTipo: z.union(enumToZodUnion(ConstancyType)).optional(),
 
     // H016
     constanciaNumero: z.string().optional(),
@@ -74,8 +75,8 @@ export const DocumentoAsociadoSchema = z
     // H017
     constanciaControl: z.string().optional(),
 
-    // H018
-    rucFusionado: z.string().optional(),
+    // H018: TODO: OTRO DESAPARECIDO
+    /* rucFusionado: z.string().optional(), */
   })
   .superRefine((data, ctx) => {
     const validator = new ZodValidator(ctx, data);
@@ -89,13 +90,25 @@ export const DocumentoAsociadoSchema = z
       validator.requiredField('tipoDocumentoImpreso');
     } else if (
       data.formato == AssociatedDocumentType.ELECTRONICO ||
-      data.formato ==
-        AssociatedDocumentType.CONSTANCIA_ELECTRONICA
+      data.formato == AssociatedDocumentType.CONSTANCIA_ELECTRONICA
     ) {
       validator.undesiredField('cdc');
       validator.undesiredField('timbrado');
       validator.undesiredField('establecimiento');
       validator.undesiredField('punto');
+    }
+
+    if (data.formato == AssociatedDocumentType.CONSTANCIA_ELECTRONICA) {
+      validator.requiredField('constanciaTipo');
+
+      if (data.constanciaTipo == ConstancyType.CONSTANCIA_DE_MICROPRODUCTORES) {
+        validator.requiredField('constanciaNumero');
+        validator.requiredField('constanciaControl');
+      }
+    } else {
+      validator.undesiredField('constanciaTipo');
+      validator.undesiredField('constanciaNumero');
+      validator.undesiredField('constanciaControl');
     }
 
     if (data.establecimiento) {
