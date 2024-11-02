@@ -8,7 +8,9 @@ export const UsuarioSchema = z
     documentoTipo: z.union(enumToZodUnion(UserIdentityDocument)),
 
     // D142
-    documentoTipoDescripcion: z.string().min(9).max(41).optional(),
+    documentoTipoDescripcion: z.string().min(9).max(41),
+    // correccion david: no es opcional
+
     
     // D143
     documentoNumero: z.string().min(1).max(20),

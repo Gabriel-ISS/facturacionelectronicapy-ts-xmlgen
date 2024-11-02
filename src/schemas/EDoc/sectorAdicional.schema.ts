@@ -1,23 +1,33 @@
 import { z } from 'zod';
+import { validateNumberLength } from '../../helpers/zod.helpers';
 
 export const SectorAdicionalSchema = z.object({
   // E821
-  ciclo: z.string().optional().describe('Ciclo'),
+  ciclo: z.string().min(1).max(15).optional().describe('Ciclo'),
   
   // E822
-  inicioCiclo: z.string().optional().describe('Fecha de inicio de ciclo'),
+  inicioCiclo: z.string().length(10).optional().describe('Fecha de inicio de ciclo'),
   
   // E823
-  finCiclo: z.string().optional().describe('Fecha de fin de ciclo'),
+  finCiclo: z.string().length(10).optional().describe('Fecha de fin de ciclo'),
   
   // E824
-  vencimientoPago: z.string().optional().describe('Fecha de vencimiento para el pago'),
+  vencimientoPago: z.string().length(10).optional().describe('Fecha de vencimiento para el pago'),
   
   // E825
-  numeroContrato: z.string().optional().describe('Número de contrato E'),
+  numeroContrato: z.string().min(1).max(30).optional().describe('Número de contrato E'),
   
   // E826
-  saldoAnterior: z.number().optional().describe('Saldo anterior'),
+  saldoAnterior: z.number().optional().superRefine((data, ctx) => {
+    if (data == undefined) return;
+    validateNumberLength({
+      value: data,
+      fieldName: 'saldoAnterior',
+      maxDecimals: 4,
+      max: 15,
+      ctx,
+    })
+  }).describe('Saldo anterior'),
 }).superRefine((data, ctx) => {
   if (data.inicioCiclo && data.finCiclo) {
     const inicio = new Date(data.inicioCiclo);

@@ -169,6 +169,7 @@ export const EDocDataSchema = z
     sectorSeguros: SectorSegurosSchema.optional(),
     sectorSupermercados: SectorSupermercadosSchema.optional(),
     sectorAdicional: SectorAdicionalSchema.optional(),
+    // listo bro (corregido por mi) :)
   })
   .superRefine((EDoc, ctx) => {
     if (EDoc.tipoDocumento == ValidDocumentType.FACTURA_ELECTRONICA || EDoc.tipoDocumento == ValidDocumentType.AUTOFACTURA_ELECTRONICA) {

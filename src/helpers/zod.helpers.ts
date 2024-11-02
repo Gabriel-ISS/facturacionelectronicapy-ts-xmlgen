@@ -19,10 +19,11 @@ export function validateNumberLength(data: {
   min?: number;
   max: number;
   maxDecimals?: number;
+  decimalsLength?: number;
   ctx: z.RefinementCtx;
   fieldName: string;
 }) {
-  const { value, min = 1, max, maxDecimals, ctx, fieldName } = data;
+  const { value, min = 1, max, maxDecimals, decimalsLength, ctx, fieldName } = data;
 
   if (value < 0) {
     ctx.addIssue({
@@ -54,6 +55,16 @@ export function validateNumberLength(data: {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: `No se pueden tener más de ${maxDecimals} decimales`,
+        path: [fieldName],
+      });
+    }
+  }
+
+  if (decimalsLength) {
+    if (decimalsLength != decimalPart.length) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `La longitud de la parte decimal debe ser de ${decimalsLength}`,
         path: [fieldName],
       });
     }
