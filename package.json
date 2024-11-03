@@ -1,8 +1,9 @@
 {
-  "name": "facturacionelectronicapy-xmlgen",
-  "version": "1.0.251",
+  "name": "facturacionelectronicapy-ts-xmlgen",
+  "version": "1.0.0",
   "description": "API Node JS para generar el archivo XML del Documento electrónico exigido por la SET en base a JSON",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "start": "nodemon --config nodemon.json ./app.ts",
     "debug": "export DEBUG=* && npm start",
@@ -18,11 +19,12 @@
     "postversion": "git push && git push --tags"
   },
   "files": [
-    "dist/**/*"
+    "dist",
+    "data"
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/marcosjara/facturacionelectronicapy-xmlgen.git"
+    "url": "https://github.com/Gabriel-ISS/facturacionelectronicapy-ts-xmlgen.git"
   },
   "keywords": [
     "Facturacion electrónica",
@@ -31,12 +33,12 @@
     "SET",
     "Paraguay"
   ],
-  "author": "Marcos Jara",
+  "author": "Gabriel Sanabria",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/marcosjara/facturacionelectronicapy-xmlgen/issues"
+    "url": "https://github.com/Gabriel-ISS/facturacionelectronicapy-ts-xmlgen/issues"
   },
-  "homepage": "https://github.com/marcosjara/facturacionelectronicapy-xmlgen#readme",
+  "homepage": "https://github.com/Gabriel-ISS/facturacionelectronicapy-ts-xmlgen#readme",
   "dependencies": {
     "copyfiles": "^2.4.1",
     "fs": "0.0.1-security",
