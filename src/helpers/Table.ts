@@ -1,57 +1,67 @@
-type SchemaPart<
-  T extends [header: string, value: any] = [header: string, value: any],
-> = T;
+import fs from 'fs';
+import csv from 'csv-parser';
+
+type SchemaPart = [header: string, value: any]
 
 export type Schema<T extends SchemaPart[] = SchemaPart[]> = T;
-
-type Headers<S extends Schema> = { [key in keyof S]: S[key][0] };
 type Row<S extends Schema> = { [key in keyof S]: S[key][1] };
 
-type _Combine<
+// LO DEJO PORQUE PUEDE VOLVER A SER UTIL
+/* type _Combine<
   T,
   K extends PropertyKey = T extends unknown ? keyof T : never,
 > = T extends unknown ? T & Partial<Record<Exclude<K, keyof T>, never>> : never;
 
-type Combine<T> = Required<{ [K in keyof _Combine<T>]: _Combine<T>[K] }>;
-
-type RowAsObject<S extends Schema> = Combine<
-  {
-    [key in keyof S]: Record<S[key][0], S[key][1]>;
-  }[number]
->;
-
-// TODO: usar file name para leer el archivo y parsearlo con csv-parser
+type Combine<T> = Required<{ [K in keyof _Combine<T>]: _Combine<T>[K] }>; */
 
 /**
  * @example
  * type S = Schema<[['_id', number], ['description', string]]>;
- * 
+ *
  * const t = new Table<S>(
  *   'test',
- *   ['_id', 'description'],
- *   [
- *     [1, 'asdf'],
- *     [2, 'qwer'],
- *   ],
+ *   '../data/test.csv',
  * );
  */
-export default class Table<S extends Schema> {
-  constructor(
-    readonly tableName: string,
-    readonly fileName: string,
-  ) {}
+export default class Table<
+  S extends Schema<[[header: '_id', value: string | number], ...SchemaPart[]]>,
+  ID extends S[0][0] = S[0][0],
+  R extends Row<S> & {_id: ID} = Row<S> & {_id: ID},
+> {
+  data: Promise<R[]>;
+  idIndex: Promise<Map<S[0][0], number>>;
 
-  private rowToObject(row: Row<S>): RowAsObject<S> {
-    let obj: any = {};
-    for (const index in this.headers) {
-      const key = this.headers[index];
-      obj[key] = row[index];
-    }
-    return obj;
+  constructor(readonly tableName: string, readonly filePath: string) {
+    this.data = new Promise(() => {});
+    this.idIndex = new Promise(() => {});
+
+    let data: R[] = [];
+    let idIndex: Map<S[0][0], number> = new Map();
+    let i = 0;
+
+    fs.createReadStream(this.filePath)
+      .pipe(csv())
+      .on('data', (row) => {
+        data.push(row);
+        idIndex.set((row as R)._id, i);
+        i++;
+      })
+      .on('end', () => {
+        this.data = Promise.resolve(data);
+        this.idIndex = Promise.resolve(idIndex);
+      })
+      .on('error', (error) => {
+        console.error('Error al leer el archivo CSV:', error);
+      });
   }
 
-  findById(_id: number) {
-    const foundRow = this.rows.find((row) => row[0] == _id);
-    return foundRow ? this.rowToObject(foundRow) : null;
+  async findById(id: ID) {
+    const idIndex = await this.idIndex;
+
+    const index = idIndex.get(id);
+    if (index == null) return null;
+
+    const data = await this.data;
+    return data[index];
   }
 }

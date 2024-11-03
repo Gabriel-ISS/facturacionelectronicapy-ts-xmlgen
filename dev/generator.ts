@@ -1,8 +1,7 @@
 import fs from 'fs';
+import { Parser } from 'json2csv';
 import * as readline from 'readline';
 import constantsService, { BasicData } from '../src/services/constants.service';
-import Table from '../src/helpers/Table';
-import {Parser} from 'json2csv';
 
 /**
  * Para no tener que repetir los archivos si se deja el trabajo a la mitad
@@ -10,8 +9,8 @@ import {Parser} from 'json2csv';
  */
 class Progress {
   constructor(
-    readonly PROGRESS_FILE = '_progress.dev.txt',
-    readonly SKIP_FILE = '_skipped.dev.txt',
+    readonly PROGRESS_FILE,
+    readonly SKIP_FILE,
     readonly SEPARATOR = '\n',
   ) {}
 
@@ -93,13 +92,13 @@ class ToTableTransformer<
 
   constructor(readonly currentData: T) {}
 
-  /** 
+  /**
    * @param currentConstantFilePath
    * debería ser relativo a este archivo
-   * 
+   *
    * @param tableName
    * el nombre que identifica la tabla
-   * 
+   *
    * @param csvFilePath
    * debería ser relativo al archivo donde se guardara la tabla
    * ademas debería guardarse en la carpeta data
@@ -147,10 +146,7 @@ class ToTableTransformer<
     return `type S = Schema<[${fields.join(', ')}]>;\n\n`;
   }
 
-  private getTableStr(
-    tableName: string, 
-    csvFilePath: string,
-  ): string {
+  private getTableStr(tableName: string, csvFilePath: string): string {
     let table = '';
     table += `const table: Table<S> = new Table<S>(\n`;
     table += `  '${tableName}',\n`;
@@ -161,39 +157,19 @@ class ToTableTransformer<
   }
 }
 
-const progress = new Progress('_progress.dev.txt', '_skipped.dev.txt', '\n');
-//const constantFormatter = new ConstantFormatter();
-const rl = new ReadLine();
-
-
-type ConstanteService = typeof constantsService;
-type KeyOfData = keyof ConstanteService;
-async function createConstantFile<T extends BasicData>(
-  key: KeyOfData,
-  data: T[],
-  fileName: string,
-  folderName: string = ''
-) {
-  const fileContent = new ToTableTransformer(data).getTableFileContent(fileName);
-
-  const createFile = (fileName: string, content: string) => {
-    return new Promise<string>((resolve, reject) => {
-      fs.writeFile(fileName, content, (err) => {
-        if (err) reject(err);
-        else resolve(fileName);
-      });
+function createFile(path: string, content: string) {
+  return new Promise<string>((resolve, reject) => {
+    fs.writeFile(path, content, (err) => {
+      if (err) reject(err);
+      else resolve(path);
     });
-  };
-
-  try {
-    await createFile(folderName + fileName, fileContent);
-    await progress.addToProgress(key);
-  } catch (error) {
-    console.error('Error al crear el archivo:', (error as Error).message);
-  }
+  });
 }
 
 async function createFiles(object: Record<string, any>) {
+  const progress = new Progress('progress.txt', 'skipped.txt');
+  const rl = new ReadLine();
+  
   const toSkip = await progress.getToSkip();
 
   for (const key in object) {
@@ -225,11 +201,27 @@ async function createFiles(object: Record<string, any>) {
       continue;
     }
 
-    const userConstantName = rl.ask(`Nombre de constante (${key}):`);
+    const currentConstantFilePath = key + '.constants.ts';
+    const u_currentConstantFilePath = await rl.ask(
+      `Ruta al archivo con los datos (${currentConstantFilePath}):`,
+    );
+    const u_tableName = await rl.ask(`Nombre de tabla (${key}):`);
+    const tableName = u_tableName ?? key;
+    const fileName = tableName + '.table.ts';
+    const csvFilePath = '../data/' + tableName + '.csv';
 
-    const fileName = (userConstantName ?? key) + '.table.ts';
+    const fileContent = new ToTableTransformer(data).getTableFileContent(
+      u_currentConstantFilePath ?? currentConstantFilePath,
+      fileName,
+      csvFilePath,
+    );
 
-    await createConstantFile(key as KeyOfData, data, fileName, '../db/');
+    try {
+      await createFile('../data/' + fileName, fileContent);
+      await progress.addToProgress(key);
+    } catch (error) {
+      console.error('Error al crear el archivo:', (error as Error).message);
+    }
   }
 
   rl.close();
