@@ -12,12 +12,12 @@ class JSonDteTransporteService {
   public generateDatosTransporte(params: any, data: any) {
     const jsonResult: any = {
       iTipTrans: data.detalleTransporte['tipo'],
-      dDesTipTrans: constanteService.transportTypes.filter((tt) => tt.id == data.detalleTransporte['tipo'])[0][
+      dDesTipTrans: constanteService.transportTypes.filter((tt) => tt._id == data.detalleTransporte['tipo'])[0][
         'description'
       ],
       iModTrans: data.detalleTransporte['modalidad'],
       dDesModTrans: constanteService.transportModalities.filter(
-        (mt) => mt.id == data.detalleTransporte['modalidad'],
+        (mt) => mt._id == data.detalleTransporte['modalidad'],
       )[0]['description'],
       iRespFlete: data.detalleTransporte['tipoResponsable'],
       //cCondNeg: data.detalleTransporte['condicionNegociacion'],
@@ -43,7 +43,7 @@ class JSonDteTransporteService {
     if (data.detalleTransporte['paisDestino']) {
       jsonResult['cPaisDest'] = data.detalleTransporte['paisDestino'];
       jsonResult['dDesPaisDest'] = constanteService.countries.filter(
-        (pais) => pais.id === data.detalleTransporte['paisDestino'],
+        (pais) => pais._id === data.detalleTransporte['paisDestino'],
       )[0]['description'];
     }
 
@@ -94,17 +94,17 @@ class JSonDteTransporteService {
 
     jsonResult['cDepSal'] = +data.detalleTransporte['salida']['departamento'];
     jsonResult['dDesDepSal'] = constanteService.departments.filter(
-      (td) => td.id === +data.detalleTransporte['salida']['departamento'],
+      (td) => td._id === +data.detalleTransporte['salida']['departamento'],
     )[0]['description'];
 
     jsonResult['cDisSal'] = data.detalleTransporte['salida']['distrito'];
     jsonResult['dDesDisSal'] = constanteService.districts.filter(
-      (td) => td.id === +data.detalleTransporte['salida']['distrito'],
+      (td) => td._id === +data.detalleTransporte['salida']['distrito'],
     )[0]['description'];
 
     jsonResult['cCiuSal'] = +data.detalleTransporte['salida']['ciudad'];
     jsonResult['dDesCiuSal'] = constanteService.cities.filter(
-      (td) => td.id === +data.detalleTransporte['salida']['ciudad'],
+      (td) => td._id === +data.detalleTransporte['salida']['ciudad'],
     )[0]['description'];
 
     if (
@@ -148,7 +148,7 @@ class JSonDteTransporteService {
       jsonResult['cDepEnt'] = +data.detalleTransporte['entrega']['departamento'];
 
       jsonResult['dDesDepEnt'] = constanteService.departments.filter(
-        (td) => td.id === +data.detalleTransporte['entrega']['departamento'],
+        (td) => td._id === +data.detalleTransporte['entrega']['departamento'],
       )[0]['description'];
     }
 
@@ -156,7 +156,7 @@ class JSonDteTransporteService {
       jsonResult['cDisEnt'] = +data.detalleTransporte['entrega']['distrito'];
 
       jsonResult['dDesDisEnt'] = constanteService.districts.filter(
-        (td) => td.id === +data.detalleTransporte['entrega']['distrito'],
+        (td) => td._id === +data.detalleTransporte['entrega']['distrito'],
       )[0]['description'];
     }
 
@@ -164,7 +164,7 @@ class JSonDteTransporteService {
       jsonResult['cCiuEnt'] = +data.detalleTransporte['entrega']['ciudad'];
 
       jsonResult['dDesCiuEnt'] = constanteService.cities.filter(
-        (td) => td.id === +data.detalleTransporte['entrega']['ciudad'],
+        (td) => td._id === +data.detalleTransporte['entrega']['ciudad'],
       )[0]['description'];
     }
 
@@ -242,7 +242,7 @@ class JSonDteTransporteService {
     if (!data.detalleTransporte['transportista']['contribuyente']) {
       jsonResult['iTipIDTrans'] = data.detalleTransporte['transportista']['documentoTipo'];
       jsonResult['dDTipIDTrans'] = constanteService.userIdentityDocuments.filter(
-        (td) => td.id === data.detalleTransporte['transportista']['documentoTipo'],
+        (td) => td._id === data.detalleTransporte['transportista']['documentoTipo'],
       )[0]['description'];
       jsonResult['dNumIDTrans'] = data.detalleTransporte['transportista']['documentoNumero'].substring(0, 20);
     }
@@ -250,7 +250,7 @@ class JSonDteTransporteService {
     if (data.detalleTransporte['transportista'] && data.detalleTransporte['transportista']['pais']) {
       jsonResult['cNacTrans'] = data.detalleTransporte['transportista']['pais'];
       jsonResult['dDesNacTrans'] = constanteService.countries.filter(
-        (pais) => pais.id === data.detalleTransporte['transportista']['pais'],
+        (pais) => pais._id === data.detalleTransporte['transportista']['pais'],
       )[0]['description'];
     }
 

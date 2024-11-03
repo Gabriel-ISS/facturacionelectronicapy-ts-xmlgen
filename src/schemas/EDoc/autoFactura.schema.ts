@@ -78,7 +78,7 @@ export const AutoFacturaSchema = z
   })
   .transform((data, ctx) => {
     const departmentDescription = constantsService.departments.find(
-      (department) => department.id == data.departamento,
+      (department) => department._id == data.departamento,
     );
     if (departmentDescription) {
       data.departamentoDescripcion = departmentDescription.description;
@@ -92,7 +92,7 @@ export const AutoFacturaSchema = z
 
     if (data.distrito) {
       const foundDistrict = constantsService.districts.find(
-        (district) => district.id == data.distrito,
+        (district) => district._id == data.distrito,
       );
       if (foundDistrict) {
         data.distritoDescripcion = foundDistrict.description;
@@ -106,7 +106,7 @@ export const AutoFacturaSchema = z
     }
 
     const foundCity = constantsService.cities.find(
-      (city) => city.id == data.ciudad,
+      (city) => city._id == data.ciudad,
     );
     if (foundCity) {
       data.ciudadDescripcion = foundCity.description;

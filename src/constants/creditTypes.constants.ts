@@ -7,11 +7,11 @@ export enum CreditType {
 
 export const creditTypes: BasicData<CreditType>[] = [
   {
-    id: CreditType.PLAZO,
+    _id: CreditType.PLAZO,
     description: 'Plazo',
   },
   {
-    id: CreditType.CUOTA,
+    _id: CreditType.CUOTA,
     description: 'Cuota',
   },
 ];

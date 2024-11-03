@@ -32,7 +32,7 @@ export const UbicacionSchema = z.object({
   ciudadDescripcion: z.string().optional(),
 }).transform((data, ctx) => {
   const departmentDescription = constantsService.departments.find(
-    (department) => department.id === data.departamento,
+    (department) => department._id === data.departamento,
   )
   if (!departmentDescription) {
     ctx.addIssue({
@@ -45,7 +45,7 @@ export const UbicacionSchema = z.object({
   }
 
   const districtDescription = constantsService.districts.find(
-    (district) => district.id === data.distrito,
+    (district) => district._id === data.distrito,
   )
   if (!districtDescription) {
     ctx.addIssue({
@@ -58,7 +58,7 @@ export const UbicacionSchema = z.object({
   }
 
   const cityDescription = constantsService.cities.find(
-    (city) => city.id === data.ciudad,
+    (city) => city._id === data.ciudad,
   )
   if (!cityDescription) {
     ctx.addIssue({

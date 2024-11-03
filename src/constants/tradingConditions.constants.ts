@@ -16,47 +16,47 @@ export enum TradingCondition {
 
 export const tradingConditions: BasicData<TradingCondition>[] = [
   {
-    id: TradingCondition.COSTO_Y_FLETE,
+    _id: TradingCondition.COSTO_Y_FLETE,
     description: 'Costo y flete',
   },
   {
-    id: TradingCondition.COSTO__SEGURO_Y_FLETE,
+    _id: TradingCondition.COSTO__SEGURO_Y_FLETE,
     description: 'Costo, seguro y flete',
   },
   {
-    id: TradingCondition.TRANSPORTE_Y_SEGURO_PAGADOS_HASTA,
+    _id: TradingCondition.TRANSPORTE_Y_SEGURO_PAGADOS_HASTA,
     description: 'Transporte y seguro pagados hasta',
   },
   {
-    id: TradingCondition.TRANSPORTE_PAGADO_HASTA,
+    _id: TradingCondition.TRANSPORTE_PAGADO_HASTA,
     description: 'Transporte pagado hasta',
   },
   {
-    id: TradingCondition.ENTREGADA_EN_LUGAR_CONVENIDO,
+    _id: TradingCondition.ENTREGADA_EN_LUGAR_CONVENIDO,
     description: 'Entregada en lugar convenido',
   },
   {
-    id: TradingCondition.ENTREGADA_EN_TERMINAL,
+    _id: TradingCondition.ENTREGADA_EN_TERMINAL,
     description: 'Entregada en terminal',
   },
   {
-    id: TradingCondition.ENTREGADA_DERECHOS_PAGADOS,
+    _id: TradingCondition.ENTREGADA_DERECHOS_PAGADOS,
     description: 'Entregada derechos pagados',
   },
   {
-    id: TradingCondition.EN_FABRICA,
+    _id: TradingCondition.EN_FABRICA,
     description: 'En fabrica',
   },
   {
-    id: TradingCondition.FRANCO_AL_COSTADO_DEL_BUQUE,
+    _id: TradingCondition.FRANCO_AL_COSTADO_DEL_BUQUE,
     description: 'Franco al costado del buque',
   },
   {
-    id: TradingCondition.FRANCO_TRANSPORTISTA,
+    _id: TradingCondition.FRANCO_TRANSPORTISTA,
     description: 'Franco transportista',
   },
   {
-    id: TradingCondition.FRANCO_A_BORDO,
+    _id: TradingCondition.FRANCO_A_BORDO,
     description: 'Franco a bordo',
   },
 ];

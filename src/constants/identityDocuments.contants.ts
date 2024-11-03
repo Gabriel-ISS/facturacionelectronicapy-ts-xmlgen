@@ -12,31 +12,31 @@ export enum IdentityDocument {
 
 export const identityDocuments = {
   CEDULA_PARAGUAYA: {
-    id: IdentityDocument.CEDULA_PARAGUAYA,
+    _id: IdentityDocument.CEDULA_PARAGUAYA,
     description: 'Cédula paraguaya',
   },
   PASAPORTE: {
-    id: IdentityDocument.PASAPORTE,
+    _id: IdentityDocument.PASAPORTE,
     description: 'Pasaporte',
   },
   CEDULA_EXTRANJERA: {
-    id: IdentityDocument.CEDULA_EXTRANJERA,
+    _id: IdentityDocument.CEDULA_EXTRANJERA,
     description: 'Cédula extranjera',
   },
   CARNET_DE_RESIDENCIA: {
-    id: IdentityDocument.CARNET_DE_RESIDENCIA,
+    _id: IdentityDocument.CARNET_DE_RESIDENCIA,
     description: 'Carnet de residencia',
   },
   INNOMINADO: {
-    id: IdentityDocument.INNOMINADO,
+    _id: IdentityDocument.INNOMINADO,
     description: 'Innominado',
   },
   TARJETA_DIPLOMATICA_DE_EXONERACION_FISCAL: {
-    id: IdentityDocument.TARJETA_DIPLOMATICA_DE_EXONERACION_FISCAL,
+    _id: IdentityDocument.TARJETA_DIPLOMATICA_DE_EXONERACION_FISCAL,
     description: 'Tarjeta Diplomática de exoneración fiscal',
   },
   OTRO: {
-    id: IdentityDocument.OTRO,
+    _id: IdentityDocument.OTRO,
     description: 'Otro',
   },
 } as const satisfies Record<string, BasicData<IdentityDocument>>;

@@ -489,7 +489,7 @@ TypeScript:
 ``` ts
   import xmlgen from 'facturacionelectronicapy-xmlgen';
 
-  xmlgen.generateXMLEventoCancelacion(id, params, data).then(xml => {
+  xmlgen.generateXMLEventoCancelacion(_id, params, data).then(xml => {
       console.log(xml);
   }).catch(error => {
       console.log(error);
@@ -497,15 +497,15 @@ TypeScript:
 ```
 Siendo, los demás eventos disponibles:
 
-generateXMLEventoInutilizacion(id, params, data);
+generateXMLEventoInutilizacion(_id, params, data);
 
-generateXMLEventoConformidad(id, params, data);
+generateXMLEventoConformidad(_id, params, data);
 
-generateXMLEventoDisconformidad(id, params, data);
+generateXMLEventoDisconformidad(_id, params, data);
 
-generateXMLEventoDesconocimiento(id, params, data);
+generateXMLEventoDesconocimiento(_id, params, data);
 
-generateXMLEventoNotificacion(id, params, data);
+generateXMLEventoNotificacion(_id, params, data);
 
 ## Proyectos relacionados
 [Generación de XML (proyecto original)](https://www.npmjs.com/package/facturacionelectronicapy-xmlgen)<br/>

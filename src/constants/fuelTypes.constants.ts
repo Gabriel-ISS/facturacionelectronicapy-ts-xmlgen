@@ -11,27 +11,27 @@ export enum FuelType {
 
 export const fuelTypes: BasicData<FuelType>[] = [
   {
-    id: FuelType.GASOLINA,
+    _id: FuelType.GASOLINA,
     description: 'Gasolina',
   },
   {
-    id: FuelType.DIESEL,
+    _id: FuelType.DIESEL,
     description: 'Diésel',
   },
   {
-    id: FuelType.ETANOL,
+    _id: FuelType.ETANOL,
     description: 'Etanol',
   },
   {
-    id: FuelType.GNV,
+    _id: FuelType.GNV,
     description: 'GNV',
   },
   {
-    id: FuelType.FLEX,
+    _id: FuelType.FLEX,
     description: 'Flex',
   },
   {
-    id: FuelType.OTRO,
+    _id: FuelType.OTRO,
     description: 'Otro',
   },
 ];

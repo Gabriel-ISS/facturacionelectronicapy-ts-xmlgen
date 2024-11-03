@@ -78,7 +78,7 @@ class JSonDteComplementariosComercialesService {
       }*/
       jsonResult['cUniMedTotVol'] = data.complementarios['carga']['unidadMedidaVolumenTotal'];
       jsonResult['dDesUniMedTotVol'] = constanteService.measurementUnits.filter(
-        (td) => td.id == data.complementarios['carga']['unidadMedidaVolumenTotal'],
+        (td) => td._id == data.complementarios['carga']['unidadMedidaVolumenTotal'],
       )[0]['representation'];
     }
     if (
@@ -107,7 +107,7 @@ class JSonDteComplementariosComercialesService {
       }*/
       jsonResult['cUniMedTotPes'] = data.complementarios['carga']['unidadMedidaPesoTotal'];
       jsonResult['dDesUniMedTotPes'] = constanteService.measurementUnits.filter(
-        (td) => td.id == data.complementarios['carga']['unidadMedidaPesoTotal'],
+        (td) => td._id == data.complementarios['carga']['unidadMedidaPesoTotal'],
       )[0]['representation'];
     }
     if (data.complementarios && data.complementarios['carga'] && data.complementarios['carga']['pesoTotal']) {
@@ -132,7 +132,7 @@ class JSonDteComplementariosComercialesService {
       }*/
       jsonResult['iCarCarga'] = data.complementarios['carga']['caracteristicaCarga'];
       jsonResult['dDesCarCarga'] = constanteService.cargoCharacteristics.filter(
-        (td) => td.id == data.complementarios['carga']['caracteristicaCarga'],
+        (td) => td._id == data.complementarios['carga']['caracteristicaCarga'],
       )[0]['description'];
 
       if (data.complementarios['carga']['caracteristicaCarga'] == 3) {

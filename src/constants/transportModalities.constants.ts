@@ -9,19 +9,19 @@ export enum TransportModality {
 
 export const transportModalities: BasicData<TransportModality>[] = [
   {
-    id: TransportModality.TERRESTRE,
+    _id: TransportModality.TERRESTRE,
     description: 'Terrestre',
   },
   {
-    id: TransportModality.FLUVIAL,
+    _id: TransportModality.FLUVIAL,
     description: 'Fluvial',
   },
   {
-    id: TransportModality.AEREO,
+    _id: TransportModality.AEREO,
     description: 'Aéreo',
   },
   {
-    id: TransportModality.MULTIMODAL,
+    _id: TransportModality.MULTIMODAL,
     description: 'Multimodal',
   },
 ];

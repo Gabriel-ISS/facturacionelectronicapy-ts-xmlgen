@@ -21,77 +21,77 @@ export enum RemissionReason {
 
   export const remissionReasons: BasicData<RemissionReason>[] = [
     { 
-      id: RemissionReason.TRASLADO_POR_VENTAS, 
+      _id: RemissionReason.TRASLADO_POR_VENTAS, 
       description: "Traslado por ventas",
       
     },
     { 
-      id: RemissionReason.TRASLADO_POR_CONSIGNACION, 
+      _id: RemissionReason.TRASLADO_POR_CONSIGNACION, 
       description: "Traslado por consignación",
       
     },
     { 
-      id: RemissionReason.EXPORTACION, 
+      _id: RemissionReason.EXPORTACION, 
       description: "Exportación",
       
     },
     { 
-      id: RemissionReason.TRASLADO_POR_COMPRA, 
+      _id: RemissionReason.TRASLADO_POR_COMPRA, 
       description: "Traslado por compra",
       
     },
     { 
-      id: RemissionReason.IMPORTACION, 
+      _id: RemissionReason.IMPORTACION, 
       description: "Importación",
       
     },
     { 
-      id: RemissionReason.TRASLADO_POR_DEVOLUCION, 
+      _id: RemissionReason.TRASLADO_POR_DEVOLUCION, 
       description: "Traslado por devolución",
       
     },
     { 
-      id: RemissionReason.TRASLADO_ENTRE_LOCALES_DE_LA_EMPRESA, 
+      _id: RemissionReason.TRASLADO_ENTRE_LOCALES_DE_LA_EMPRESA, 
       description: "Traslado entre locales de la empresa",
       
     },
     { 
-      id: RemissionReason.TRASLADO_DE_BIENES_POR_TRANSFORMACION, 
+      _id: RemissionReason.TRASLADO_DE_BIENES_POR_TRANSFORMACION, 
       description: "Traslado de bienes por transformación",
       
     },
     { 
-      id: RemissionReason.TRASLADO_DE_BIENES_POR_REPARACION, 
+      _id: RemissionReason.TRASLADO_DE_BIENES_POR_REPARACION, 
       description: "Traslado de bienes por reparación",
       
     },
     { 
-      id: RemissionReason.TRASLADO_POR_EMISOR_MOVIL, 
+      _id: RemissionReason.TRASLADO_POR_EMISOR_MOVIL, 
       description: "Traslado por emisor móvil",
       
     },
     { 
-      id: RemissionReason.EXHIBICION_O_DEMOSTRACION, 
+      _id: RemissionReason.EXHIBICION_O_DEMOSTRACION, 
       description: "Exhibición o demostración",
       
     },
     { 
-      id: RemissionReason.PARTICIPACION_EN_FERIAS, 
+      _id: RemissionReason.PARTICIPACION_EN_FERIAS, 
       description: "Participación en ferias",
       
     },
     { 
-      id: RemissionReason.TRASLADO_DE_ENCOMIENDA, 
+      _id: RemissionReason.TRASLADO_DE_ENCOMIENDA, 
       description: "Traslado de encomienda",
       
     },
     { 
-      id: RemissionReason.DECOMISO, 
+      _id: RemissionReason.DECOMISO, 
       description: "Decomiso",
       
     },
     { 
-      id: RemissionReason.OTRO, 
+      _id: RemissionReason.OTRO, 
       description: "Otro",
       
     },

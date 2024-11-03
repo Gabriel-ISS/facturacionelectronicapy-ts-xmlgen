@@ -48,14 +48,14 @@ class JSonDteItemService {
 
         gCamItem['cUniMed'] = item['unidadMedida'];
         gCamItem['dDesUniMed'] = constanteService.measurementUnits
-          .filter((um) => um.id === +item['unidadMedida'])[0]
+          .filter((um) => um._id === +item['unidadMedida'])[0]
           ['representation'].trim();
 
         gCamItem['dCantProSer'] = item['cantidad'];
 
         if (item['pais']) {
           gCamItem['cPaisOrig'] = item['pais'];
-          gCamItem['dDesPaisOrig'] = constanteService.countries.filter((pais) => pais.id === item['pais'])[0][
+          gCamItem['dDesPaisOrig'] = constanteService.countries.filter((pais) => pais._id === item['pais'])[0][
             'description'
           ];
         }
@@ -68,7 +68,7 @@ class JSonDteItemService {
           if (item['tolerancia']) {
             gCamItem['cRelMerc'] = item['tolerancia'];
             gCamItem['dDesRelMerc'] = constanteService.merchandiseRelevances.filter(
-              (um) => um.id === item['tolerancia'],
+              (um) => um._id === item['tolerancia'],
             )[0]['description'];
 
             if (item['toleranciaCantidad']) {
@@ -361,7 +361,7 @@ class JSonDteItemService {
   ) {
     const jsonResult: any = {
       iAfecIVA: item['ivaTipo'], //E731
-      dDesAfecIVA: constanteService.taxTreatments.filter((ca) => ca.id === +item['ivaTipo'])[0][
+      dDesAfecIVA: constanteService.taxTreatments.filter((ca) => ca._id === +item['ivaTipo'])[0][
         'description'
       ],
       dPropIVA: item['ivaBase'], //E733
@@ -615,7 +615,7 @@ class JSonDteItemService {
     const jsonResult: any = {
       iTipOpVN: item['sectorAutomotor']['tipo'],
       dDesTipOpVN: constanteService.vehicleOperationTypes.filter(
-        (ov) => ov.id === item['sectorAutomotor']['tipo'],
+        (ov) => ov._id === item['sectorAutomotor']['tipo'],
       )[0]['description'],
       dChasis: item['sectorAutomotor']['chasis'],
       dColor: item['sectorAutomotor']['color'],
@@ -625,7 +625,7 @@ class JSonDteItemService {
       dPBruto: item['sectorAutomotor']['pesoBruto'],
       iTipCom: item['sectorAutomotor']['tipoCombustible'],
       dDesTipCom: constanteService.fuelTypes.filter(
-        (tc) => tc.id === item['sectorAutomotor']['tipoCombustible'],
+        (tc) => tc._id === item['sectorAutomotor']['tipoCombustible'],
       )[0]['description'],
       dNroMotor: item['sectorAutomotor']['numeroMotor'],
       dCapTracc: item['sectorAutomotor']['capacidadTraccion'],

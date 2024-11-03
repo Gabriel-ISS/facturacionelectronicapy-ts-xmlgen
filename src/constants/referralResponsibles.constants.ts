@@ -10,23 +10,23 @@ export enum RemissionResponsible {
 
 export const remissionResponsibles: BasicData<RemissionResponsible>[] = [
   {
-    id: RemissionResponsible.EMISOR_DE_LA_FACTURA,
+    _id: RemissionResponsible.EMISOR_DE_LA_FACTURA,
     description: 'Emisor de la factura',
   },
   {
-    id: RemissionResponsible.POSEEDOR_DE_LA_FACTURA_Y_BIENES,
+    _id: RemissionResponsible.POSEEDOR_DE_LA_FACTURA_Y_BIENES,
     description: 'Poseedor de la factura y bienes',
   },
   {
-    id: RemissionResponsible.EMPRESA_TRANSPORTISTA,
+    _id: RemissionResponsible.EMPRESA_TRANSPORTISTA,
     description: 'Empresa transportista',
   },
   {
-    id: RemissionResponsible.DESPACHANTE_DE_ADUANAS,
+    _id: RemissionResponsible.DESPACHANTE_DE_ADUANAS,
     description: 'Despachante de Aduanas',
   },
   {
-    id: RemissionResponsible.AGENTE_DE_TRANSPORTE_O_INTERMEDIARIO,
+    _id: RemissionResponsible.AGENTE_DE_TRANSPORTE_O_INTERMEDIARIO,
     description: 'Agente de transporte o intermediario',
   },
 ];

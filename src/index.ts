@@ -9,36 +9,36 @@ class EDocument {
     return EDocumentService.generateXMLDocument(params, data, config);
   }
 
-  generateXMLCancellationEvent(id: number, params: any, data: any, config?: XmlGenConfig) {
-    return eventService.generateXMLCancellationEvent(id, params, data, config);
+  generateXMLCancellationEvent(_id: number, params: any, data: any, config?: XmlGenConfig) {
+    return eventService.generateXMLCancellationEvent(_id, params, data, config);
   }
 
-  generateXMLDisablementEvent(id: number, params: any, data: any, config?: XmlGenConfig) {
-    return eventService.generateXMLDisablementEvent(id, params, data, config);
+  generateXMLDisablementEvent(_id: number, params: any, data: any, config?: XmlGenConfig) {
+    return eventService.generateXMLDisablementEvent(_id, params, data, config);
   }
 
-  generateXMLComplianceEvent(id: number, params: any, data: any, config?: XmlGenConfig) {
-    return eventService.generateXMLComplianceEvent(id, params, data, config);
+  generateXMLComplianceEvent(_id: number, params: any, data: any, config?: XmlGenConfig) {
+    return eventService.generateXMLComplianceEvent(_id, params, data, config);
   }
 
-  generateXMLDisagreementEvent(id: number, params: any, data: any, config?: XmlGenConfig) {
-    return eventService.generateXMLDisagreementEvent(id, params, data, config);
+  generateXMLDisagreementEvent(_id: number, params: any, data: any, config?: XmlGenConfig) {
+    return eventService.generateXMLDisagreementEvent(_id, params, data, config);
   }
 
-  generateXMLUnawarenceEvent(id: number, params: any, data: any, config?: XmlGenConfig) {
-    return eventService.generateXMLUnawarenceEvent(id, params, data, config);
+  generateXMLUnawarenceEvent(_id: number, params: any, data: any, config?: XmlGenConfig) {
+    return eventService.generateXMLUnawarenceEvent(_id, params, data, config);
   }
 
-  generateXMLNotificationEvent(id: number, params: any, data: any, config?: XmlGenConfig) {
-    return eventService.generateXMLNotificationEvent(id, params, data, config);
+  generateXMLNotificationEvent(_id: number, params: any, data: any, config?: XmlGenConfig) {
+    return eventService.generateXMLNotificationEvent(_id, params, data, config);
   }
 
-  generateXMLNominationEvent(id: number, params: any, data: any, config?: XmlGenConfig) {
-    return eventService.generateXMLNominationEvent(id, params, data, config);
+  generateXMLNominationEvent(_id: number, params: any, data: any, config?: XmlGenConfig) {
+    return eventService.generateXMLNominationEvent(_id, params, data, config);
   }
 
-  generateXMLTransportDataUpdateEvent(id: number, params: any, data: any, config?: XmlGenConfig) {
-    return eventService.generateXMLTransportDataUpdateEvent(id, params, data, config);
+  generateXMLTransportDataUpdateEvent(_id: number, params: any, data: any, config?: XmlGenConfig) {
+    return eventService.generateXMLTransportDataUpdateEvent(_id, params, data, config);
   }
 
   async getCountries() {

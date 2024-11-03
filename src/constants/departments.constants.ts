@@ -23,75 +23,75 @@ export enum Department {
 
 export const departments: BasicData<Department>[] = [
   {
-    id: Department.ALTO_PARAGUAY,
+    _id: Department.ALTO_PARAGUAY,
     description: 'ALTO PARAGUAY',
   },
   {
-    id: Department.ALTO_PARANA,
+    _id: Department.ALTO_PARANA,
     description: 'ALTO PARANA',
   },
   {
-    id: Department.AMAMBAY,
+    _id: Department.AMAMBAY,
     description: 'AMAMBAY',
   },
   {
-    id: Department.BOQUERON,
+    _id: Department.BOQUERON,
     description: 'BOQUERON',
   },
   {
-    id: Department.CAAGUAZU,
+    _id: Department.CAAGUAZU,
     description: 'CAAGUAZU',
   },
   {
-    id: Department.CAAZAPA,
+    _id: Department.CAAZAPA,
     description: 'CAAZAPA',
   },
   {
-    id: Department.CANINDEYU,
+    _id: Department.CANINDEYU,
     description: 'CANINDEYU',
   },
   {
-    id: Department.CAPITAL,
+    _id: Department.CAPITAL,
     description: 'CAPITAL',
   },
   {
-    id: Department.CENTRAL,
+    _id: Department.CENTRAL,
     description: 'CENTRAL',
   },
   {
-    id: Department.CONCEPCION,
+    _id: Department.CONCEPCION,
     description: 'CONCEPCION',
   },
   {
-    id: Department.CORDILLERA,
+    _id: Department.CORDILLERA,
     description: 'CORDILLERA',
   },
   {
-    id: Department.GUAIRA,
+    _id: Department.GUAIRA,
     description: 'GUAIRA',
   },
   {
-    id: Department.ITAPUA,
+    _id: Department.ITAPUA,
     description: 'ITAPUA',
   },
   {
-    id: Department.MISIONES,
+    _id: Department.MISIONES,
     description: 'MISIONES',
   },
   {
-    id: Department.NEEMBUCU,
+    _id: Department.NEEMBUCU,
     description: 'NEEMBUCU',
   },
   {
-    id: Department.PARAGUARI,
+    _id: Department.PARAGUARI,
     description: 'PARAGUARI',
   },
   {
-    id: Department.PTE__HAYES,
+    _id: Department.PTE__HAYES,
     description: 'PTE. HAYES',
   },
   {
-    id: Department.SAN_PEDRO,
+    _id: Department.SAN_PEDRO,
     description: 'SAN PEDRO',
   },
 ];

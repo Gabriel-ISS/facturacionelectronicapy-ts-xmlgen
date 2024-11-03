@@ -12,31 +12,31 @@ export enum PresenceIndicator {
 
 export const presenceIndicators: BasicData<PresenceIndicator>[] = [
   {
-    id: PresenceIndicator.OPERACION_PRESENCIAL,
+    _id: PresenceIndicator.OPERACION_PRESENCIAL,
     description: 'Operación presencial',
   },
   {
-    id: PresenceIndicator.OPERACION_ELECTRONICA,
+    _id: PresenceIndicator.OPERACION_ELECTRONICA,
     description: 'Operación electrónica',
   },
   {
-    id: PresenceIndicator.OPERACION_TELEMARKETING,
+    _id: PresenceIndicator.OPERACION_TELEMARKETING,
     description: 'Operación telemarketing',
   },
   {
-    id: PresenceIndicator.VENTA_A_DOMICILIO,
+    _id: PresenceIndicator.VENTA_A_DOMICILIO,
     description: 'Venta a domicilio',
   },
   {
-    id: PresenceIndicator.OPERACION_BANCARIA,
+    _id: PresenceIndicator.OPERACION_BANCARIA,
     description: 'Operación bancaria',
   },
   {
-    id: PresenceIndicator.OPERACION_CICLICA,
+    _id: PresenceIndicator.OPERACION_CICLICA,
     description: 'Operación cíclica',
   },
   {
-    id: PresenceIndicator.OTRO,
+    _id: PresenceIndicator.OTRO,
     description: 'Otro',
   },
 ];

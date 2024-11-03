@@ -7,11 +7,11 @@ export enum ConstancyType {
 
 export const constancyTypes: BasicData<ConstancyType>[] = [
   {
-    id: ConstancyType.CONSTANCIA_DE_NO_SER_CONTRIBUYENTE,
+    _id: ConstancyType.CONSTANCIA_DE_NO_SER_CONTRIBUYENTE,
     description: 'Constancia de no ser contribuyente',
   },
   {
-    id: ConstancyType.CONSTANCIA_DE_MICROPRODUCTORES,
+    _id: ConstancyType.CONSTANCIA_DE_MICROPRODUCTORES,
     description: 'Constancia de microproductores',
   },
 ];

@@ -18,67 +18,67 @@ export enum TransactionType {
 
 export const transactionTypes: DataWithState<TransactionType>[] = [
   {
-    id: TransactionType.VENTA_DE_MERCADERIA,
+    _id: TransactionType.VENTA_DE_MERCADERIA,
     description: 'Venta de mercadería',
     state: 0,
   },
   {
-    id: TransactionType.PRESTACION_DE_SERVICIOS,
+    _id: TransactionType.PRESTACION_DE_SERVICIOS,
     description: 'Prestación de servicios',
     state: 1,
   },
   {
-    id: TransactionType.MIXTO__VENTA_DE_MERCADERIA_Y_SERVICIOS_,
+    _id: TransactionType.MIXTO__VENTA_DE_MERCADERIA_Y_SERVICIOS_,
     description: 'Mixto (Venta de mercadería y servicios)',
     state: 1,
   },
   {
-    id: TransactionType.VENTA_DE_ACTIVO_FIJO,
+    _id: TransactionType.VENTA_DE_ACTIVO_FIJO,
     description: 'Venta de activo fijo',
     state: 0,
   },
   {
-    id: TransactionType.VENTA_DE_DIVISAS,
+    _id: TransactionType.VENTA_DE_DIVISAS,
     description: 'Venta de divisas',
     state: 0,
   },
   {
-    id: TransactionType.COMPRA_DE_DIVISAS,
+    _id: TransactionType.COMPRA_DE_DIVISAS,
     description: 'Compra de divisas',
     state: 0,
   },
   {
-    id: TransactionType.PROMOCION_O_ENTREGA_DE_MUESTRAS,
+    _id: TransactionType.PROMOCION_O_ENTREGA_DE_MUESTRAS,
     description: 'Promoción o entrega de muestras',
     state: 0,
   },
   {
-    id: TransactionType.DONACION,
+    _id: TransactionType.DONACION,
     description: 'Donación',
     state: 1,
   },
   {
-    id: TransactionType.ANTICIPO,
+    _id: TransactionType.ANTICIPO,
     description: 'Anticipo',
     state: 1,
   },
   {
-    id: TransactionType.COMPRA_DE_PRODUCTOS,
+    _id: TransactionType.COMPRA_DE_PRODUCTOS,
     description: 'Compra de productos',
     state: 1,
   },
   {
-    id: TransactionType.COMPRA_DE_SERVICIOS,
+    _id: TransactionType.COMPRA_DE_SERVICIOS,
     description: 'Compra de servicios',
     state: 1,
   },
   {
-    id: TransactionType.VENTA_DE_CREDITO_FISCAL,
+    _id: TransactionType.VENTA_DE_CREDITO_FISCAL,
     description: 'Venta de crédito fiscal',
     state: 1,
   },
   {
-    id: TransactionType.MUESTRAS_MEDICAS__ART__3_RG_24_2014_,
+    _id: TransactionType.MUESTRAS_MEDICAS__ART__3_RG_24_2014_,
     description: 'Muestras médicas (Art. 3 RG 24/2014)',
     state: 1,
   },

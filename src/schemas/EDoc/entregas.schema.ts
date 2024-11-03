@@ -49,7 +49,7 @@ export const EntregasSchema = z
       }
     } else {
       const foundPaymentType = constantsService.paymentTypes.find(
-        (d) => d.id == entrega.tipo,
+        (d) => d._id == entrega.tipo,
       );
 
       entrega.tipoDescripcion = foundPaymentType?.description;

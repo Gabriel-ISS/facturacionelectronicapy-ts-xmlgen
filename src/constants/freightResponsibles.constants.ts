@@ -10,23 +10,23 @@ export enum FreightResponsible {
 
 export const freightResponsibles: BasicData<FreightResponsible>[] = [
   {
-    id: FreightResponsible.EMISOR_DE_LA_FACTURA_ELECTRONICA,
+    _id: FreightResponsible.EMISOR_DE_LA_FACTURA_ELECTRONICA,
     description: 'Emisor de la Factura Electrónica',
   },
   {
-    id: FreightResponsible.RECEPTOR_DE_LA_FACTURA_ELECTRONICA,
+    _id: FreightResponsible.RECEPTOR_DE_LA_FACTURA_ELECTRONICA,
     description: 'Receptor de la Factura Electrónica',
   },
   {
-    id: FreightResponsible.TERCERO,
+    _id: FreightResponsible.TERCERO,
     description: 'Tercero',
   },
   {
-    id: FreightResponsible.AGENTE_INTERMEDIARIO_DEL_TRANSPORTE__CUANDO_INTERVENGA_,
+    _id: FreightResponsible.AGENTE_INTERMEDIARIO_DEL_TRANSPORTE__CUANDO_INTERVENGA_,
     description: 'Agente intermediario del transporte (cuando intervenga)',
   },
   {
-    id: FreightResponsible.TRANSPORTE_PROPIO,
+    _id: FreightResponsible.TRANSPORTE_PROPIO,
     description: 'Transporte propio',
   },
 ];

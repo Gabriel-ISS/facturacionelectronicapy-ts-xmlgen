@@ -7,11 +7,11 @@ export enum MerchandiseRelevance {
 
 export const merchandiseRelevances: BasicData<MerchandiseRelevance>[] = [
   {
-    id: MerchandiseRelevance.TOLERANCIA_DE_QUIEBRA,
+    _id: MerchandiseRelevance.TOLERANCIA_DE_QUIEBRA,
     description: 'Tolerancia de quiebra',
   },
   {
-    id: MerchandiseRelevance.TOLERANCIA_DE_MERMA,
+    _id: MerchandiseRelevance.TOLERANCIA_DE_MERMA,
     description: 'Tolerancia de merma',
   },
 ];

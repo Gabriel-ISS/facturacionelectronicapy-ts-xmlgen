@@ -46,7 +46,7 @@ import { vehicleOperationTypes } from '../constants/vehicleOperationTypes.consta
 import { exchangeRateConditions } from '../constants/exchangeRateConditions.constants';
 
 export type BasicData<Code = number> = {
-  id: Code;
+  _id: Code;
   description: string;
 };
 
@@ -156,31 +156,31 @@ export default Object.freeze({
     errors: string[],
   ) {
     if (cityId) {
-      let foundCity = this.cities.find((c) => c.id === cityId);
+      let foundCity = this.cities.find((c) => c._id === cityId);
 
       if (!foundCity) {
         errors.push(`No se encontro la ciudad con el Id "${cityId}"`);
       } else if (foundCity.distrito != districtId) {
         errors.push(
-          `El distrito con id "${districtId}" no pertenece a la ciudad con id "${cityId}"`,
+          `El distrito con _id "${districtId}" no pertenece a la ciudad con _id "${cityId}"`,
         );
       }
     } else {
-      errors.push(`El id de ciudad "${cityId}" no es valido`);
+      errors.push(`El _id de ciudad "${cityId}" no es valido`);
     }
 
     if (districtId) {
-      let districtFound = this.districts.find((d) => d.id === districtId);
+      let districtFound = this.districts.find((d) => d._id === districtId);
 
       if (!districtFound) {
         errors.push(`No se encontro el distrito con el Id "${districtId}"`);
       } else if (districtFound.department != departmentId) {
         errors.push(
-          `El departamento con id "${departmentId}" no pertenece al distrito con id "${districtId}"`,
+          `El departamento con _id "${departmentId}" no pertenece al distrito con _id "${districtId}"`,
         );
       }
     } else {
-      errors.push(`El id del distrito "${districtId}" no es valido`);
+      errors.push(`El _id del distrito "${districtId}" no es valido`);
     }
   },
 });

@@ -10,23 +10,23 @@ export enum PrintedDocumentType {
 
 export const printedDocumentTypes: BasicData<PrintedDocumentType>[] = [
   {
-    id: PrintedDocumentType.FACTURA,
+    _id: PrintedDocumentType.FACTURA,
     description: 'Factura',
   },
   {
-    id: PrintedDocumentType.NOTA_DE_CREDITO,
+    _id: PrintedDocumentType.NOTA_DE_CREDITO,
     description: 'Nota de crédito',
   },
   {
-    id: PrintedDocumentType.NOTA_DE_DEBITO,
+    _id: PrintedDocumentType.NOTA_DE_DEBITO,
     description: 'Nota de débito',
   },
   {
-    id: PrintedDocumentType.NOTA_DE_REMISION,
+    _id: PrintedDocumentType.NOTA_DE_REMISION,
     description: 'Nota de remisión',
   },
   {
-    id: PrintedDocumentType.COMPROBANTE_DE_RETENCION,
+    _id: PrintedDocumentType.COMPROBANTE_DE_RETENCION,
     description: 'Comprobante de retención',
   },
 ];

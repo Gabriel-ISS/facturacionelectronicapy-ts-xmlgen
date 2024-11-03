@@ -11,9 +11,9 @@ class DbService {
     type TD = T[number];
 
     return {
-      findById: (id: TD['id']): TD | null => {
-        if (!table[0].id) throw new Error('Invalid table');
-        return table.find((item) => item.id === id) ?? null;
+      findById: (_id: TD['_id']): TD | null => {
+        if (!table[0]._id) throw new Error('Invalid table');
+        return table.find((item) => item._id === _id) ?? null;
       },
     };
   }

@@ -13,7 +13,7 @@ class JSonDteIdentificacionDocumentoService {
     const jsonResult: any = {
       iTipDocAso: dataDocumentoAsociado['formato'],
       dDesTipDocAso: constanteService.associatedDocumentTypes.filter(
-        (td) => td.id === +dataDocumentoAsociado['formato'],
+        (td) => td._id === +dataDocumentoAsociado['formato'],
       )[0]['description'],
     };
 
@@ -46,7 +46,7 @@ class JSonDteIdentificacionDocumentoService {
       if (dataDocumentoAsociado['tipoDocumentoImpreso']) {
         jsonResult['iTipoDocAso'] = +dataDocumentoAsociado['tipoDocumentoImpreso'];
         jsonResult['dDTipoDocAso'] = constanteService.printedDocumentTypes.filter(
-          (td) => td.id === +dataDocumentoAsociado['tipoDocumentoImpreso'],
+          (td) => td._id === +dataDocumentoAsociado['tipoDocumentoImpreso'],
         )[0]['description'];
       }
       if (dataDocumentoAsociado['fecha']) {
@@ -73,7 +73,7 @@ class JSonDteIdentificacionDocumentoService {
       if (dataDocumentoAsociado['constanciaTipo']) {
         jsonResult['iTipCons'] = dataDocumentoAsociado['constanciaTipo'];
         jsonResult['dDesTipCons'] = constanteService.constancyTypes.filter(
-          (tc) => tc.id === dataDocumentoAsociado['constanciaTipo'],
+          (tc) => tc._id === dataDocumentoAsociado['constanciaTipo'],
         )[0]['description'];
         jsonResult['dNumCons'] = +dataDocumentoAsociado['constanciaNumero'];
         jsonResult['dNumControl'] = dataDocumentoAsociado['constanciaControl'];
