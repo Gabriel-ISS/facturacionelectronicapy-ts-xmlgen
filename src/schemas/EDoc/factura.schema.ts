@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { PresenceIndicator } from '../../constants/presenceIndicators.constants';
 import DateHelper from '../../helpers/DateHelper';
-import { enumToZodUnion } from '../../helpers/zod.helpers';
+import { enumToZodUnion } from '../../helpers/validation/Common';
 
 export const FacturaSchema = z.object({
   // E011

@@ -1,18 +1,17 @@
 import { z } from 'zod';
-import { ItemDncpSchema } from './itemDncp.schema';
-import { SectorAutomotorSchema } from './sectorAutomotor.schema';
-import {
-  enumToZodEnum,
-  enumToZodUnion,
-  validateNumberLength,
-} from '../../helpers/zod.helpers';
-import constantsService from '../../services/constants.service';
-import dbService from '../../services/db.service';
 import { Country } from '../../constants/countries.constants';
 import { MerchandiseRelevance } from '../../constants/merchandiseRelevances.constants';
 import { TaxTreatment } from '../../constants/taxTreatments.constants';
-import { TaxRate } from './taxRate.constants';
 import DateHelper from '../../helpers/DateHelper';
+import NumberLength from '../../helpers/validation/NumberLenght';
+import {
+  enumToZodEnum,
+  enumToZodUnion
+} from '../../helpers/validation/Common';
+import dbService from '../../services/db.service';
+import { ItemDncpSchema } from './itemDncp.schema';
+import { SectorAutomotorSchema } from './sectorAutomotor.schema';
+import { TaxRate } from './taxRate.constants';
 
 export const ItemSchema = z
   .object({
@@ -59,12 +58,7 @@ export const ItemSchema = z
 
     // E721
     precioUnitario: z.number().superRefine((value, ctx) => {
-      validateNumberLength({
-        value,
-        max: 15,
-        maxDecimals: 8,
-        ctx,
-      });
+      new NumberLength(value, ctx).max(15).maxDecimals(8);
     }),
 
     // E725
@@ -73,13 +67,7 @@ export const ItemSchema = z
       .optional()
       .superRefine((value, ctx) => {
         if (value == undefined) return;
-
-        validateNumberLength({
-          value,
-          max: 5,
-          maxDecimals: 4,
-          ctx,
-        });
+        new NumberLength(value, ctx).max(5).maxDecimals(4);
       }),
 
     // EA002
@@ -88,13 +76,7 @@ export const ItemSchema = z
       .optional()
       .superRefine((value, ctx) => {
         if (value == undefined) return;
-
-        validateNumberLength({
-          value,
-          max: 15,
-          maxDecimals: 8,
-          ctx,
-        });
+        new NumberLength(value, ctx).max(15).maxDecimals(8);
       }),
 
     // EA006
@@ -103,12 +85,7 @@ export const ItemSchema = z
       .optional()
       .superRefine((value, ctx) => {
         if (value == undefined) return;
-        validateNumberLength({
-          value,
-          max: 15,
-          maxDecimals: 8,
-          ctx,
-        });
+        new NumberLength(value, ctx).max(15).maxDecimals(8);
       }),
 
     // E712
@@ -126,12 +103,7 @@ export const ItemSchema = z
       .optional()
       .superRefine((value, ctx) => {
         if (value == undefined) return;
-        validateNumberLength({
-          value,
-          max: 10,
-          maxDecimals: 4,
-          ctx,
-        });
+        new NumberLength(value, ctx).max(10).maxDecimals(4);
       }),
 
     // E718
@@ -140,12 +112,7 @@ export const ItemSchema = z
       .optional()
       .superRefine((value, ctx) => {
         if (value == undefined) return;
-        validateNumberLength({
-          value,
-          max: 3,
-          maxDecimals: 8,
-          ctx,
-        });
+        new NumberLength(value, ctx).max(3).maxDecimals(8);
       }),
 
     // E719: TODO: A ARTIR DE AQUI VOLVER EN REVERSA PARA VERIFICAR LOS VALORES QUE DEPENDEN DE VALORES GLOBALES
@@ -164,12 +131,7 @@ export const ItemSchema = z
     // E735
     ivaBase: z.number().superRefine((value, ctx) => {
       if (value == undefined) return;
-      validateNumberLength({
-        value,
-        max: 15,
-        maxDecimals: 8,
-        ctx,
-      });
+      new NumberLength(value, ctx).max(15).maxDecimals(8);
     }),
 
     // E751

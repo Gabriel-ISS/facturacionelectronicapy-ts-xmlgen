@@ -1,8 +1,8 @@
 import { z } from 'zod';
 import { Country } from '../../constants/countries.constants';
 import { OperationType } from '../../constants/operationTypes.constants';
-import { Receptor } from '../../constants/receptorTypes.constants';
-import { enumToZodEnum, enumToZodUnion } from '../../helpers/zod.helpers';
+import { TaxpayerNotTaxpayer } from '../../constants/taxpayerNotTaxpayer.constants';
+import { enumToZodEnum, enumToZodUnion } from '../../helpers/validation/Common';
 import constantsService from '../../services/constants.service';
 import { DEFAULT_NAME } from '../../constants/other.constants';
 import { Taxpayer } from '../../constants/taxpayer.constants';
@@ -11,7 +11,7 @@ import { IdentityDocumentReceptor } from '../../constants/identityDocumentsRecep
 export const ClienteSchema = z
   .object({
     // D201
-    contribuyente: z.boolean().transform(v => v ? Receptor.CONTRIBUYENTE : Receptor.NO_CONTRIBUYENTE),
+    contribuyente: z.boolean().transform(v => v ? TaxpayerNotTaxpayer.CONTRIBUYENTE : TaxpayerNotTaxpayer.NO_CONTRIBUYENTE),
     
     // D206
     ruc: z.string().min(3).max(8).optional(),
@@ -65,7 +65,7 @@ export const ClienteSchema = z
     codigo: z.string().min(3).max(15).optional(),
   })
   .superRefine((cliente, ctx) => {
-    if (cliente.contribuyente == Receptor.CONTRIBUYENTE) {
+    if (cliente.contribuyente == TaxpayerNotTaxpayer.CONTRIBUYENTE) {
       if (!cliente.ruc) {
         ctx.addIssue({
           path: ['ruc'],

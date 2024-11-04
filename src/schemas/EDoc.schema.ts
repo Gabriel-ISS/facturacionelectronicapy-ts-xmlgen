@@ -4,10 +4,14 @@ import { ValidDocumentType } from '../constants/documentTypes.constants';
 import { EmissionType } from '../constants/emissionTypes.constants';
 import { GlobalAndPerItem } from '../constants/globalAndPerItem.constants';
 import { OperationType } from '../constants/operationTypes.constants';
+import { PaymentType } from '../constants/paymentTypes.constants';
+import { RemissionReason } from '../constants/remissionReasons.constants';
 import { TaxType } from '../constants/taxTypes.constants';
 import { TransactionType } from '../constants/transactionTypes.constants';
 import DateHelper from '../helpers/DateHelper';
-import { enumToZodEnum, enumToZodUnion } from '../helpers/zod.helpers';
+import { Path } from '../helpers/Path';
+import { enumToZodEnum, enumToZodUnion } from '../helpers/validation/Common';
+import ZodValidator from '../helpers/validation/ZodValidator';
 import { AutoFacturaSchema } from './EDoc/autoFactura.schema';
 import { ClienteSchema } from './EDoc/cliente.schema';
 import { ComplementariosSchema } from './EDoc/complementarios.schema';
@@ -17,7 +21,6 @@ import { DocumentoAsociadoSchema } from './EDoc/documentoAsociado.schema';
 import { FacturaSchema } from './EDoc/factura.schema';
 import { ItemSchema } from './EDoc/item.schama';
 import { NotaCreditoDebitoSchema } from './EDoc/notaCheditoDebitoSchema';
-import { ObligacionSchema } from './EDoc/obligacion.schema';
 import { RemisionSchema } from './EDoc/remision.schema';
 import { SectorAdicionalSchema } from './EDoc/sectorAdicional.schema';
 import { SectorEnergiaElectricaSchema } from './EDoc/sectorEnergiaElectrica.schema';
@@ -25,14 +28,9 @@ import { SectorSegurosSchema } from './EDoc/sectorSeguros.schema';
 import { SectorSupermercadosSchema } from './EDoc/sectorSupermercados.schema';
 import { TransporteSchema } from './EDoc/transporte.schema';
 import { UsuarioSchema } from './EDoc/usuario.schema';
-import { PaymentType } from '../constants/paymentTypes.constants';
-import ZodValidator from '../helpers/ZodValidator';
-import { Path } from '../helpers/Path';
-import { RemissionReason } from '../constants/remissionReasons.constants';
 
-// TODO: BUSCAR COGIGOS INVENTADOS POR LA IA
-// TODO: VALIDAR LONGITUD DE STRINGS
 // TODO: NÚMEROS Y DECIMALES (Tabla C del manual)
+// TODO: COMMON SCHEMAS
 // TODO: VALIDAR FECHAS DE INICIO Y FIN
 // TODO: VALIDAR CORREOS Y NÚMEROS DE TELÉFONOS
 

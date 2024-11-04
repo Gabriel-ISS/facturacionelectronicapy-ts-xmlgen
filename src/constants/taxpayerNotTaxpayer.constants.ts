@@ -1,17 +1,17 @@
 import { BasicData } from '../services/constants.service';
 
-export enum Receptor {
+export enum TaxpayerNotTaxpayer {
   CONTRIBUYENTE = 1,
   NO_CONTRIBUYENTE = 2,
 }
 
-export const receptorTypes: BasicData<Receptor>[] = [
+export const taxpayerNotTaxpayer: BasicData<TaxpayerNotTaxpayer>[] = [
   {
-    _id: Receptor.CONTRIBUYENTE,
+    _id: TaxpayerNotTaxpayer.CONTRIBUYENTE,
     description: 'Contribuyente',
   },
   {
-    _id: Receptor.NO_CONTRIBUYENTE,
+    _id: TaxpayerNotTaxpayer.NO_CONTRIBUYENTE,
     description: 'No Contribuyente',
   },
 ];

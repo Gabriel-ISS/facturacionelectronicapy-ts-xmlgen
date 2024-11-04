@@ -26,7 +26,7 @@ import { operationTypes } from '../constants/operationTypes.constants';
 import { paymentTypes } from '../constants/paymentTypes.constants';
 import { presenceIndicators } from '../constants/presenceIndicators.constants';
 import { printedDocumentTypes } from '../constants/printedDocumentTypes.constants';
-import { receptorTypes } from '../constants/receptorTypes.constants';
+import { taxpayerNotTaxpayer } from '../constants/taxpayerNotTaxpayer.constants';
 import { remissionReasons } from '../constants/remissionReasons.constants';
 import { remissionResponsibles } from '../constants/referralResponsibles.constants';
 import { regimeTypes } from '../constants/regimeTypes.constants';
@@ -115,7 +115,7 @@ export default Object.freeze({
   typesOfDocumentsInnominateReceptors: identityDocumentsInnominateReceptors,
   operationTypes,
   presenceIndicators,
-  receptorTypes,
+  receptorTypes: taxpayerNotTaxpayer,
   sellerNatureSelfInvoicingCases,
   creditNoteReasons,
   remissionReasons,

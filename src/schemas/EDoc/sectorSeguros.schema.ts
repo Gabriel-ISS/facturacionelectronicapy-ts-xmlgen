@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { validateNumberLength } from '../../helpers/zod.helpers';
 import DateHelper from '../../helpers/DateHelper';
+import NumberLength from '../../helpers/validation/NumberLenght';
 
 export const SectorSegurosSchema = z.object({
   // E801
@@ -18,12 +18,7 @@ export const SectorSegurosSchema = z.object({
   // EA793
   vigenciaUnidad: z.number().superRefine((value, ctx) => {
     if (value == undefined) return;
-    validateNumberLength({
-      value,
-      decimalsLength: 1,
-      max: 5,
-      ctx,
-    })
+    new NumberLength(value, ctx).max(5).decimalsLength(1);
   }),
 
   // EA795

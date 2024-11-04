@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { validateNumberLength } from '../../helpers/zod.helpers';
+import NumberLength from '../../helpers/validation/NumberLenght';
 
 export const SectorEnergiaElectricaSchema = z.object({
   // E792
@@ -19,23 +19,13 @@ export const SectorEnergiaElectricaSchema = z.object({
   // E795
   lecturaAnterior: z.number().optional().superRefine((value, ctx) => {
     if (value == undefined) return;
-    validateNumberLength({
-      value,
-      decimalsLength: 2, // numero exacto de decimales
-      max: 11,
-      ctx,
-    })
+    new NumberLength(value, ctx).max(11).decimalsLength(2);
   }),
 
   // E796
   lecturaActual: z.number().optional().superRefine((value, ctx) => {
     if (value == undefined) return;
-    validateNumberLength({
-      value,
-      decimalsLength: 2,
-      max: 11,
-      ctx,
-    })
+    new NumberLength(value, ctx).max(11).decimalsLength(2);
   }),
 });
 

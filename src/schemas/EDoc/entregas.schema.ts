@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { Currency } from '../../constants/curencies.constants';
 import { PaymentType } from '../../constants/paymentTypes.constants';
-import { enumToZodUnion, enumToZodEnum } from '../../helpers/zod.helpers';
+import { enumToZodUnion, enumToZodEnum } from '../../helpers/validation/Common';
 import { InfoChequeSchema } from './infoCheque.schema';
 import { InfoTarjetaSchema } from './infoTarjeta.schema';
 import constantsService from '../../services/constants.service';

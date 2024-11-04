@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { FreightResponsible } from '../../constants/freightResponsibles.constants';
 import { RemissionReason } from '../../constants/remissionReasons.constants';
 import DateHelper from '../../helpers/DateHelper';
-import { enumToZodUnion } from '../../helpers/zod.helpers';
+import { enumToZodUnion } from '../../helpers/validation/Common';
 import constantsService from '../../services/constants.service';
 
 export const RemisionSchema = z.object({

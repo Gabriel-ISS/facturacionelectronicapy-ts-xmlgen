@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { validateNumberLength } from '../../helpers/zod.helpers';
+import NumberLength from '../../helpers/validation/NumberLenght';
 
 export const SectorSupermercadosSchema = z.object({
   // E811
@@ -8,34 +8,19 @@ export const SectorSupermercadosSchema = z.object({
   // E812
   efectivo: z.number().optional().superRefine((value, ctx) => {
     if (value == undefined) return;
-    validateNumberLength({
-      value,
-      maxDecimals: 4,
-      max: 15,
-      ctx,
-    })
+    new NumberLength(value, ctx).max(15).maxDecimals(4);
   }),
 
   // E813
   vuelto: z.number().optional().superRefine((value, ctx) => {
     if (value == undefined) return;
-    validateNumberLength({
-      value,
-      maxDecimals: 4,
-      max: 6,
-      ctx,
-    })
+    new NumberLength(value, ctx).max(6).maxDecimals(4);
   }),
 
   // E814
   donacion: z.number().optional().superRefine((value, ctx) => {
     if (value == undefined) return;
-    validateNumberLength({
-      value,
-      maxDecimals: 4,
-      max: 6,
-      ctx,
-    })
+    new NumberLength(value, ctx).max(6).maxDecimals(4);
   }),
 
   // E815

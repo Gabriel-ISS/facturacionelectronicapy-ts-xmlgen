@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { CreditNoteReason } from '../../constants/creditNoteReasons.constants';
-import { enumToZodUnion } from '../../helpers/zod.helpers';
+import { enumToZodUnion } from '../../helpers/validation/Common';
 
 export const NotaCreditoDebitoSchema = z.object({
   // E401

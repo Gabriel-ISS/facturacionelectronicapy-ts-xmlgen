@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { Path } from './Path';
+import { Path } from '../Path';
 
 /** ZodValidator */
 export default class ZodValidator<T extends Record<string, any>> {

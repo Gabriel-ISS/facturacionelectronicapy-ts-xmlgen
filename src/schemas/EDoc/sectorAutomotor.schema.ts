@@ -1,10 +1,10 @@
 import { z } from 'zod';
-import {
-  enumToZodUnion,
-  validateNumberLength,
-} from '../../helpers/zod.helpers';
-import { VehicleOperationType } from '../../constants/vehicleOperationTypes.constants';
 import { FuelType } from '../../constants/fuelTypes.constants';
+import { VehicleOperationType } from '../../constants/vehicleOperationTypes.constants';
+import NumberLength from '../../helpers/validation/NumberLenght';
+import {
+  enumToZodUnion
+} from '../../helpers/validation/Common';
 import dbService from '../../services/db.service';
 
 export const SectorAutomotorSchema = z
@@ -24,11 +24,7 @@ export const SectorAutomotorSchema = z
       .optional()
       .superRefine((value, ctx) => {
         if (value == undefined) return;
-        validateNumberLength({
-          value,
-          max: 4,
-          ctx,
-        });
+        new NumberLength(value, ctx).int().max(4);
       }),
 
     // E776
@@ -37,11 +33,7 @@ export const SectorAutomotorSchema = z
       .optional()
       .superRefine((value, ctx) => {
         if (value == undefined) return;
-        validateNumberLength({
-          value,
-          max: 4,
-          ctx,
-        });
+        new NumberLength(value, ctx).int().max(4);
       }),
 
     // E785
@@ -50,11 +42,7 @@ export const SectorAutomotorSchema = z
       .optional()
       .superRefine((value, ctx) => {
         if (value == undefined) return;
-        validateNumberLength({
-          value,
-          max: 3,
-          ctx,
-        });
+        new NumberLength(value, ctx).int().max(3);
       }),
 
     // E777
@@ -63,12 +51,7 @@ export const SectorAutomotorSchema = z
       .optional()
       .superRefine((value, ctx) => {
         if (value == undefined) return;
-        validateNumberLength({
-          value,
-          max: 6,
-          maxDecimals: 4,
-          ctx,
-        });
+        new NumberLength(value, ctx).max(6).maxDecimals(4);
       }),
 
     // E778
@@ -77,12 +60,7 @@ export const SectorAutomotorSchema = z
       .optional()
       .superRefine((value, ctx) => {
         if (value == undefined) return;
-        validateNumberLength({
-          value,
-          max: 6,
-          maxDecimals: 4,
-          ctx,
-        });
+        new NumberLength(value, ctx).max(6).maxDecimals(4);
       }),
 
     // E779
@@ -102,12 +80,7 @@ export const SectorAutomotorSchema = z
       .optional()
       .superRefine((value, ctx) => {
         if (value == undefined) return;
-        validateNumberLength({
-          value,
-          max: 6,
-          maxDecimals: 4,
-          ctx,
-        });
+        new NumberLength(value, ctx).max(6).maxDecimals(4);
       }),
 
     // E783

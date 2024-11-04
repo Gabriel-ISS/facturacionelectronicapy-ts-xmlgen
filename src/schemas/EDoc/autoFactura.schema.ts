@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { Department } from '../../constants/departments.constants';
 import { IdentityDocumentCarriers } from '../../constants/identityDocumentsCarriers.constants';
 import { SellerNatureSelfInvoicing } from '../../constants/sellerNatureSelfInvoicingCases.constants';
-import { enumToZodUnion } from '../../helpers/zod.helpers';
+import { enumToZodUnion } from '../../helpers/validation/Common';
 import { UbicacionSchema } from './ubicacion.schema';
 import constantsService from '../../services/constants.service';
 

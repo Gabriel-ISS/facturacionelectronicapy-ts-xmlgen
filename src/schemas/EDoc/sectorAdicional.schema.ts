@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { validateNumberLength } from '../../helpers/zod.helpers';
+import NumberLength from '../../helpers/validation/NumberLenght';
 
 export const SectorAdicionalSchema = z.object({
   // E821
@@ -20,12 +20,7 @@ export const SectorAdicionalSchema = z.object({
   // E826
   saldoAnterior: z.number().optional().superRefine((value, ctx) => {
     if (value == undefined) return;
-    validateNumberLength({
-      value,
-      maxDecimals: 4,
-      max: 15,
-      ctx,
-    })
+    new NumberLength(value, ctx).max(15).maxDecimals(4);
   }).describe('Saldo anterior'),
 }).superRefine((data, ctx) => {
   if (data.inicioCiclo && data.finCiclo) {

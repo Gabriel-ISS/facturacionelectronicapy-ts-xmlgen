@@ -1,10 +1,10 @@
 import { z } from 'zod';
 import { CargoCharacteristic } from '../../constants/cargoCharacteristics.constants';
 import { MeasurementUnit } from '../../constants/measurementUnits.constants';
+import NumberLength from '../../helpers/validation/NumberLenght';
 import {
-  enumToZodUnion,
-  validateNumberLength,
-} from '../../helpers/zod.helpers';
+  enumToZodUnion
+} from '../../helpers/validation/Common';
 import dbService from '../../services/db.service';
 
 export const CargaSchema = z
@@ -18,13 +18,9 @@ export const CargaSchema = z
     volumenTotal: z
       .number()
       .optional()
-      .superRefine((data, ctx) => {
-        if (data == undefined) return;
-        validateNumberLength({
-          value: data,
-          max: 20,
-          ctx,
-        });
+      .superRefine((value, ctx) => {
+        if (value == undefined) return;
+        new NumberLength(value, ctx).max(20);
       }),
 
     // G054
@@ -34,13 +30,9 @@ export const CargaSchema = z
     pesoTotal: z
       .number()
       .optional()
-      .superRefine((data, ctx) => {
-        if (data == undefined) return;
-        validateNumberLength({
-          value: data,
-          max: 20,
-          ctx,
-        });
+      .superRefine((value, ctx) => {
+        if (value == undefined) return;
+        new NumberLength(value, ctx).max(20);
       }),
 
     // G057

@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { Obligation } from '../../constants/obligations.constants';
-import { enumToZodUnion } from '../../helpers/zod.helpers';
+import { enumToZodUnion } from '../../helpers/validation/Common';
 
 export const ObligacionSchema = z.object({
   // D031

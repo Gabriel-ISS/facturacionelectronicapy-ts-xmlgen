@@ -2,8 +2,8 @@ import { z } from 'zod';
 import { AssociatedDocumentType } from '../../constants/associatedDocumentTypes.constants';
 import { PrintedDocumentType } from '../../constants/printedDocumentTypes.constants';
 import DateHelper from '../../helpers/DateHelper';
-import { enumToZodUnion } from '../../helpers/zod.helpers';
-import ZodValidator from '../../helpers/ZodValidator';
+import { enumToZodUnion } from '../../helpers/validation/Common';
+import ZodValidator from '../../helpers/validation/ZodValidator';
 import { ConstancyType } from '../../constants/constancyTypes.constants';
 
 export const DocumentoAsociadoSchema = z

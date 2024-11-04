@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { CreditCardProcessingMethod } from '../../constants/creditCardProcessingMethods.constants';
 import { CreditCard } from '../../constants/creditCards.constants';
-import { enumToZodUnion } from '../../helpers/zod.helpers';
+import { enumToZodUnion } from '../../helpers/validation/Common';
 import constantsService from '../../services/constants.service';
 
 export const InfoTarjetaSchema = z

@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { UserIdentityDocument, userIdentityDocuments } from '../../constants/userIdentityDocuments.constants';
-import { enumToZodUnion } from '../../helpers/zod.helpers';
-import ZodValidator from '../../helpers/ZodValidator';
+import { enumToZodUnion } from '../../helpers/validation/Common';
+import ZodValidator from '../../helpers/validation/ZodValidator';
 import dbService from '../../services/db.service';
 
 export const UsuarioSchema = z
