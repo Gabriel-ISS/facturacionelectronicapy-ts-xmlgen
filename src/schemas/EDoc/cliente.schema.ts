@@ -2,19 +2,22 @@ import { z } from 'zod';
 import { Country } from '../../constants/countries.constants';
 import { OperationType } from '../../constants/operationTypes.constants';
 import { TaxpayerNotTaxpayer } from '../../constants/taxpayerNotTaxpayer.constants';
-import { enumToZodEnum, enumToZodUnion } from '../../helpers/validation/Common';
+import { enumToZodEnum, enumToZodUnion } from '../../helpers/validation/enumConverter';
 import constantsService from '../../services/constants.service';
 import { DEFAULT_NAME } from '../../constants/other.constants';
 import { Taxpayer } from '../../constants/taxpayer.constants';
 import { IdentityDocumentReceptor } from '../../constants/identityDocumentsReceptors.constants';
+import CommonValidators from '../../helpers/validation/CommonValidators';
+import NumberLength from '../../helpers/validation/NumberLenght';
+import { Department } from '../../constants/departments.constants';
 
 export const ClienteSchema = z
   .object({
     // D201
-    contribuyente: z.boolean().transform(v => v ? TaxpayerNotTaxpayer.CONTRIBUYENTE : TaxpayerNotTaxpayer.NO_CONTRIBUYENTE),
+    contribuyente: CommonValidators.taxpayer(),
     
     // D206
-    ruc: z.string().min(3).max(8).optional(),
+    ruc: CommonValidators.ruc().optional(),
     
     // D211
     razonSocial: z.string().min(4).max(255).default(DEFAULT_NAME),
@@ -26,22 +29,22 @@ export const ClienteSchema = z
     tipoOperacion: z.union(enumToZodUnion(OperationType)),
 
     // D213
-    direccion: z.string().min(1).max(255).optional(),
+    direccion: CommonValidators.address().optional(),
 
     // D218
-    numeroCasa: z.number().min(1).max(999999).optional(),
+    numeroCasa: CommonValidators.houseNumber().optional(),
 
     // D219
-    departamento: z.number().min(1).max(99).optional(),
+    departamento: CommonValidators.department().optional(),
 
     // D221
-    distrito: z.number().optional(),
+    distrito: CommonValidators.district().optional(),
 
     // D223
-    ciudad: z.number().optional(),
+    ciudad: CommonValidators.city().optional(),
 
     // D203
-    pais: z.enum(enumToZodEnum(Country)),
+    pais: CommonValidators.country(),
 
     // D205
     tipoContribuyente: z.union(enumToZodUnion(Taxpayer)).optional(),
@@ -50,7 +53,7 @@ export const ClienteSchema = z
     documentoTipo: z.union(enumToZodUnion(IdentityDocumentReceptor)).optional(),
 
     // D210
-    documentoNumero: z.string().min(1).max(20).optional(),
+    documentoNumero: CommonValidators.identityDocNumber().optional(),
 
     // D214
     telefono: z.string().min(6).max(15).optional(),
@@ -59,7 +62,7 @@ export const ClienteSchema = z
     celular: z.string().min(10).max(20).optional(),
 
     // D216
-    email: z.string().min(3).max(80).optional(),
+    email: z.string().email().min(3).max(80).optional(),
 
     // D217 TODO: INVESTIGAR, PORQUE  NO SE ESPECIFICA QUE ES
     codigo: z.string().min(3).max(15).optional(),

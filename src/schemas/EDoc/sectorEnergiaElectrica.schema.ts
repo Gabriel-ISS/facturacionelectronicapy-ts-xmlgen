@@ -6,11 +6,9 @@ export const SectorEnergiaElectricaSchema = z.object({
   numeroMedidor: z.string().min(1).max(50).optional(),
 
   // E793
-  codigoActividad: z.number().optional().refine(value => {
-    if (value == undefined) return true;
-    if (value.toString().length != 2) return false;
-  }, {
-    message: 'El valor debe tener 2 dígitos',
+  codigoActividad: z.number().optional().superRefine((value, ctx) => {
+    if (value == undefined) return;
+    new NumberLength(value, ctx).int().length(2);
   }),
 
   // E794

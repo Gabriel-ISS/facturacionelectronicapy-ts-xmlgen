@@ -7,7 +7,7 @@ import NumberLength from '../../helpers/validation/NumberLenght';
 import {
   enumToZodEnum,
   enumToZodUnion
-} from '../../helpers/validation/Common';
+} from '../../helpers/validation/enumConverter';
 import dbService from '../../services/db.service';
 import { ItemDncpSchema } from './itemDncp.schema';
 import { SectorAutomotorSchema } from './sectorAutomotor.schema';
@@ -24,10 +24,16 @@ export const ItemSchema = z
       .max(20, { message: 'El código no puede tener más de 20 caracteres' }),
 
     // E702
-    partidaArancelaria: z.number().min(1000).max(9999).optional(),
+    partidaArancelaria: z.number().optional().superRefine((value, ctx) => {
+      if (value == undefined) return;
+      new NumberLength(value, ctx).int().length(4);
+    }),
 
     // E703
-    ncm: z.number().min(100000).max(99999999).optional(),
+    ncm: z.number().optional().superRefine((value, ctx) => {
+      if (value == undefined) return;
+      new NumberLength(value, ctx).int().min(6).max(8);
+    }),
 
     // E708
     descripcion: z
@@ -37,21 +43,29 @@ export const ItemSchema = z
       .min(1)
       .max(120),
 
-    // E709: TODO: ver con mas cuidado
+    // E709
     unidadMedida: z
       .number({
         required_error: 'La unidad de medida es requerida',
-      })
-      .min(1)
-      .max(99999),
+      }).superRefine((value, ctx) => {
+        const foundUnit = dbService.select('measurementUnits').findById(value);
+        if (!foundUnit) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: 'Unidad de medida no encontrada',
+            path: ctx.path,
+          });
+        }
+      }),
 
     // E711
     cantidad: z
       .number({
         required_error: 'La cantidad es requerida',
       })
-      .min(1)
-      .max(9999999999),
+      .superRefine((value, ctx) => {
+        new NumberLength(value, ctx).max(10).maxDecimals(4);
+      }),
 
     // E714
     observacion: z.string().min(1).max(500).optional(),
@@ -188,6 +202,7 @@ export const ItemSchema = z
     sectorAutomotor: SectorAutomotorSchema.optional(),
   })
   .transform((data, ctx) => {
+
     if (data.pais) {
       const foundCountry = dbService.select('countries').findById(data.pais);
 

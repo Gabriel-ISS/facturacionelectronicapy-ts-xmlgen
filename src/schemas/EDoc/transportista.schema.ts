@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { enumToZodUnion } from '../../helpers/validation/Common';
+import { enumToZodUnion } from '../../helpers/validation/enumConverter';
 import { IdentityDocumentCarriers } from '../../constants/identityDocumentsCarriers.constants';
 import { ChoferSchema } from './chofer.schema';
 import { AgenteSchema } from './agente.schema';

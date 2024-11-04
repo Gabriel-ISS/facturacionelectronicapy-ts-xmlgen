@@ -1,9 +1,10 @@
 import { z } from 'zod';
 import { Department } from '../../constants/departments.constants';
 import NumberLength from '../../helpers/validation/NumberLenght';
-import { enumToZodUnion } from '../../helpers/validation/Common';
+import { enumToZodUnion } from '../../helpers/validation/enumConverter';
 import ZodValidator from '../../helpers/validation/ZodValidator';
 import dbService from '../../services/db.service';
+import CommonValidators from '../../helpers/validation/CommonValidators';
 
 /**
  * @SALIDA
@@ -34,11 +35,9 @@ import dbService from '../../services/db.service';
  */
 export const SalidaYEntregaSchema = z.object({
   direccion: z.string().min(1).max(255),
-  numeroCasa: z.number().default(0).superRefine((value, ctx) => {
-    new NumberLength(value, ctx).int().max(6);
-  }),
-  complementoDireccion1: z.string().min(1).max(255).optional(),
-  complementoDireccion2: z.string().min(1).max(255).optional(),
+  numeroCasa: CommonValidators.houseNumber().default(0),
+  complementoDireccion1: CommonValidators.address().optional(),
+  complementoDireccion2: CommonValidators.address().optional(),
   departamento: z.union(enumToZodUnion(Department)),
   distrito: z.number().optional(),
   ciudad: z.number(),

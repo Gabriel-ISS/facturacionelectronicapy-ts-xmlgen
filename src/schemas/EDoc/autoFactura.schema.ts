@@ -2,9 +2,11 @@ import { z } from 'zod';
 import { Department } from '../../constants/departments.constants';
 import { IdentityDocumentCarriers } from '../../constants/identityDocumentsCarriers.constants';
 import { SellerNatureSelfInvoicing } from '../../constants/sellerNatureSelfInvoicingCases.constants';
-import { enumToZodUnion } from '../../helpers/validation/Common';
+import { enumToZodUnion } from '../../helpers/validation/enumConverter';
 import { UbicacionSchema } from './ubicacion.schema';
 import constantsService from '../../services/constants.service';
+import CommonValidators from '../../helpers/validation/CommonValidators';
+import ZodValidator from '../../helpers/validation/ZodValidator';
 
 export const AutoFacturaSchema = z
   .object({
@@ -19,106 +21,72 @@ export const AutoFacturaSchema = z
     }),
 
     // E306
-    documentoNumero: z
-      .string({
-        required_error: 'El número de documento es requerido',
-      })
-      .min(1)
-      .max(20),
+    documentoNumero: CommonValidators.identityDocNumber(),
 
     // E307
-    nombre: z
-      .string({
-        required_error: 'El nombre y apellido del vendedor son requeridos',
-      })
-      .min(4)
-      .max(60),
+    nombre: CommonValidators.name(),
 
     // E308
-    direccion: z
-      .string({
-        required_error: 'La dirección del vendedor es requerida',
-      })
-      .min(1)
-      .max(255),
+    direccion: CommonValidators.address(),
 
     // E309
-    numeroCasa: z
-      .number({
-        required_error: 'El número de casa es requerido',
-      })
-      .min(0, { message: 'El número de casa no puede ser menor que 0' })
-      .max(999999, {
-        message: 'El número de casa no puede ser mayor que 999999',
-      }),
+    numeroCasa: CommonValidators.houseNumber(),
 
     // E310
-    departamento: z.union(enumToZodUnion(Department), {
-      required_error: 'El código del departamento es requerido',
-    }),
-
-    // E311: SE ESTABLECE AUTOMÁTICAMENTE (no se valida)
-    departamentoDescripcion: z.string().optional(),
+    departamento: CommonValidators.department(),
 
     // E312
-    distrito: z.number().optional(),
-
-    // E313: SE ESTABLECE AUTOMÁTICAMENTE (no se valida)
-    distritoDescripcion: z.string().optional(),
+    distrito: CommonValidators.district().optional(),
 
     // E314
-    ciudad: z.number({
-      required_error: 'El código de la ciudad es requerido',
-    }),
-
-    // E315: SE ESTABLECE AUTOMÁTICAMENTE (no se valida)
-    ciudadDescripcion: z.string().optional(),
+    ciudad: CommonValidators.city(),
 
     ubicacion: UbicacionSchema,
   })
   .transform((data, ctx) => {
-    const departmentDescription = constantsService.departments.find(
+    const validator = new ZodValidator(ctx, data);
+
+    const foundDepartment = constantsService.departments.find(
       (department) => department._id == data.departamento,
     );
-    if (departmentDescription) {
-      data.departamentoDescripcion = departmentDescription.description;
-    } else {
-      ctx.addIssue({
-        path: ['departamentoDescripcion'],
-        code: z.ZodIssueCode.custom,
-        message: 'El código del departamento no es válido',
-      });
-    }
 
+    validator.validate(
+      'departamento',
+      !foundDepartment,
+      `El código del departamento no es válido`,
+    );
+
+    let distritoDescripcion;
     if (data.distrito) {
       const foundDistrict = constantsService.districts.find(
         (district) => district._id == data.distrito,
       );
-      if (foundDistrict) {
-        data.distritoDescripcion = foundDistrict.description;
-      } else {
-        ctx.addIssue({
-          path: ['distritoDescripcion'],
-          code: z.ZodIssueCode.custom,
-          message: 'El código del distrito no es válido',
-        });
-      }
+
+      distritoDescripcion = foundDistrict?.description;
+
+      validator.validate(
+        'distrito',
+        !foundDistrict,
+        `El código del distrito no es válido`,
+      );
     }
 
     const foundCity = constantsService.cities.find(
       (city) => city._id == data.ciudad,
     );
-    if (foundCity) {
-      data.ciudadDescripcion = foundCity.description;
-    } else {
-      ctx.addIssue({
-        path: ['ciudadDescripcion'],
-        code: z.ZodIssueCode.custom,
-        message: 'El código de la ciudad no es válido',
-      });
-    }
 
-    return data;
+    validator.validate(
+      'ciudad',
+      !foundCity,
+      `El código de la ciudad no es válido`,
+    );
+
+    return {
+      ...data,
+      distritoDescripcion,
+      departamentoDescripcion: foundDepartment?.description as string,
+      ciudadDescripcion: foundCity?.description as string,
+    };
   });
 
 export type AutoFactura = z.infer<typeof AutoFacturaSchema>;

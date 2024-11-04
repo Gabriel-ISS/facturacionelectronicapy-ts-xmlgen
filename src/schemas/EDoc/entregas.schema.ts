@@ -1,10 +1,12 @@
 import { z } from 'zod';
 import { Currency } from '../../constants/curencies.constants';
 import { PaymentType } from '../../constants/paymentTypes.constants';
-import { enumToZodUnion, enumToZodEnum } from '../../helpers/validation/Common';
+import { enumToZodUnion, enumToZodEnum } from '../../helpers/validation/enumConverter';
 import { InfoChequeSchema } from './infoCheque.schema';
 import { InfoTarjetaSchema } from './infoTarjeta.schema';
 import constantsService from '../../services/constants.service';
+import NumberLength from '../../helpers/validation/NumberLenght';
+import CommonValidators from '../../helpers/validation/CommonValidators';
 
 export const EntregasSchema = z
   .object({
@@ -19,23 +21,22 @@ export const EntregasSchema = z
     // E608
     monto: z.number({
       required_error: 'El monto por tipo de pago es requerido',
-    }).min(1).max(999999999999999),
-
-    // E609: TODO: "Se requiere la misma moneda para todos los ítems del DE"
-    moneda: z.enum(enumToZodEnum<typeof Currency, Currency>(Currency), {
-      required_error: 'La moneda por tipo de pago es requerida',
+    }).superRefine((value, ctx) => {
+      if (value == undefined) return;
+      new NumberLength(value, ctx).max(15).maxDecimals(4);
     }),
 
+    // E609: TODO: "Se requiere la misma moneda para todos los ítems del DE"
+    moneda: CommonValidators.currency(),
+
     // E611
-    cambio: z.number().min(1).max(99999).optional(),
+    cambio: CommonValidators.currencyChange().optional(),
 
     // Campos que describen el pago o entrega inicial de la operación con tarjeta de crédito/débito
     infoTarjeta: InfoTarjetaSchema.optional(),
 
     // Campos que describen el pago o entrega inicial de la operación con cheque
-    infoCheque: InfoChequeSchema.optional().describe(
-      'Campos que describen el pago o entrega inicial de la operación con cheque',
-    ),
+    infoCheque: InfoChequeSchema.optional(),
   })
   .transform((entrega, ctx) => {
     if (entrega.tipo == PaymentType.OTRO) {

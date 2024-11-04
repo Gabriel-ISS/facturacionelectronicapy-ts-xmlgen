@@ -4,7 +4,7 @@ import { VehicleOperationType } from '../../constants/vehicleOperationTypes.cons
 import NumberLength from '../../helpers/validation/NumberLenght';
 import {
   enumToZodUnion
-} from '../../helpers/validation/Common';
+} from '../../helpers/validation/enumConverter';
 import dbService from '../../services/db.service';
 
 export const SectorAutomotorSchema = z
@@ -86,13 +86,7 @@ export const SectorAutomotorSchema = z
     // E783
     año: z.number().optional().superRefine((value, ctx) => {
       if (value == undefined) return;
-      if (value.toString().length != 4) {
-        ctx.addIssue({
-          path: ['año'],
-          message: 'El año debe tener 4 caracteres',
-          code: z.ZodIssueCode.custom,
-        });
-      }
+      new NumberLength(value, ctx).int().length(4);
     }),
 
     // E784

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { enumToZodUnion } from '../../helpers/validation/Common';
+import { enumToZodUnion } from '../../helpers/validation/enumConverter';
 import { Department } from '../../constants/departments.constants';
 import constantsService from '../../services/constants.service';
 

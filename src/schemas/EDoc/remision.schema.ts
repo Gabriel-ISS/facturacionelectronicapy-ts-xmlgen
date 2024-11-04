@@ -2,17 +2,15 @@ import { z } from 'zod';
 import { FreightResponsible } from '../../constants/freightResponsibles.constants';
 import { RemissionReason } from '../../constants/remissionReasons.constants';
 import DateHelper from '../../helpers/DateHelper';
-import { enumToZodUnion } from '../../helpers/validation/Common';
+import { enumToZodUnion } from '../../helpers/validation/enumConverter';
 import constantsService from '../../services/constants.service';
+import NumberLength from '../../helpers/validation/NumberLenght';
 
 export const RemisionSchema = z.object({
   // E501
   motivo: z.union(enumToZodUnion(RemissionReason), {
     required_error: 'El motivo de la emisión es requerido',
   }),
-
-  // E502
-  motivoDescripcion: z.string().optional(),
 
   // E503, 
   tipoResponsable: z.union(enumToZodUnion(FreightResponsible), {
@@ -22,7 +20,10 @@ export const RemisionSchema = z.object({
   // E505
   kms: z.number({
     required_error: 'Los kilómetros estimados de recorrido son requeridos',
-  }).min(1).max(99999).optional(),
+  }).optional().superRefine((value, ctx) => {
+    if (value == undefined) return;
+    new NumberLength(value, ctx).int().max(5);
+  }),
 
   // E506
   fechaFactura: z
@@ -36,7 +37,7 @@ export const RemisionSchema = z.object({
     ),
 
   // E507: TODO: CÓDIGO NO ENCONTRADO
-  costoFlete: z.number().optional(),
+  /* costoFlete: z.number().optional(), */
 }).transform((data, ctx) => {
   const motive = constantsService.remissionReasons.find(
     d => d._id = data.motivo
@@ -48,6 +49,8 @@ export const RemisionSchema = z.object({
 
   return {
     ...data,
+    
+    // E502
     motivoDescripcion: motive?.description as string,
 
     // E504

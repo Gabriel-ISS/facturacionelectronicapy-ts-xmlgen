@@ -10,7 +10,9 @@ import { TaxType } from '../constants/taxTypes.constants';
 import { TransactionType } from '../constants/transactionTypes.constants';
 import DateHelper from '../helpers/DateHelper';
 import { Path } from '../helpers/Path';
-import { enumToZodEnum, enumToZodUnion } from '../helpers/validation/Common';
+import CommonValidators from '../helpers/validation/CommonValidators';
+import { enumToZodUnion } from '../helpers/validation/enumConverter';
+import NumberLength from '../helpers/validation/NumberLenght';
 import ZodValidator from '../helpers/validation/ZodValidator';
 import { AutoFacturaSchema } from './EDoc/autoFactura.schema';
 import { ClienteSchema } from './EDoc/cliente.schema';
@@ -29,7 +31,6 @@ import { SectorSupermercadosSchema } from './EDoc/sectorSupermercados.schema';
 import { TransporteSchema } from './EDoc/transporte.schema';
 import { UsuarioSchema } from './EDoc/usuario.schema';
 
-// TODO: NÚMEROS Y DECIMALES (Tabla C del manual)
 // TODO: COMMON SCHEMAS
 // TODO: VALIDAR FECHAS DE INICIO Y FIN
 // TODO: VALIDAR CORREOS Y NÚMEROS DE TELÉFONOS
@@ -62,8 +63,8 @@ export const EDocDataSchema = z
     establecimiento: z
       .number()
       .min(1)
-      .max(999)
-      .transform((value) => {
+      .transform((value, ctx) => {
+        new NumberLength(value, ctx).int().max(3);
         return value.toString().padStart(3, '0');
       }),
 
@@ -71,8 +72,8 @@ export const EDocDataSchema = z
     punto: z
       .number()
       .min(1)
-      .max(999)
-      .transform((value) => {
+      .transform((value, ctx) => {
+        new NumberLength(value, ctx).int().max(3);
         return value.toString().padStart(3, '0');
       }),
 
@@ -80,11 +81,8 @@ export const EDocDataSchema = z
     numero: z
       .number()
       .min(1)
-      .max(
-        9999999,
-        'No se permiten numeros mayores a 9999999, utilice el campo "serie"',
-      )
-      .transform((value) => {
+      .transform((value, ctx) => {
+        new NumberLength(value, ctx).int().max(7);
         return value.toString().padStart(7, '0');
       }),
 
@@ -127,26 +125,38 @@ export const EDocDataSchema = z
     tipoImpuesto: z.union(enumToZodUnion(TaxType)),
 
     // D015
-    moneda: z.enum(enumToZodEnum<typeof Currency, Currency>(Currency)),
+    moneda: CommonValidators.currency(),
+
+    // D017
+    condicionTipoCambio: z.union(enumToZodUnion(GlobalAndPerItem)).optional(),
+
+    // D018
+    cambio: CommonValidators.currencyChange().optional(),
 
     // D019
     condicionAnticipo: z.union(enumToZodUnion(GlobalAndPerItem)).optional(),
 
-    // D017
-    condicionTipoCambio: z.union(enumToZodUnion(GlobalAndPerItem)).optional(),
 
     // D030 - NT18 ?
     // ⚠️ TODO: EL CÓDIGO NO ESTA EN EL MANUAL TÉCNICO NI EN NINGÚN LADO
     /* obligaciones: z.array(ObligacionSchema).optional(), */
 
-    // D018
-    cambio: z.number().optional(),
 
     // Relacionado a EA004
-    descuentoGlobal: z.number().default(0),
+    descuentoGlobal: z
+      .number()
+      .default(0)
+      .superRefine((value, ctx) => {
+        new NumberLength(value, ctx).max(15).maxDecimals(8);
+      }),
 
     // Relacionado a EA007
-    anticipoGlobal: z.number().default(0),
+    anticipoGlobal: z
+      .number()
+      .default(0)
+      .superRefine((value, ctx) => {
+        new NumberLength(value, ctx).max(15).maxDecimals(8);
+      }),
 
     // TODO: PARECE DE FS, sin código asociado
     /* cdc: z.string().length(44).optional(), */
@@ -221,7 +231,7 @@ export const EDocDataSchema = z
     if (data.cliente.tipoOperacion == OperationType.B2G) {
       validator.requiredField('dncp');
     }
- 
+
     // POR EL TIPO DE TRANSACCIÓN (D011)
     if (data.tipoTransaccion == TransactionType.ANTICIPO) {
       const itemsPath = new Path<Data>('items');
@@ -253,7 +263,9 @@ export const EDocDataSchema = z
 
     // POR EL MOTIVO DE REMISION (E501)
     if (data.remision?.motivo == RemissionReason.IMPORTACION) {
-      validator.requiredField(transportPath.concat('numeroDespachoImportacion'));
+      validator.requiredField(
+        transportPath.concat('numeroDespachoImportacion'),
+      );
     }
 
     // Y POR LA GLORIA!!! (TODO: ELIMINAR ESTO)

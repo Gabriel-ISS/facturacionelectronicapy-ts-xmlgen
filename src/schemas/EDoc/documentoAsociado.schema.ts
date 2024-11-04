@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { AssociatedDocumentType } from '../../constants/associatedDocumentTypes.constants';
 import { PrintedDocumentType } from '../../constants/printedDocumentTypes.constants';
 import DateHelper from '../../helpers/DateHelper';
-import { enumToZodUnion } from '../../helpers/validation/Common';
+import { enumToZodUnion } from '../../helpers/validation/enumConverter';
 import ZodValidator from '../../helpers/validation/ZodValidator';
 import { ConstancyType } from '../../constants/constancyTypes.constants';
 

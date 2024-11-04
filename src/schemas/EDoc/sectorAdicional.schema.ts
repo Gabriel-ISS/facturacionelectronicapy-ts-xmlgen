@@ -22,6 +22,7 @@ export const SectorAdicionalSchema = z.object({
     if (value == undefined) return;
     new NumberLength(value, ctx).max(15).maxDecimals(4);
   }).describe('Saldo anterior'),
+  
 }).superRefine((data, ctx) => {
   if (data.inicioCiclo && data.finCiclo) {
     const inicio = new Date(data.inicioCiclo);

@@ -4,7 +4,7 @@ import { MeasurementUnit } from '../../constants/measurementUnits.constants';
 import NumberLength from '../../helpers/validation/NumberLenght';
 import {
   enumToZodUnion
-} from '../../helpers/validation/Common';
+} from '../../helpers/validation/enumConverter';
 import dbService from '../../services/db.service';
 
 export const CargaSchema = z

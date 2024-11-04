@@ -17,7 +17,6 @@ export const SectorSegurosSchema = z.object({
 
   // EA793
   vigenciaUnidad: z.number().superRefine((value, ctx) => {
-    if (value == undefined) return;
     new NumberLength(value, ctx).max(5).decimalsLength(1);
   }),
 

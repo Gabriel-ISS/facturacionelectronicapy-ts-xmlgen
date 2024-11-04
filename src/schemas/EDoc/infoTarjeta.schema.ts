@@ -1,8 +1,10 @@
 import { z } from 'zod';
 import { CreditCardProcessingMethod } from '../../constants/creditCardProcessingMethods.constants';
 import { CreditCard } from '../../constants/creditCards.constants';
-import { enumToZodUnion } from '../../helpers/validation/Common';
+import { enumToZodUnion } from '../../helpers/validation/enumConverter';
 import constantsService from '../../services/constants.service';
+import CommonValidators from '../../helpers/validation/CommonValidators';
+import NumberLength from '../../helpers/validation/NumberLenght';
 
 export const InfoTarjetaSchema = z
   .object({
@@ -18,7 +20,7 @@ export const InfoTarjetaSchema = z
     razonSocial: z.string().min(4).max(60).optional(),
 
     // E624
-    ruc: z.string().min(3).max(8).optional(),
+    ruc: CommonValidators.ruc().optional(),
 
     // E626
     medioPago: z.union(enumToZodUnion(CreditCardProcessingMethod), {
@@ -26,7 +28,10 @@ export const InfoTarjetaSchema = z
     }),
 
     // E627
-    codigoAutorizacion: z.number().min(1000).max(9999999999).optional(),
+    codigoAutorizacion: z.number().optional().superRefine((value, ctx) => {
+      if (value == undefined) return;
+      new NumberLength(value, ctx).int().min(6).max(10);
+    }),
 
     // E628
     titular: z.string().min(4).max(30).optional(),

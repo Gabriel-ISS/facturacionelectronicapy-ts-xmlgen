@@ -5,7 +5,7 @@ import { TradingCondition } from '../../constants/tradingConditions.constants';
 import { TransportModality } from '../../constants/transportModalities.constants';
 import { TransportType } from '../../constants/transportTypes.constants';
 import DateHelper from '../../helpers/DateHelper';
-import { enumToZodEnum, enumToZodUnion } from '../../helpers/validation/Common';
+import { enumToZodEnum, enumToZodUnion } from '../../helpers/validation/enumConverter';
 import ZodValidator from '../../helpers/validation/ZodValidator';
 import dbService from '../../services/db.service';
 import { SalidaYEntregaSchema } from './salidaYEntrega.schema';

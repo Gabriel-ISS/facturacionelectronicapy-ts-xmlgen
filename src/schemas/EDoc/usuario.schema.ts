@@ -1,8 +1,9 @@
 import { z } from 'zod';
 import { UserIdentityDocument, userIdentityDocuments } from '../../constants/userIdentityDocuments.constants';
-import { enumToZodUnion } from '../../helpers/validation/Common';
+import { enumToZodUnion } from '../../helpers/validation/enumConverter';
 import ZodValidator from '../../helpers/validation/ZodValidator';
 import dbService from '../../services/db.service';
+import CommonValidators from '../../helpers/validation/CommonValidators';
 
 export const UsuarioSchema = z
   .object({
@@ -13,10 +14,10 @@ export const UsuarioSchema = z
     documentoTipoDescripcion: z.string().min(9).max(41).optional(),
     
     // D143
-    documentoNumero: z.string().min(1).max(20),
+    documentoNumero: CommonValidators.identityDocNumber(),
 
     // D144
-    nombre: z.string().min(4).max(255),
+    nombre: CommonValidators.name(),
     
     // D145
     cargo: z.string().min(4).max(100),

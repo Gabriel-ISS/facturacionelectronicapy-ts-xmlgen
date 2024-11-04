@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { PaymentCondition } from '../../constants/paymentCondition.constants';
-import { enumToZodUnion } from '../../helpers/validation/Common';
+import { enumToZodUnion } from '../../helpers/validation/enumConverter';
 import { EntregasSchema } from './entregas.schema';
 
 export const CondicionSchema = z.object({

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { TaxpayerNotTaxpayer } from '../../constants/taxpayerNotTaxpayer.constants';
 
 export function enumToZodUnion<T extends Record<string, any>>(
   enumObj: T,
@@ -16,16 +17,3 @@ export function enumToZodEnum<
 >(enumObj: T) {
   return Object.values(enumObj) as any as readonly [V, ...V[]];
 }
-
-type Min = {min?: string}
-type Max = {max?: string}
-
-export function name(messages?: Min & Max) {
-  return z.string().min(4, messages?.min).max(60, messages?.max);
-}
-
-export function address(messages?: Min & Max) {
-  return z.string().min(1, messages?.min).max(255, messages?.max);
-}
-
-// TODO: AGREGAR MAS VALIDACIONES COMUNES

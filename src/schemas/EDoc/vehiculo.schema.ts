@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { VehicleIdentification } from '../../constants/vehicleIdentifications.constants';
-import { enumToZodUnion } from '../../helpers/validation/Common';
+import { enumToZodUnion } from '../../helpers/validation/enumConverter';
 import ZodValidator from '../../helpers/validation/ZodValidator';
 
 export const VehiculoSchema = z
