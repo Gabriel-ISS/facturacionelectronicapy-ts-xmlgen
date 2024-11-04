@@ -22,7 +22,6 @@ export const CargaSchema = z
         if (data == undefined) return;
         validateNumberLength({
           value: data,
-          fieldName: 'volumenTotal',
           max: 20,
           ctx,
         });
@@ -39,7 +38,6 @@ export const CargaSchema = z
         if (data == undefined) return;
         validateNumberLength({
           value: data,
-          fieldName: 'volumenTotal',
           max: 20,
           ctx,
         });

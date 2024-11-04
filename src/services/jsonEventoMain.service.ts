@@ -180,7 +180,7 @@ class JSonEventoMainService {
 
     this.json['gGroupGesEve']['rGesEve']['rEve']['$'] = {};
     this.json['gGroupGesEve']['rGesEve']['rEve']['$']['Id'] = 1;
-    this.json['gGroupGesEve']['rGesEve']['rEve']['dFecFirma'] = fechaUtilService.getISODateTimeString(new Date());
+    this.json['gGroupGesEve']['rGesEve']['rEve']['dFecFirma'] = fechaUtilService.getIsoDateTimeString(new Date());
     this.json['gGroupGesEve']['rGesEve']['rEve']['dVerFor'] = params.version;
     this.json['gGroupGesEve']['rGesEve']['rEve']['gGroupTiEvt'] = {};
 

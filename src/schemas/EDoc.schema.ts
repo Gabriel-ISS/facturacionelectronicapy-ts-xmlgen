@@ -28,6 +28,7 @@ import { UsuarioSchema } from './EDoc/usuario.schema';
 import { PaymentType } from '../constants/paymentTypes.constants';
 import ZodValidator from '../helpers/ZodValidator';
 import { Path } from '../helpers/Path';
+import { RemissionReason } from '../constants/remissionReasons.constants';
 
 // TODO: BUSCAR COGIGOS INVENTADOS POR LA IA
 // TODO: VALIDAR LONGITUD DE STRINGS
@@ -113,7 +114,7 @@ export const EDocDataSchema = z
 
     // D002
     fecha: z.coerce.date().transform((value) => {
-      return DateHelper.getISODateTimeString(value);
+      return DateHelper.getIsoDateTimeString(value);
     }),
 
     // B002
@@ -178,7 +179,7 @@ export const EDocDataSchema = z
     const associatedDocumentPath = new Path<Data>('documentoAsociado');
     const clientePath = new Path<Data>('cliente');
 
-    // POR EL TIPO DE DOCUMENTO
+    // POR EL TIPO DE DOCUMENTO (C002)
     if (
       data.tipoDocumento == ValidDocumentType.FACTURA_ELECTRONICA ||
       data.tipoDocumento == ValidDocumentType.AUTOFACTURA_ELECTRONICA
@@ -190,6 +191,7 @@ export const EDocDataSchema = z
       validator.requiredField('descripcion');
       validator.requiredField('transporte');
       validator.requiredField(transportPath.concat('tipo'));
+      validator.requiredField(transportPath.concat('inicioEstimadoTranslado'));
       validator.requiredField(transportPath.concat('salida'));
       validator.requiredField(transportPath.concat('entrega'));
       validator.requiredField(transportPath.concat('vehiculo'));
@@ -199,7 +201,7 @@ export const EDocDataSchema = z
       validator.undesiredField('tipoTransaccion');
     }
 
-    // POR EL TIPO DE MONEDA
+    // POR EL TIPO DE MONEDA (D015)
     if (data.moneda != Currency.GUARANI) {
       validator.requiredField('condicionTipoCambio');
       validator.requiredField('cambio');
@@ -208,7 +210,7 @@ export const EDocDataSchema = z
       validator.undesiredField('cambio');
     }
 
-    // POR EL TIPO DE CAMBIO
+    // POR EL TIPO DE CAMBIO (D017)
     if (data.condicionTipoCambio == GlobalAndPerItem.GLOBAL) {
       validator.requiredField('cambio');
     } else if (data.condicionTipoCambio == GlobalAndPerItem.POR_ITEM) {
@@ -217,12 +219,12 @@ export const EDocDataSchema = z
 
     // TODO: VALIDAR CDC
 
-    // POR EL TIPO DE OPERACIÓN
+    // POR EL TIPO DE OPERACIÓN (D202)
     if (data.cliente.tipoOperacion == OperationType.B2G) {
       validator.requiredField('dncp');
     }
-
-    // POR EL TIPO DE TRANSACCIÓN
+ 
+    // POR EL TIPO DE TRANSACCIÓN (D011)
     if (data.tipoTransaccion == TransactionType.ANTICIPO) {
       const itemsPath = new Path<Data>('items');
       data.items.forEach((_item, i) => {
@@ -240,7 +242,7 @@ export const EDocDataSchema = z
       );
     }
 
-    // POR LA CONDICIÓN DE ENTREGA
+    // POR EL TIPO DE PAGO DE ENTREGA (E606)
     if (
       data.condicion?.entregas?.some((d) => d.tipo == PaymentType.RETENCION)
     ) {
@@ -249,6 +251,11 @@ export const EDocDataSchema = z
       validator.undesiredField(
         associatedDocumentPath.concat('numeroRetencion'),
       );
+    }
+
+    // POR EL MOTIVO DE REMISION (E501)
+    if (data.remision?.motivo == RemissionReason.IMPORTACION) {
+      validator.requiredField(transportPath.concat('numeroDespachoImportacion'));
     }
 
     // Y POR LA GLORIA!!! (TODO: ELIMINAR ESTO)

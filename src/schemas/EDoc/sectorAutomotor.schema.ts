@@ -27,7 +27,6 @@ export const SectorAutomotorSchema = z
         validateNumberLength({
           value,
           max: 4,
-          fieldName: 'potencia',
           ctx,
         });
       }),
@@ -41,7 +40,6 @@ export const SectorAutomotorSchema = z
         validateNumberLength({
           value,
           max: 4,
-          fieldName: 'potencia',
           ctx,
         });
       }),
@@ -55,7 +53,6 @@ export const SectorAutomotorSchema = z
         validateNumberLength({
           value,
           max: 3,
-          fieldName: 'potencia',
           ctx,
         });
       }),
@@ -70,7 +67,6 @@ export const SectorAutomotorSchema = z
           value,
           max: 6,
           maxDecimals: 4,
-          fieldName: 'potencia',
           ctx,
         });
       }),
@@ -85,7 +81,6 @@ export const SectorAutomotorSchema = z
           value,
           max: 6,
           maxDecimals: 4,
-          fieldName: 'potencia',
           ctx,
         });
       }),
@@ -111,7 +106,6 @@ export const SectorAutomotorSchema = z
           value,
           max: 6,
           maxDecimals: 4,
-          fieldName: 'potencia',
           ctx,
         });
       }),

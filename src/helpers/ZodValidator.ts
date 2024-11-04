@@ -10,10 +10,10 @@ export default class ZodValidator<T extends Record<string, any>> {
 
   validate(
     fieldNameOrPath: keyof T | Path<any>,
-    condition: boolean,
+    errorCondition: boolean,
     message: string,
   ) {
-    if (condition) {
+    if (errorCondition) {
       this.ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message,

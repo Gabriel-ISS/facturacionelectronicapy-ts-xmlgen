@@ -350,7 +350,7 @@ class EDocumentMainValidateService {
         this.validator.errors.push("El Tipo de Contribuyente '" + data['tipoContribuyente'] + "' en data.tipoContribuyente debe coincidir con el CDC reutilizado (" + tipoContribuyenteCDC + ")");
       }*/
 
-    const formattedDate = DateHelper.getCDCFormatDateString(new Date(data.fecha));
+    const formattedDate = DateHelper.getCdcFormatDateString(new Date(data.fecha));
     if (formattedDate != cdc.date) {
       this.validator.errors.push(`La fecha '${formattedDate}' debe coincidir con la fecha del CDC '${cdc.date}'`);
     }

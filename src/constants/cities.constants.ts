@@ -1,38 +1,5 @@
 import { BasicData } from '../services/constants.service';
 
-
-type Table<H extends string[], R extends any[]> = {
-  headers: H;
-  rows: R[];
-}
-
-type CitiesTable = Table<
-['_id', 'description', 'district'], 
-[number, string, number]
->;
-
-/** TODO: (OLIVER)
- * Modificar estructura de datos para reducir espacio
- * la idea es remplazar la estructura de cities y los
- * demás datos para que utilize el formato de tabla.
- * Por ejemplo:
- */
-export const _cities: CitiesTable = {
-  headers: ['_id', 'description', 'district'],
-  rows: [
-    [1, 'ASUNCION (DISTRITO)', 1],
-    [3, 'CONCEPCION (MUNICIPIO)', 2],
-    [4, 'ABASTO CUE', 2],
-    [5, 'AGUA FRIA', 2],
-    // y asi sucesivamente ...
-  ]
-}
-
-/** 
- * Puedes modificar el siguiente script para 
- */
-
-
 type Data = BasicData<number> & { distrito: number };
 export const cities: Data[] = [
   { _id: 1, description: 'ASUNCION (DISTRITO)', distrito: 1 },

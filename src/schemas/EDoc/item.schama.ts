@@ -58,13 +58,12 @@ export const ItemSchema = z
     observacion: z.string().min(1).max(500).optional(),
 
     // E721
-    precioUnitario: z.number().superRefine((data, ctx) => {
+    precioUnitario: z.number().superRefine((value, ctx) => {
       validateNumberLength({
-        value: data,
+        value,
         max: 15,
         maxDecimals: 8,
         ctx,
-        fieldName: 'precioUnitario',
       });
     }),
 
@@ -72,15 +71,14 @@ export const ItemSchema = z
     cambio: z
       .number()
       .optional()
-      .superRefine((data, ctx) => {
-        if (data == undefined) return;
+      .superRefine((value, ctx) => {
+        if (value == undefined) return;
 
         validateNumberLength({
-          value: data,
+          value,
           max: 5,
           maxDecimals: 4,
           ctx,
-          fieldName: 'cambio',
         });
       }),
 
@@ -88,15 +86,14 @@ export const ItemSchema = z
     descuento: z
       .number()
       .optional()
-      .superRefine((data, ctx) => {
-        if (data == undefined) return;
+      .superRefine((value, ctx) => {
+        if (value == undefined) return;
 
         validateNumberLength({
-          value: data,
+          value,
           max: 15,
           maxDecimals: 8,
           ctx,
-          fieldName: 'descuento',
         });
       }),
 
@@ -104,14 +101,13 @@ export const ItemSchema = z
     anticipo: z
       .number()
       .optional()
-      .superRefine((data, ctx) => {
-        if (data == undefined) return;
+      .superRefine((value, ctx) => {
+        if (value == undefined) return;
         validateNumberLength({
-          value: data,
+          value,
           max: 15,
           maxDecimals: 8,
           ctx,
-          fieldName: 'anticipo',
         });
       }),
 
@@ -128,14 +124,13 @@ export const ItemSchema = z
     toleranciaCantidad: z
       .number()
       .optional()
-      .superRefine((data, ctx) => {
-        if (data == undefined) return;
+      .superRefine((value, ctx) => {
+        if (value == undefined) return;
         validateNumberLength({
-          value: data,
+          value,
           max: 10,
           maxDecimals: 4,
           ctx,
-          fieldName: 'toleranciaCantidad',
         });
       }),
 
@@ -143,14 +138,13 @@ export const ItemSchema = z
     toleranciaPorcentaje: z
       .number()
       .optional()
-      .superRefine((data, ctx) => {
-        if (data == undefined) return;
+      .superRefine((value, ctx) => {
+        if (value == undefined) return;
         validateNumberLength({
-          value: data,
+          value,
           max: 3,
           maxDecimals: 8,
           ctx,
-          fieldName: 'toleranciaPorcentaje',
         });
       }),
 
@@ -168,14 +162,13 @@ export const ItemSchema = z
     }),
 
     // E735
-    ivaBase: z.number().superRefine((data, ctx) => {
-      if (data == undefined) return;
+    ivaBase: z.number().superRefine((value, ctx) => {
+      if (value == undefined) return;
       validateNumberLength({
-        value: data,
+        value,
         max: 15,
         maxDecimals: 8,
         ctx,
-        fieldName: 'ivaBase',
       });
     }),
 
@@ -219,11 +212,7 @@ export const ItemSchema = z
     registroSenave: z.string().length(20).optional(),
 
     // E760
-    registroEntidadComercial: z
-      .string()
-      .length(20)
-      .optional(),
-
+    registroEntidadComercial: z.string().length(20).optional(),
 
     // E761: TODO: OTRO DESAPARECIDO
     /* nombreProducto: z

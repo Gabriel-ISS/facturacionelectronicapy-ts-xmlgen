@@ -24,52 +24,39 @@ export function validateNumberLength(data: {
   maxDecimals?: number;
   decimalsLength?: number;
   ctx: z.RefinementCtx;
-  fieldName: string;
 }) {
-  const { value, min = 1, max, maxDecimals, decimalsLength, ctx, fieldName } = data;
+  const { value, min = 1, max, maxDecimals, decimalsLength, ctx } = data;
 
-  if (value < 0) {
+  const addError = (message: string) => {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: `No se permiten valores negativos`,
-      path: [fieldName],
+      message,
+      path: ctx.path,
     });
+  };
+
+  if (value < 0) {
+    addError('No se permiten valores negativos');
   }
 
   const [intPart, decimalPart] = value.toString().split('.');
 
   if (intPart.length < min) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: `El valor debe tener al menos ${min} caracteres`,
-      path: [fieldName],
-    });
+    addError(`El valor debe tener al menos ${min} caracteres`);
   }
   if (intPart.length > max) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: `El valor no puede tener más de ${max} caracteres`,
-      path: [fieldName],
-    });
+    addError(`El valor no puede tener más de ${max} caracteres`);
   }
 
-  if (maxDecimals) {
-    if (decimalPart.length > maxDecimals) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: `No se pueden tener más de ${maxDecimals} decimales`,
-        path: [fieldName],
-      });
-    }
+  if (maxDecimals && decimalPart?.length > maxDecimals) {
+    addError(`El valor no puede tener más de ${maxDecimals} decimales`);
   }
 
-  if (decimalsLength) {
-    if (decimalsLength != decimalPart.length) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: `La longitud de la parte decimal debe ser de ${decimalsLength}`,
-        path: [fieldName],
-      });
-    }
+  if (decimalsLength && decimalPart && decimalsLength != decimalPart.length) {
+    addError(`La longitud de la parte decimal debe ser de ${decimalsLength}`);
+  }
+
+  if (!maxDecimals && !decimalsLength && decimalPart) {
+    addError(`No se permiten decimales`);
   }
 }

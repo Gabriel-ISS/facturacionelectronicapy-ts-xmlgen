@@ -17,11 +17,10 @@ export const SectorEnergiaElectricaSchema = z.object({
   codigoCategoria: z.string().length(3).optional(),
 
   // E795
-  lecturaAnterior: z.number().optional().superRefine((data, ctx) => {
-    if (data == undefined) return;
+  lecturaAnterior: z.number().optional().superRefine((value, ctx) => {
+    if (value == undefined) return;
     validateNumberLength({
-      value: data,
-      fieldName: 'lecturaAnterior',
+      value,
       decimalsLength: 2, // numero exacto de decimales
       max: 11,
       ctx,
@@ -29,11 +28,10 @@ export const SectorEnergiaElectricaSchema = z.object({
   }),
 
   // E796
-  lecturaActual: z.number().optional().superRefine((data, ctx) => {
-    if (data == undefined) return;
+  lecturaActual: z.number().optional().superRefine((value, ctx) => {
+    if (value == undefined) return;
     validateNumberLength({
-      value: data,
-      fieldName: 'lecturaActual',
+      value,
       decimalsLength: 2,
       max: 11,
       ctx,

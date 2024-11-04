@@ -16,11 +16,10 @@ export const SectorSegurosSchema = z.object({
   vigencia: z.string().min(3).max(15),
 
   // EA793
-  vigenciaUnidad: z.number().superRefine((data, ctx) => {
-    if (data == undefined) return;
+  vigenciaUnidad: z.number().superRefine((value, ctx) => {
+    if (value == undefined) return;
     validateNumberLength({
-      value: data,
-      fieldName: 'vigenciaUnidad',
+      value,
       decimalsLength: 1,
       max: 5,
       ctx,
@@ -30,13 +29,13 @@ export const SectorSegurosSchema = z.object({
   // EA795
   inicioVigencia: z.coerce.date().optional().transform(value => {
     if(value == undefined) return value
-    return DateHelper.getISODateTimeString(value);
+    return DateHelper.getIsoDateTimeString(value);
   }),
 
   // EA796
   finVigencia: z.coerce.date().optional().transform(value => {
     if(value == undefined) return value
-    return DateHelper.getISODateTimeString(value);
+    return DateHelper.getIsoDateTimeString(value);
   }),
 
   // EA797

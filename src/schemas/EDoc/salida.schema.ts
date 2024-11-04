@@ -1,13 +1,19 @@
 import { z } from 'zod';
 import { Department } from '../../constants/departments.constants';
-import { enumToZodUnion } from '../../helpers/zod.helpers';
+import { enumToZodUnion, validateNumberLength } from '../../helpers/zod.helpers';
 
 export const SalidaSchema = z.object({
   // E921
-  direccion: z.string(),
+  direccion: z.string().min(1).max(255),
 
   // E922
-  numeroCasa: z.string(),
+  numeroCasa: z.number().default(0).superRefine((value, ctx) => {
+    validateNumberLength({
+      value,
+      max: 6,
+      ctx,
+    })
+  }),
 
   // E923
   complementoDireccion1: z.string().optional(),
@@ -41,4 +47,5 @@ export const SalidaSchema = z.object({
   // E931
   telefonoContacto: z.string().optional(),
 });
+
 export type Salida = z.infer<typeof SalidaSchema>;

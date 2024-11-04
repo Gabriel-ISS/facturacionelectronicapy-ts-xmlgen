@@ -6,11 +6,10 @@ export const SectorSupermercadosSchema = z.object({
   nombreCajero: z.string().min(1).max(20).optional(),
 
   // E812
-  efectivo: z.number().optional().superRefine((data, ctx) => {
-    if (data == undefined) return;
+  efectivo: z.number().optional().superRefine((value, ctx) => {
+    if (value == undefined) return;
     validateNumberLength({
-      value: data,
-      fieldName: 'efectivo',
+      value,
       maxDecimals: 4,
       max: 15,
       ctx,
@@ -18,11 +17,10 @@ export const SectorSupermercadosSchema = z.object({
   }),
 
   // E813
-  vuelto: z.number().optional().superRefine((data, ctx) => {
-    if (data == undefined) return;
+  vuelto: z.number().optional().superRefine((value, ctx) => {
+    if (value == undefined) return;
     validateNumberLength({
-      value: data,
-      fieldName: 'vuelto',
+      value,
       maxDecimals: 4,
       max: 6,
       ctx,
@@ -30,11 +28,10 @@ export const SectorSupermercadosSchema = z.object({
   }),
 
   // E814
-  donacion: z.number().optional().superRefine((data, ctx) => {
-    if (data == undefined) return;
+  donacion: z.number().optional().superRefine((value, ctx) => {
+    if (value == undefined) return;
     validateNumberLength({
-      value: data,
-      fieldName: 'donacion',
+      value,
       maxDecimals: 4,
       max: 6,
       ctx,

@@ -85,7 +85,7 @@ class JSonDteAlgoritmosService {
     const punto = data.punto.padStart(3, '0');
     const numero = data.numero.padStart(7, '0');
     const tipoContribuyente = params['tipoContribuyente'];
-    const fechaEmision = fechaUtilService.getCDCFormatDateString(
+    const fechaEmision = fechaUtilService.getCdcFormatDateString(
       new Date(data['fecha']),
     );
     const tipoEmision = data.tipoEmision; //1=Normal 2=Contingencia

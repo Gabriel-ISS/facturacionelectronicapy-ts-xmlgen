@@ -18,11 +18,10 @@ export const SectorAdicionalSchema = z.object({
   numeroContrato: z.string().min(1).max(30).optional().describe('Número de contrato E'),
   
   // E826
-  saldoAnterior: z.number().optional().superRefine((data, ctx) => {
-    if (data == undefined) return;
+  saldoAnterior: z.number().optional().superRefine((value, ctx) => {
+    if (value == undefined) return;
     validateNumberLength({
-      value: data,
-      fieldName: 'saldoAnterior',
+      value,
       maxDecimals: 4,
       max: 15,
       ctx,
