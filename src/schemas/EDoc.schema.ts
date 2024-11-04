@@ -8,7 +8,6 @@ import { PaymentType } from '../constants/paymentTypes.constants';
 import { RemissionReason } from '../constants/remissionReasons.constants';
 import { TaxType } from '../constants/taxTypes.constants';
 import { TransactionType } from '../constants/transactionTypes.constants';
-import DateHelper from '../helpers/DateHelper';
 import { Path } from '../helpers/Path';
 import CommonValidators from '../helpers/validation/CommonValidators';
 import { enumToZodUnion } from '../helpers/validation/enumConverter';
@@ -31,9 +30,8 @@ import { SectorSupermercadosSchema } from './EDoc/sectorSupermercados.schema';
 import { TransporteSchema } from './EDoc/transporte.schema';
 import { UsuarioSchema } from './EDoc/usuario.schema';
 
-// TODO: COMMON SCHEMAS
 // TODO: VALIDAR FECHAS DE INICIO Y FIN
-// TODO: VALIDAR CORREOS Y NÚMEROS DE TELÉFONOS
+// TODO: VALIDAR NÚMEROS DE TELÉFONOS
 
 /**
  * TODO: ASEGURARSE DE QUE TODOS LOS TRANSFORMS RETORNEN UN VALOR
@@ -109,9 +107,7 @@ export const EDocDataSchema = z
     observacion: z.string().min(1).max(3000).optional(),
 
     // D002
-    fecha: z.coerce.date().transform((value) => {
-      return DateHelper.getIsoDateTimeString(value);
-    }),
+    fecha: CommonValidators.isoDateTime(),
 
     // B002
     tipoEmision: z

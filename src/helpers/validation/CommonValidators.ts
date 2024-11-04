@@ -5,6 +5,7 @@ import { Country } from '../../constants/countries.constants';
 import { enumToZodEnum, enumToZodUnion } from './enumConverter';
 import { Department } from '../../constants/departments.constants';
 import { Currency } from '../../constants/curencies.constants';
+import DateHelper from '../DateHelper';
 
 // MENSAJES
 type Required = { required?: string };
@@ -13,6 +14,26 @@ type Min = { min?: string };
 type Max = { max?: string };
 
 class CommonValidators {
+  isoDate(messages?: Required & Type) {
+    return z.coerce.date({
+      required_error: messages?.required,
+      invalid_type_error: messages?.invalid_type,
+    }).transform((value) => {
+      if (!value) return value;
+      return DateHelper.getIsoDateString(value);
+    })
+  }
+
+  isoDateTime(messages?: Required & Type) {
+    return z.coerce.date({
+      required_error: messages?.required,
+      invalid_type_error: messages?.invalid_type,
+    }).transform((value) => {
+      if (!value) return value;
+      return DateHelper.getIsoDateTimeString(value);
+    })
+  }
+
   taxpayer(messages?: Required & Type) {
     return z
       .boolean({

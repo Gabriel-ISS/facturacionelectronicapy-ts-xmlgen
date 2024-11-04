@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import DateHelper from '../../helpers/DateHelper';
 import NumberLength from '../../helpers/validation/NumberLenght';
+import CommonValidators from '../../helpers/validation/CommonValidators';
 
 export const SectorSegurosSchema = z.object({
   // E801
@@ -21,16 +22,10 @@ export const SectorSegurosSchema = z.object({
   }),
 
   // EA795
-  inicioVigencia: z.coerce.date().optional().transform(value => {
-    if(value == undefined) return value
-    return DateHelper.getIsoDateTimeString(value);
-  }),
+  inicioVigencia: CommonValidators.isoDateTime().optional(),
 
   // EA796
-  finVigencia: z.coerce.date().optional().transform(value => {
-    if(value == undefined) return value
-    return DateHelper.getIsoDateTimeString(value);
-  }),
+  finVigencia: CommonValidators.isoDateTime().optional(),
 
   // EA797
   codigoInternoItem: z.string().min(3).max(20).optional(),
