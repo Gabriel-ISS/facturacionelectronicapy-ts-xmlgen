@@ -23,7 +23,7 @@ export const SectorAdicionalSchema = z.object({
   saldoAnterior: z.number().optional().superRefine((value, ctx) => {
     if (value == undefined) return;
     new NumberLength(value, ctx).max(15).maxDecimals(4);
-  }).describe('Saldo anterior'),
+  }),
   
 }).superRefine((data, ctx) => {
   const validator = new ZodValidator(ctx, data)

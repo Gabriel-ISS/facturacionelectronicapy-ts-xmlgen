@@ -2,13 +2,11 @@ import { z } from 'zod';
 import { enumToZodUnion } from '../../helpers/validation/enumConverter';
 import { GtinCodes } from '../../constants/gtinCodes.constants';
 import ZodValidator from '../../helpers/validation/ZodValidator';
+import CommonValidators from '../../helpers/validation/CommonValidators';
 
 export const ItemDncpSchema = z.object({
   // E704
-  codigoNivelGeneral: z.number().optional().transform(value => {
-    if (value == undefined) return value;
-    return value.toString().padStart(8, '0');
-  }),
+  codigoNivelGeneral: CommonValidators.zeroPadToLength(8).optional(),
 
   // E705
   codigoNivelEspecifico: z.string().min(3).max(4).optional(),

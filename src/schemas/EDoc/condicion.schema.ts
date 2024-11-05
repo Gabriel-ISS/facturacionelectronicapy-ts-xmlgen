@@ -15,8 +15,7 @@ export const CondicionSchema = z.object({
   // E603:TODO: CÓDIGO NO ENCONTRADO
   credito: z
     .string()
-    .optional()
-    .describe('Campos que describen la operación a crédito'),
+    .optional(),
 });
 
 export type Condicion = z.infer<typeof CondicionSchema>;

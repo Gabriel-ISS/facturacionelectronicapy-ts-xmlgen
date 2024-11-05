@@ -5,29 +5,24 @@ import { ChoferSchema } from './chofer.schema';
 import { AgenteSchema } from './agente.schema';
 import ZodValidator from '../../helpers/validation/ZodValidator';
 import { TaxpayerNotTaxpayer } from '../../constants/taxpayerNotTaxpayer.constants';
+import CommonValidators from '../../helpers/validation/CommonValidators';
 
 export const TransportistaSchema = z
   .object({
     // E981
-    contribuyente: z
-      .boolean()
-      .transform((isTaxpayer) =>
-        isTaxpayer
-          ? TaxpayerNotTaxpayer.CONTRIBUYENTE
-          : TaxpayerNotTaxpayer.NO_CONTRIBUYENTE,
-      ),
+    contribuyente: CommonValidators.taxpayer(),
 
     // E982
-    nombre: z.string().min(4).max(60),
+    nombre: CommonValidators.name(),
 
     // E983
-    ruc: z.string().min(3).max(8),
+    ruc: CommonValidators.ruc(),
 
     // E985
     documentoTipo: z.union(enumToZodUnion(IdentityDocumentCarriers)).optional(),
 
     // E987
-    documentoNumero: z.string().optional(),
+    documentoNumero: CommonValidators.identityDocNumber().optional(),
 
     // E992
     direccion: z.string().min(1).max(150),

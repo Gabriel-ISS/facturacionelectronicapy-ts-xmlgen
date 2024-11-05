@@ -57,31 +57,13 @@ export const EDocDataSchema = z
     tipoDocumento: z.union(enumToZodUnion(ValidDocumentType)),
 
     // C005: Debe coincidir con la estructura de timbrado
-    establecimiento: z
-      .number()
-      .min(1)
-      .transform((value, ctx) => {
-        new NumberLength(value, ctx).int().max(3);
-        return value.toString().padStart(3, '0');
-      }),
+    establecimiento: CommonValidators.zeroPadToLength(3),
 
     // C006: Debe coincidir con la estructura de timbrado
-    punto: z
-      .number()
-      .min(1)
-      .transform((value, ctx) => {
-        new NumberLength(value, ctx).int().max(3);
-        return value.toString().padStart(3, '0');
-      }),
+    punto: CommonValidators.zeroPadToLength(3),
 
     // C007: Debe coincidir con la estructura de timbrado
-    numero: z
-      .number()
-      .min(1)
-      .transform((value, ctx) => {
-        new NumberLength(value, ctx).int().max(7);
-        return value.toString().padStart(7, '0');
-      }),
+    numero: CommonValidators.zeroPadToLength(7),
 
     // C010: obligatorio cuando se consumió la numeración permitida
     serie: z
@@ -193,12 +175,14 @@ export const EDocDataSchema = z
     ) {
       validator.requiredField('descripcion');
       validator.requiredField('transporte');
+      
       validator.requiredField(transportPath.concat('tipo'));
       validator.requiredField(transportPath.concat('inicioEstimadoTranslado'));
       validator.requiredField(transportPath.concat('salida'));
       validator.requiredField(transportPath.concat('entrega'));
       validator.requiredField(transportPath.concat('vehiculo'));
       validator.requiredField(transportPath.concat('transportista'));
+
       validator.requiredField(clientePath.concat('direccion'));
     } else {
       validator.undesiredField('tipoTransaccion');

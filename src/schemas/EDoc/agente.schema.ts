@@ -1,14 +1,15 @@
 import { z } from 'zod';
+import CommonValidators from '../../helpers/validation/CommonValidators';
 
 export const AgenteSchema = z.object({
   // E994
-  nombre: z.string().min(4).max(60).optional(),
+  nombre: CommonValidators.name().optional(),
 
   // E995
-  ruc: z.string().min(3).max(8).optional(),
+  ruc: CommonValidators.ruc().optional(),
 
   // E997
-  direccion: z.string().min(1).max(255).optional(),
+  direccion: CommonValidators.address().optional(),
 });
 
 export type Agente = z.infer<typeof AgenteSchema>;

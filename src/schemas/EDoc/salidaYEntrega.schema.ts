@@ -32,33 +32,25 @@ import CommonValidators from '../../helpers/validation/CommonValidators';
  * @field E949 = ciudad
  * @field E950 = ciudadDescripcion
  * @field E951 = telefonoContacto
+ * 
+ * TODO: SIN CÓDIGO
+ * @field ???? = pais
+ * @field ???? = paisDescripcion
  */
 export const SalidaYEntregaSchema = z.object({
-  direccion: z.string().min(1).max(255),
+  direccion: CommonValidators.address(),
   numeroCasa: CommonValidators.houseNumber().default(0),
   complementoDireccion1: CommonValidators.address().optional(),
   complementoDireccion2: CommonValidators.address().optional(),
   departamento: z.union(enumToZodUnion(Department)),
-  distrito: z.number().optional(),
-  ciudad: z.number(),
-
-  // TODO: OTRO SIN CÓDIGO (lo mismo para la descripción)
-  /* pais: z.union(enumToZodUnion(Country)).optional(), */
-
+  distrito: CommonValidators.district().optional(),
+  ciudad: CommonValidators.city(),
   telefonoContacto: z.string().min(6).max(15).optional(),
-
 }).transform((data, ctx) => {
   const validator = new ZodValidator(ctx, data);
 
   const foundDepartment = dbService.select('departments').findById(data.departamento);
   
-  const foundCity = dbService.select('cities').findById(data.ciudad);
-  validator.validate(
-    'ciudad',
-    !foundCity,
-    `No existe la ciudad con id ${data.ciudad}`
-  )
-
   let distritoDescripcion;
   if (data.distrito) {
     const foundDistrict = dbService.select('districts').findById(data.distrito);
@@ -69,6 +61,13 @@ export const SalidaYEntregaSchema = z.object({
     )
     distritoDescripcion = foundDistrict?.description;
   }
+
+  const foundCity = dbService.select('cities').findById(data.ciudad);
+  validator.validate(
+    'ciudad',
+    !foundCity,
+    `No existe la ciudad con id ${data.ciudad}`
+  )
 
   return {
     ...data,

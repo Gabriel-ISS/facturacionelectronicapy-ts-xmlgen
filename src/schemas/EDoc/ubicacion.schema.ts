@@ -1,74 +1,64 @@
 import { z } from 'zod';
-import { enumToZodUnion } from '../../helpers/validation/enumConverter';
-import { Department } from '../../constants/departments.constants';
+import CommonValidators from '../../helpers/validation/CommonValidators';
+import ZodValidator from '../../helpers/validation/ZodValidator';
 import constantsService from '../../services/constants.service';
 
-export const UbicacionSchema = z.object({
-  // E316
-  lugar: z.string({
-    required_error: 'El lugar de la transacción es requerido',
-  }).min(1).max(255),
+export const UbicacionSchema = z
+  .object({
+    // E316
+    lugar: CommonValidators.address(),
 
-  // E317
-  departamento: z.union(enumToZodUnion(Department)),
+    // E317
+    departamento: CommonValidators.department(),
 
-  // E318
-  departamentoDescripcion: z.string().optional(),
+    // E319
+    distrito: CommonValidators.district().optional(),
 
-  // E319
-  distrito: z.number({
-    required_error: 'El código del distrito es requerido',
-  }),
+    // E321
+    ciudad: CommonValidators.city(),
+  })
+  .transform((data, ctx) => {
+    const validator = new ZodValidator(ctx, data);
 
-  // E320
-  distritoDescripcion: z.string().optional(),
+    const foundDepartment = constantsService.departments.find(
+      (d) => d._id === data.departamento,
+    );
 
-  // E321
-  ciudad: z.number({
-    required_error: 'El código de la ciudad es requerido',
-  }),
+    validator.validate(
+      'departamento',
+      !foundDepartment,
+      'El departamento no es válido',
+    );
 
-  // E322
-  ciudadDescripcion: z.string().optional(),
-}).transform((data, ctx) => {
-  const departmentDescription = constantsService.departments.find(
-    (department) => department._id === data.departamento,
-  )
-  if (!departmentDescription) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: 'El departamento no es válido',
-      path: ['departamento'],
-    })
-  } else {
-    data.departamentoDescripcion = departmentDescription.description
-  }
+    let distritoDescripcion;
+    if (data.distrito) {
+      const foundDistrict = constantsService.districts.find(
+        (district) => district._id === data.distrito,
+      );
 
-  const districtDescription = constantsService.districts.find(
-    (district) => district._id === data.distrito,
-  )
-  if (!districtDescription) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: 'El distrito no es válido',
-      path: ['distrito'],
-    })
-  } else {
-    data.distritoDescripcion = districtDescription.description
-  }
+      validator.validate(
+        'distrito',
+        !foundDistrict,
+        'El distrito no es válido',
+      );
+      distritoDescripcion = foundDistrict?.description;
+    }
 
-  const cityDescription = constantsService.cities.find(
-    (city) => city._id === data.ciudad,
-  )
-  if (!cityDescription) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: 'La ciudad no es válida',
-      path: ['ciudad'],
-    })
-  } else {
-    data.ciudadDescripcion = cityDescription.description
-  }
-});
+    const foundCity = constantsService.cities.find(
+      (city) => city._id === data.ciudad,
+    );
+
+    validator.validate('ciudad', !foundCity, 'La ciudad no es válida');
+
+    return {
+      ...data,
+      // E318
+      departamentoDescripcion: foundDepartment?.description as string,
+      // E320
+      distritoDescripcion: distritoDescripcion,
+      // E322
+      ciudadDescripcion: foundCity?.description as string,
+    };
+  });
 
 export type Ubicacion = z.infer<typeof UbicacionSchema>;

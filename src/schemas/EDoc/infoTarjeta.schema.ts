@@ -5,6 +5,7 @@ import { enumToZodUnion } from '../../helpers/validation/enumConverter';
 import constantsService from '../../services/constants.service';
 import CommonValidators from '../../helpers/validation/CommonValidators';
 import NumberLength from '../../helpers/validation/NumberLenght';
+import ZodValidator from '../../helpers/validation/ZodValidator';
 
 export const InfoTarjetaSchema = z
   .object({
@@ -40,14 +41,10 @@ export const InfoTarjetaSchema = z
     numero: z.string().length(4).optional(),
   })
   .transform((data, ctx) => {
-    if (data.tipo == CreditCard.OTRO && !data.tipoDescripcion) {
-      if (!data.tipoDescripcion) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'Si la tarjeta es otra, debe proveer la descripción',
-          path: ['tipoDescripcion'],
-        });
-      }
+    const validator = new ZodValidator(ctx, data);
+
+    if (data.tipo == CreditCard.OTRO) {
+      validator.requiredField('tipoDescripcion')
     } else {
       const foundCreditCard = constantsService.creditCards.find(
         (d) => d._id == data.tipo,
@@ -58,7 +55,7 @@ export const InfoTarjetaSchema = z
 
     return {
       ...data,
-      tipoDescripcion: data.tipoDescripcion || '',
+      tipoDescripcion: data.tipoDescripcion as string,
     };
   });
 

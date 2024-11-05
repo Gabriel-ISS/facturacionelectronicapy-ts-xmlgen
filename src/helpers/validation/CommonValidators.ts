@@ -10,28 +10,49 @@ import DateHelper from '../DateHelper';
 // MENSAJES
 type Required = { required?: string };
 type Type = { invalid_type?: string };
+type Int = { int?: string };
 type Min = { min?: string };
 type Max = { max?: string };
 
 class CommonValidators {
+  zeroPadToLength(maxLength: number, messages?: Required & Type & Int & Max) {
+    return z
+      .number({
+        required_error: messages?.required,
+        invalid_type_error: messages?.invalid_type,
+      })
+      .min(1)
+      .transform((value, ctx) => {
+        if (value == undefined) return value;
+        new NumberLength(value, ctx)
+          .int(messages?.int)
+          .max(maxLength, messages?.max);
+        return value.toString().padStart(maxLength, '0');
+      });
+  }
+
   isoDate(messages?: Required & Type) {
-    return z.coerce.date({
-      required_error: messages?.required,
-      invalid_type_error: messages?.invalid_type,
-    }).transform((value) => {
-      if (!value) return value;
-      return DateHelper.getIsoDateString(value);
-    })
+    return z.coerce
+      .date({
+        required_error: messages?.required,
+        invalid_type_error: messages?.invalid_type,
+      })
+      .transform((value) => {
+        if (!value) return value;
+        return DateHelper.getIsoDateString(value);
+      });
   }
 
   isoDateTime(messages?: Required & Type) {
-    return z.coerce.date({
-      required_error: messages?.required,
-      invalid_type_error: messages?.invalid_type,
-    }).transform((value) => {
-      if (!value) return value;
-      return DateHelper.getIsoDateTimeString(value);
-    })
+    return z.coerce
+      .date({
+        required_error: messages?.required,
+        invalid_type_error: messages?.invalid_type,
+      })
+      .transform((value) => {
+        if (!value) return value;
+        return DateHelper.getIsoDateTimeString(value);
+      });
   }
 
   taxpayer(messages?: Required & Type) {
@@ -89,7 +110,8 @@ class CommonValidators {
       .number({
         required_error: messages?.required,
         invalid_type_error: messages?.invalid_type,
-      }).superRefine((value, ctx) => {
+      })
+      .superRefine((value, ctx) => {
         if (value == undefined) return;
         new NumberLength(value, ctx).max(5).maxDecimals(4);
       });

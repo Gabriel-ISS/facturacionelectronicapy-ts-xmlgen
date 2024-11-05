@@ -83,8 +83,11 @@ export const AutoFacturaSchema = z
 
     return {
       ...data,
-      distritoDescripcion,
+      // E311
       departamentoDescripcion: foundDepartment?.description as string,
+      // E313
+      distritoDescripcion,
+      // E315
       ciudadDescripcion: foundCity?.description as string,
     };
   });

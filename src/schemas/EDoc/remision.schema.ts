@@ -5,6 +5,7 @@ import DateHelper from '../../helpers/DateHelper';
 import { enumToZodUnion } from '../../helpers/validation/enumConverter';
 import constantsService from '../../services/constants.service';
 import NumberLength from '../../helpers/validation/NumberLenght';
+import CommonValidators from '../../helpers/validation/CommonValidators';
 
 export const RemisionSchema = z.object({
   // E501
@@ -26,15 +27,7 @@ export const RemisionSchema = z.object({
   }),
 
   // E506
-  fechaFactura: z
-    .coerce.date()
-    .optional()
-    .transform(
-      (date) => {
-        if (!date) return date;
-        return DateHelper.getIsoDateString(date);
-      }
-    ),
+  fechaFactura: CommonValidators.isoDate().optional(),
 
   // E507: TODO: CÓDIGO NO ENCONTRADO
   /* costoFlete: z.number().optional(), */

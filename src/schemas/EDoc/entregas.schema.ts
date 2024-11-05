@@ -7,6 +7,7 @@ import { InfoTarjetaSchema } from './infoTarjeta.schema';
 import constantsService from '../../services/constants.service';
 import NumberLength from '../../helpers/validation/NumberLenght';
 import CommonValidators from '../../helpers/validation/CommonValidators';
+import ZodValidator from '../../helpers/validation/ZodValidator';
 
 export const EntregasSchema = z
   .object({
@@ -39,15 +40,10 @@ export const EntregasSchema = z
     infoCheque: InfoChequeSchema.optional(),
   })
   .transform((entrega, ctx) => {
+    const validator = new ZodValidator(ctx, entrega);
+
     if (entrega.tipo == PaymentType.OTRO) {
-      if (!entrega.tipoDescripcion) {
-        ctx.addIssue({
-          path: ['tipoDescripcion'],
-          code: z.ZodIssueCode.custom,
-          message:
-            'Debe proveer el tipo de pago personalizado en entregas.tipoDescripcion',
-        });
-      }
+      validator.requiredField('tipoDescripcion');
     } else {
       const foundPaymentType = constantsService.paymentTypes.find(
         (d) => d._id == entrega.tipo,
@@ -57,32 +53,19 @@ export const EntregasSchema = z
     }
 
     if (entrega.moneda != Currency.GUARANI) {
-      if (!entrega.cambio) {
-        ctx.addIssue({
-          path: ['cambio'],
-          code: z.ZodIssueCode.custom,
-          message: 'Debe proveer el cambio en entregas.cambio',
-        });
-      }
+      validator.requiredField('cambio');
     }
 
     if (
       entrega.tipo == PaymentType.TARJETA_DE_CREDITO ||
       entrega.tipo == PaymentType.TARJETA_DE_DEBITO
     ) {
-      if (!entrega.infoTarjeta) {
-        ctx.addIssue({
-          path: ['infoTarjeta'],
-          code: z.ZodIssueCode.custom,
-          message:
-            'Debe proveer los datos del tarjeta de crédito/débito en entregas.infoTarjeta',
-        });
-      }
+      validator.requiredField('infoTarjeta');
     }
 
     return {
       ...entrega,
-      tipoDescripcion: entrega.tipoDescripcion || '',
+      tipoDescripcion: entrega.tipoDescripcion as string,
     }
   });
   

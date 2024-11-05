@@ -12,6 +12,7 @@ import { SalidaYEntregaSchema } from './salidaYEntrega.schema';
 import { TransportistaSchema } from './transportista.schema';
 import { VehiculoSchema } from './vehiculo.schema';
 import { Path } from '../../helpers/Path';
+import CommonValidators from '../../helpers/validation/CommonValidators';
 
 export const TransporteSchema = z
   .object({
@@ -40,22 +41,10 @@ export const TransporteSchema = z
     numeroDespachoImportacion: z.string().length(16).optional(),
 
     // E909: TODO: ES UN POCO RARO, ESPECIFICA CUANDO ES OPCIONAL Y CUANDO ES REQUERIDO, PERO QUE HAY DE LAS OPCIONES QUE NO SE MENCIONAN?
-    inicioEstimadoTranslado: z.coerce
-      .date()
-      .optional()
-      .transform((value) => {
-        if (!value) return value;
-        return DateHelper.getIsoDateString(value);
-      }),
+    inicioEstimadoTranslado: CommonValidators.isoDate().optional(),
 
     // E910
-    finEstimadoTranslado: z.coerce
-      .date()
-      .optional()
-      .transform((value) => {
-        if (!value) return value;
-        return DateHelper.getIsoDateString(value);
-      }),
+    finEstimadoTranslado: CommonValidators.isoDate().optional(),
 
     // E911
     paisDestino: z

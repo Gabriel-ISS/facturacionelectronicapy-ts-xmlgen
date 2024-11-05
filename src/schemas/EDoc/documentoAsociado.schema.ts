@@ -5,6 +5,8 @@ import DateHelper from '../../helpers/DateHelper';
 import { enumToZodUnion } from '../../helpers/validation/enumConverter';
 import ZodValidator from '../../helpers/validation/ZodValidator';
 import { ConstancyType } from '../../constants/constancyTypes.constants';
+import CommonValidators from '../../helpers/validation/CommonValidators';
+import NumberLength from '../../helpers/validation/NumberLenght';
 
 export const DocumentoAsociadoSchema = z
   .object({
@@ -20,31 +22,13 @@ export const DocumentoAsociadoSchema = z
     timbrado: z.string().length(8).optional(),
 
     // H005
-    establecimiento: z
-      .number()
-      .optional()
-      .transform((value) => {
-        if (value == undefined) return value;
-        return value.toString().padStart(3, '0');
-      }),
+    establecimiento: CommonValidators.zeroPadToLength(3).optional(),
 
     // H007
-    punto: z
-      .number()
-      .optional()
-      .transform((value) => {
-        if (!value) return value;
-        return value.toString().padStart(3, '0');
-      }),
+    punto: CommonValidators.zeroPadToLength(3).optional(),
 
     // H008
-    numero: z
-      .number()
-      .optional()
-      .transform((value) => {
-        if (!value) return value;
-        return value.toString().padStart(7, '0');
-      }),
+    numero: CommonValidators.zeroPadToLength(7).optional(),
 
     // H009
     tipoDocumentoImpreso: z
@@ -52,13 +36,7 @@ export const DocumentoAsociadoSchema = z
       .optional(),
 
     // H011
-    fecha: z.coerce
-      .date()
-      .optional()
-      .transform((value) => {
-        if (!value) return value;
-        return DateHelper.getIsoDateString(value);
-      }),
+    fecha: CommonValidators.isoDate().optional(),
 
     // H012
     numeroRetencion: z.string().length(15).optional(),
@@ -70,10 +48,13 @@ export const DocumentoAsociadoSchema = z
     constanciaTipo: z.union(enumToZodUnion(ConstancyType)).optional(),
 
     // H016
-    constanciaNumero: z.string().optional(),
+    constanciaNumero: z.number().optional().superRefine((value, ctx) => {
+      if (value == undefined) return;
+      new NumberLength(value, ctx).int().length(11);
+    }),
 
     // H017
-    constanciaControl: z.string().optional(),
+    constanciaControl: z.string().length(8).optional(),
 
     // H018: TODO: OTRO DESAPARECIDO
     /* rucFusionado: z.string().optional(), */

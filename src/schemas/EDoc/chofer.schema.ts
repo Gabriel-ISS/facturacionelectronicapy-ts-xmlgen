@@ -1,14 +1,15 @@
 import { z } from 'zod';
+import CommonValidators from '../../helpers/validation/CommonValidators';
 
 export const ChoferSchema = z.object({
   // E990
-  documentoNumero: z.string().min(1).max(20),
+  documentoNumero: CommonValidators.identityDocNumber(),
 
   // E991
-  nombre: z.string().min(4).max(60),
+  nombre: CommonValidators.name(),
 
   // E993
-  direccion: z.string().min(1).max(255).optional(),
+  direccion: CommonValidators.address().optional(),
 });
 
 export type Chofer = z.infer<typeof ChoferSchema>;
