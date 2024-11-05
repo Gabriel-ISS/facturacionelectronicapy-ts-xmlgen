@@ -8,6 +8,7 @@ import {
 import dbService from '../../services/db.service';
 import ZodValidator from '../../helpers/validation/ZodValidator';
 
+/**G1. Campos generales de la carga (G050 - G099) */
 export const CargaSchema = z
   .object({
     // G051
@@ -57,7 +58,19 @@ export const CargaSchema = z
       data.caracteristicaCargaDescripcion = foundCharacteristic?.description;
     }
 
-    return data;
+    return {
+      ...data,
+
+      // G052
+      unidadMedidaVolumenDescripcion: dbService
+        .select('measurementUnits')
+        .findByIdIfExist(data.unidadMedidaVolumenTotal)?.description,
+
+      // G055
+      unidadMedidaPesoDescripcion: dbService
+        .select('measurementUnits')
+        .findByIdIfExist(data.unidadMedidaPesoTotal)?.description,
+    };
   });
 
 export type Carga = z.infer<typeof CargaSchema>;

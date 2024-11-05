@@ -13,6 +13,7 @@ import CommonValidators from '../helpers/validation/CommonValidators';
 import { enumToZodUnion } from '../helpers/validation/enumConverter';
 import NumberLength from '../helpers/validation/NumberLenght';
 import ZodValidator from '../helpers/validation/ZodValidator';
+import dbService from '../services/db.service';
 import { AutoFacturaSchema } from './EDoc/autoFactura.schema';
 import { ClienteSchema } from './EDoc/cliente.schema';
 import { ComplementariosSchema } from './EDoc/complementarios.schema';
@@ -20,8 +21,8 @@ import { CondicionSchema } from './EDoc/condicion.schema';
 import { DncpSchema } from './EDoc/dncp.schema';
 import { DocumentoAsociadoSchema } from './EDoc/documentoAsociado.schema';
 import { FacturaSchema } from './EDoc/factura.schema';
-import { ItemSchema } from './EDoc/item.schama';
-import { NotaCreditoDebitoSchema } from './EDoc/notaCheditoDebitoSchema';
+import { ItemSchema } from './EDoc/item.schema';
+import { NotaCreditoDebitoSchema } from './EDoc/notaCheditoDebito.schema';
 import { RemisionSchema } from './EDoc/remision.schema';
 import { SectorAdicionalSchema } from './EDoc/sectorAdicional.schema';
 import { SectorEnergiaElectricaSchema } from './EDoc/sectorEnergiaElectrica.schema';
@@ -30,20 +31,25 @@ import { SectorSupermercadosSchema } from './EDoc/sectorSupermercados.schema';
 import { TransporteSchema } from './EDoc/transporte.schema';
 import { UsuarioSchema } from './EDoc/usuario.schema';
 
+// TODO: VERIFICAR LOS VALORES QUE DEPENDEN DE VALORES "GLOBALES"
 // TODO: VALIDAR FECHAS DE INICIO Y FIN
 // TODO: VALIDAR NÚMEROS DE TELÉFONOS
-
-/**
- * TODO: ASEGURARSE DE QUE TODOS LOS TRANSFORMS RETORNEN UN VALOR
- * - agregar valores perdidos
- * - algunas descripciones no permiten el valor "otro", que se agreguen
- * solo en el transform
- */
 
 // TODO: VALIDAR DATOS RELACIONADOS A TIMBRADO
 
 // TODO: CREAR OBJETO CON TODOS LOS MENSAJES POR DEFECTO
 // TODO: CREAR FUNCION PARA SOBREESCRIBIR TODOS LOS MENSAJES
+
+/** El esquema no incluye:
+ * AA. Campos que identifican el formato electrónico XML (AA001-AA009)
+ * A. Campos firmados del Documento Electrónico (A001-A099)
+ * D2. Campos que identifican al emisor del Documento Electrónico DE (D100-D129)
+ * D2.1 Campos que describen la actividad económica del emisor (D130-D139)
+ * E7.2. Campos que describen la operación a crédito (E640-E649)
+ * E7.2.1.Campos que describen las cuotas (E650-E659)
+ * F. Campos que describen los subtotales y totales de la transacción documentada (F001-F099)
+ * J. Campos fuera de la Firma Digital (J001-J049)
+ */
 
 /** Estructura de los datos de un Documento Electrónico.
  *
@@ -53,6 +59,21 @@ import { UsuarioSchema } from './EDoc/usuario.schema';
  */
 export const EDocDataSchema = z
   .object({
+    // B. Campos inherentes a la operación de Documentos Electrónicos (B001-B099)
+
+    // B002
+    tipoEmision: z
+      .union(enumToZodUnion(EmissionType))
+      .default(EmissionType.NORMAL),
+
+    // B005
+    observacion: z.string().min(1).max(3000).optional(),
+
+    // B006
+    descripcion: z.string().min(1).max(3000).optional(),
+
+    // C. Campos de datos del Timbrado (C001-C099)
+
     // C002
     tipoDocumento: z.union(enumToZodUnion(ValidDocumentType)),
 
@@ -81,19 +102,10 @@ export const EDocDataSchema = z
         },
       ),
 
-    // B006
-    descripcion: z.string().min(1).max(3000).optional(),
-
-    // B005
-    observacion: z.string().min(1).max(3000).optional(),
+    // D. Campos Generales del Documento Electrónico DE (D001-D299)
 
     // D002
     fecha: CommonValidators.isoDateTime(),
-
-    // B002
-    tipoEmision: z
-      .union(enumToZodUnion(EmissionType))
-      .default(EmissionType.NORMAL),
 
     // D011
     tipoTransaccion: z.union(enumToZodUnion(TransactionType)),
@@ -117,7 +129,7 @@ export const EDocDataSchema = z
     // ⚠️ TODO: EL CÓDIGO NO ESTA EN EL MANUAL TÉCNICO NI EN NINGÚN LADO
     /* obligaciones: z.array(ObligacionSchema).optional(), */
 
-    // Relacionado a EA004
+    // Relacionado a EA004 (TODO: IVESTIGAR)
     descuentoGlobal: z
       .number()
       .default(0)
@@ -125,7 +137,7 @@ export const EDocDataSchema = z
         new NumberLength(value, ctx).max(15).maxDecimals(8);
       }),
 
-    // Relacionado a EA007
+    // Relacionado a EA007 (TODO: IVESTIGAR)
     anticipoGlobal: z
       .number()
       .default(0)
@@ -136,26 +148,57 @@ export const EDocDataSchema = z
     // TODO: PARECE DE FS, sin código asociado
     /* cdc: z.string().length(44).optional(), */
 
-    cliente: ClienteSchema,
+    // D2.2 Campos que identifican al responsable de la generación del DE (D140-D160)
     usuario: UsuarioSchema.optional(),
+
+    // Campos que identifican al receptor del Documento Electrónico DE (D200-D299)
+    cliente: ClienteSchema,
+
+    // E1. Campos que componen la Factura Electrónica FE (E002-E099)
     factura: FacturaSchema.optional(),
-    autoFactura: AutoFacturaSchema.optional(),
-    notaCreditoDebito: NotaCreditoDebitoSchema.optional(),
-    remision: RemisionSchema.optional(),
-    condicion: CondicionSchema.optional(),
-    items: z.array(ItemSchema),
-    complementarios: ComplementariosSchema.optional(),
-    documentoAsociado: DocumentoAsociadoSchema.optional(),
-    transporte: TransporteSchema.optional(),
+
+    // E1.1. Campos de informaciones de Compras Públicas (E020-E029)
     dncp: DncpSchema.optional(),
 
-    // Campos complementarios comerciales de uso específico
+    // E4. Campos que componen la Autofactura Electrónica AFE (E300-E399)
+    autoFactura: AutoFacturaSchema.optional(),
+
+    // E5. Campos que componen la Nota de Crédito/Débito Electrónica NCE-NDE (E400-E499)
+    notaCreditoDebito: NotaCreditoDebitoSchema.optional(),
+    
+    // E6. Campos que componen la Nota de Remisión Electrónica (E500-E599)
+    remision: RemisionSchema.optional(),
+
+    // E7. Campos que describen la condición de la operación (E600-E699)
+    condicion: CondicionSchema.optional(),
+
+    // E8. Campos que describen los ítems de la operación (E700-E899)
+    items: z.array(ItemSchema),
+
+    // E9. Campos complementarios comerciales de uso específico (E790-E899)
+
+    // E9.2. Sector Energía Eléctrica (E791-E799)
     sectorEnergiaElectrica: SectorEnergiaElectricaSchema.optional(),
+    
+    // E9.3. Sector de Seguros (E800-E809)
     sectorSeguros: SectorSegurosSchema.optional(),
+
+    // E9.4. Sector de Supermercados (E810-E819)
     sectorSupermercados: SectorSupermercadosSchema.optional(),
+
+    // E9.5. Grupo de datos adicionales de uso comercial (E820-E829)
     sectorAdicional: SectorAdicionalSchema.optional(),
+    
+    // E10. Campos que describen el transporte de las mercaderías (E900-E999)
+    transporte: TransporteSchema.optional(),
+
+    // G. Campos complementarios comerciales de uso general (G001-G049)
+    complementarios: ComplementariosSchema.optional(),
+
+    // H. Campos que identifican al documento asociado (H001-H049)
+    documentoAsociado: DocumentoAsociadoSchema.optional(),
   })
-  .superRefine((data, ctx) => {
+  .transform((data, ctx) => {
     type Data = typeof data;
     const validator = new ZodValidator(ctx, data);
     const transportPath = new Path<Data>('transporte');
@@ -175,7 +218,7 @@ export const EDocDataSchema = z
     ) {
       validator.requiredField('descripcion');
       validator.requiredField('transporte');
-      
+
       validator.requiredField(transportPath.concat('tipo'));
       validator.requiredField(transportPath.concat('inicioEstimadoTranslado'));
       validator.requiredField(transportPath.concat('salida'));
@@ -272,6 +315,44 @@ export const EDocDataSchema = z
     }
 
     // Y POR LA GLORIA!!! (TODO: ELIMINAR ESTO)
+
+    return {
+      ...data,
+      // B003
+      descripcionEmision: dbService
+        .select('emissionTypes')
+        .findById(data.tipoEmision).description,
+
+      // TODO: B004
+
+      // C003
+      descripcionDocumento: dbService
+        .select('documentTypes')
+        .findById(data.tipoDocumento).description,
+
+      // TODO: C004 (Número del timbrado)
+
+      // TODO: C008 (Fecha inicio de vigencia del timbrado)
+
+      // D012
+      descripcionTipoTransaccion: dbService
+        .select('transactionTypes')
+        .findById(data.tipoTransaccion).description,
+
+      // D014
+      descripcionTipoImpuesto: dbService
+        .select('taxTypes')
+        .findById(data.tipoImpuesto).description,
+
+      // D016
+      descripcionMoneda: dbService.select('currencies').findById(data.moneda)
+        .description,
+
+      // D020
+      descripcripcionCondicionAnticipo: dbService
+        .select('advancePaymentConditions')
+        .findByIdIfExist(data.condicionAnticipo)?.description,
+    };
   });
 
 /** Estructura de los datos de un Documento Electrónico.

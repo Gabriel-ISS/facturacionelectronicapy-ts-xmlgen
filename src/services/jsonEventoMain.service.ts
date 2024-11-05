@@ -791,19 +791,19 @@ class JSonEventoMainService {
 
     if (!data['contribuyente']) {
       if (
-        constanteService.typesOfDocumentsInnominateReceptors.filter((um: any) => um.codigo === data['documentoTipo'])
+        constanteService.identityDocumentsInnominateReceptors.filter((um: any) => um.codigo === data['documentoTipo'])
           .length == 0
       ) {
         throw new Error(
           "Tipo de Documento '" +
             data['documentoTipo'] +
             "' en data.documentoTipo no encontrado. Valores: " +
-            constanteService.typesOfDocumentsInnominateReceptors.map((a: any) => a.codigo + '-' + a.descripcion),
+            constanteService.identityDocumentsInnominateReceptors.map((a: any) => a.codigo + '-' + a.descripcion),
         );
       }
 
       jsonResult['rGEveNom']['iTipIDRec'] = data['documentoTipo'];
-      jsonResult['rGEveNom']['dDTipIDRec'] = constanteService.typesOfDocumentsInnominateReceptors.filter(
+      jsonResult['rGEveNom']['dDTipIDRec'] = constanteService.identityDocumentsInnominateReceptors.filter(
         (um: any) => um.codigo === data['documentoTipo'],
       )[0].description;
 
@@ -1044,7 +1044,7 @@ class JSonEventoMainService {
         jsonResult['rGeVeTr']['dDTipIDTrans'] = data['entrega']['transportista']['documentoTipo'];
 
         if (
-          constanteService.typesOfIdentityDocumentsCarriers.filter(
+          constanteService.identityDocumentsCarriers.filter(
             (um: any) => um.codigo === +data['entrega']['transportista']['documentoTipo'],
           ).length == 0
         ) {
@@ -1052,7 +1052,7 @@ class JSonEventoMainService {
             "Tipo de Documento '" +
               data['entrega']['transportista']['documentoTipo'] +
               "' en data.entrega.transportista.documentoTipo no encontrado. Valores: " +
-              constanteService.typesOfIdentityDocumentsCarriers.map((a: any) => a.codigo + '-' + a.descripcion),
+              constanteService.identityDocumentsCarriers.map((a: any) => a.codigo + '-' + a.descripcion),
           );
         }
 

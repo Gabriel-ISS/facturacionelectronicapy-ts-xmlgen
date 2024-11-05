@@ -1,8 +1,8 @@
 import { z } from 'zod';
-import DateHelper from '../../helpers/DateHelper';
 import CommonValidators from '../../helpers/validation/CommonValidators';
 import NumberLength from '../../helpers/validation/NumberLenght';
 
+/**E1.1. Campos de informaciones de Compras Públicas (E020-E029) */
 export const DncpSchema = z.object({
    // E021
    modalidad: z.string().length(2),

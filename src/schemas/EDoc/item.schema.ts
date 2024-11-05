@@ -11,9 +11,10 @@ import {
 import dbService from '../../services/db.service';
 import { ItemDncpSchema } from './itemDncp.schema';
 import { SectorAutomotorSchema } from './sectorAutomotor.schema';
-import { TaxRate } from './taxRate.constants';
+import { TaxRate } from '../../constants/taxRate.constants';
 import ZodValidator from '../../helpers/validation/ZodValidator';
 
+/**E8. Campos que describen los ítems de la operación (E700-E899) */
 export const ItemSchema = z
   .object({
     // E701
@@ -41,6 +42,9 @@ export const ItemSchema = z
         if (value == undefined) return;
         new NumberLength(value, ctx).int().min(6).max(8);
       }),
+
+    // E704 - E707
+    dncp: ItemDncpSchema.optional(),
 
     // E708
     descripcion: z
@@ -75,46 +79,14 @@ export const ItemSchema = z
         new NumberLength(value, ctx).max(10).maxDecimals(4);
       }),
 
-    // E714
-    observacion: z.string().min(1).max(500).optional(),
-
-    // E721
-    precioUnitario: z.number().superRefine((value, ctx) => {
-      new NumberLength(value, ctx).max(15).maxDecimals(8);
-    }),
-
-    // E725
-    cambio: z
-      .number()
-      .optional()
-      .superRefine((value, ctx) => {
-        if (value == undefined) return;
-        new NumberLength(value, ctx).max(5).maxDecimals(4);
-      }),
-
-    // EA002
-    descuento: z
-      .number()
-      .optional()
-      .superRefine((value, ctx) => {
-        if (value == undefined) return;
-        new NumberLength(value, ctx).max(15).maxDecimals(8);
-      }),
-
-    // EA006
-    anticipo: z
-      .number()
-      .optional()
-      .superRefine((value, ctx) => {
-        if (value == undefined) return;
-        new NumberLength(value, ctx).max(15).maxDecimals(8);
-      }),
-
     // E712
     pais: z.enum(enumToZodEnum<typeof Country, Country>(Country)).optional(),
 
     // E713
     paisDescripcion: z.string().optional(),
+
+    // E714
+    observacion: z.string().min(1).max(500).optional(),
 
     // E715
     tolerancia: z.union(enumToZodUnion(MerchandiseRelevance)).optional(),
@@ -137,8 +109,46 @@ export const ItemSchema = z
         new NumberLength(value, ctx).max(3).maxDecimals(8);
       }),
 
-    // E719: TODO: A ARTIR DE AQUI VOLVER EN REVERSA PARA VERIFICAR LOS VALORES QUE DEPENDEN DE VALORES GLOBALES
+    // E719
     cdcAnticipo: z.string().length(44).optional(),
+
+    // E8.1. Campos que describen el precio, tipo de cambio y valor total de la operación por ítem (E720-E729)
+
+    // E721
+    precioUnitario: z.number().superRefine((value, ctx) => {
+      new NumberLength(value, ctx).max(15).maxDecimals(8);
+    }),
+
+    // E725
+    cambio: z
+      .number()
+      .optional()
+      .superRefine((value, ctx) => {
+        if (value == undefined) return;
+        new NumberLength(value, ctx).max(5).maxDecimals(4);
+      }),
+
+    // E8.1.1 Campos que describen los descuentos, anticipos y valor total por ítem (EA001-EA050)
+
+    // EA002
+    descuento: z
+      .number()
+      .optional()
+      .superRefine((value, ctx) => {
+        if (value == undefined) return;
+        new NumberLength(value, ctx).max(15).maxDecimals(8);
+      }),
+
+    // EA006
+    anticipo: z
+      .number()
+      .optional()
+      .superRefine((value, ctx) => {
+        if (value == undefined) return;
+        new NumberLength(value, ctx).max(15).maxDecimals(8);
+      }),
+
+    // E8.2. Campos que describen el IVA de la operación por ítem (E730-E739)
 
     // E731
     ivaTipo: z.union(enumToZodUnion(TaxTreatment), {
@@ -155,6 +165,8 @@ export const ItemSchema = z
       if (value == undefined) return;
       new NumberLength(value, ctx).max(15).maxDecimals(8);
     }),
+
+    // E8.4. Grupo de rastreo de la mercadería (E750-E760)
 
     // E751
     lote: z
@@ -192,6 +204,12 @@ export const ItemSchema = z
     // E755
     numeroSeguimiento: z.string().min(1).max(20).optional(),
 
+    // E756: TODO
+
+    // E757: TODO
+
+    // E758: TODO
+
     // E759
     registroSenave: z.string().length(20).optional(),
 
@@ -204,8 +222,7 @@ export const ItemSchema = z
       .optional()
       .describe('Obligados por el Art. 1 de la RG N° 106/2021 – Agroquímicos'), */
 
-    dncp: ItemDncpSchema.optional(),
-
+    // E8.5. Sector de automotores nuevos y usados (E770-E789)
     sectorAutomotor: SectorAutomotorSchema.optional(),
   })
   .transform((data, ctx) => {
@@ -241,6 +258,51 @@ export const ItemSchema = z
       'El IVA debe ser cero',
     );
 
-    return data;
+    return {
+      ...data,
+
+      // E710
+      unidadMedidaDescripcion: dbService
+        .select('measurementUnits')
+        .findById(data.unidadMedida, {
+          ctx,
+          fieldName: 'unidadMedida',
+          message: 'Unidad de medida no encontrada',
+        }),
+
+      // E716
+      toleranciaDescripcion: dbService
+        .select('merchandiseRelevances')
+        .findByIdIfExist(data.tolerancia),
+
+      // E727
+      // TODO: REDONDEAR SEGÚN SE REQUIERA
+      precioTotal: data.precioUnitario * data.cantidad,
+
+      // EA003: TODO: PREGUNTAR A LA DNIT SI ESTO ES UN ERROR DEL MANUAL
+      // DEBERÍA DIVIDIRSE POR LA CANTIDAD
+      // TODO: REDONDEAR SEGÚN SE REQUIERA
+      procentajeDescuentoPorItem: data.descuento
+        ? (data.descuento * 100) / data.precioUnitario 
+        : undefined,
+
+      // EA004: TODO
+
+      // EA007: TODO
+
+      // EA008: TODO
+
+      // EA009: TODO
+
+      // E732
+      ivaTipoDescripcion: dbService
+        .select('taxTreatments')
+        .findById(data.ivaTipo).description,
+
+      // E733: TODO
+
+      // E736
+      liquidacionIvaPorItem: data.ivaBase * (data.iva / 100),
+    };
   });
 export type Item = z.infer<typeof ItemSchema>;

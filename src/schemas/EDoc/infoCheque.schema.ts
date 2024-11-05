@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import CommonValidators from '../../helpers/validation/CommonValidators';
 
+/**E7.1.2.Campos que describen el pago o entrega inicial de la operación con cheque (E630-E639) */
 export const InfoChequeSchema = z.object({
   // E631
   numeroCheque: CommonValidators.zeroPadToLength(8),

@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import NumberLength from '../../helpers/validation/NumberLenght';
 
+/**E9.4. Sector de Supermercados (E810-E819) */
 export const SectorSupermercadosSchema = z.object({
   // E811
   nombreCajero: z.string().min(1).max(20).optional(),

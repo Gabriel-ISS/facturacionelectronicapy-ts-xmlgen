@@ -3,6 +3,7 @@ import NumberLength from '../../helpers/validation/NumberLenght';
 import ZodValidator from '../../helpers/validation/ZodValidator';
 import CommonValidators from '../../helpers/validation/CommonValidators';
 
+/**E9.5. Grupo de datos adicionales de uso comercial (E820-E829) */
 export const SectorAdicionalSchema = z.object({
   // E821
   ciclo: z.string().min(1).max(15).optional(),

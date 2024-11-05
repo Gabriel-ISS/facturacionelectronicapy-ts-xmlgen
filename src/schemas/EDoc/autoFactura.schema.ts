@@ -7,7 +7,9 @@ import { UbicacionSchema } from './ubicacion.schema';
 import constantsService from '../../services/constants.service';
 import CommonValidators from '../../helpers/validation/CommonValidators';
 import ZodValidator from '../../helpers/validation/ZodValidator';
+import dbService from '../../services/db.service';
 
+/**E4. Campos que componen la Autofactura Electrónica AFE (E300-E399) */
 export const AutoFacturaSchema = z
   .object({
     // E301
@@ -41,54 +43,45 @@ export const AutoFacturaSchema = z
     // E314
     ciudad: CommonValidators.city(),
 
+    // E316 - E322
     ubicacion: UbicacionSchema,
   })
   .transform((data, ctx) => {
-    const validator = new ZodValidator(ctx, data);
-
-    const foundDepartment = constantsService.departments.find(
-      (department) => department._id == data.departamento,
-    );
-
-    validator.validate(
-      'departamento',
-      !foundDepartment,
-      `El código del departamento no es válido`,
-    );
-
-    let distritoDescripcion;
-    if (data.distrito) {
-      const foundDistrict = constantsService.districts.find(
-        (district) => district._id == data.distrito,
-      );
-
-      distritoDescripcion = foundDistrict?.description;
-
-      validator.validate(
-        'distrito',
-        !foundDistrict,
-        `El código del distrito no es válido`,
-      );
-    }
-
-    const foundCity = constantsService.cities.find(
-      (city) => city._id == data.ciudad,
-    );
-
-    validator.validate(
-      'ciudad',
-      !foundCity,
-      `El código de la ciudad no es válido`,
-    );
-
     return {
       ...data,
+
+      // E302
+      tipoVendedorDescripcion: dbService
+        .select('sellerNatureSelfInvoicingCases')
+        .findById(data.tipoVendedor).description,
+
+      // E305
+      documentoTipoDescripcion: dbService
+        .select('identityDocumentsCarriers')
+        .findById(data.documentoTipo).description,
+
       // E311
-      departamentoDescripcion: foundDepartment?.description as string,
+      departamentoDescripcion: dbService
+        .select('departments')
+        .findById(data.departamento).description,
+
       // E313
-      distritoDescripcion,
+      distritoDescripcion: dbService
+        .select('districts')
+        .findByIdIfExist(data.distrito, {
+          ctx,
+          fieldName: 'distrito',
+          message: 'El código del distrito no es válido',
+        })?.description,
+
       // E315
-      ciudadDescripcion: foundCity?.description as string,
+      ciudadDescripcion: dbService
+        .select('districts')
+        .findById(data.ciudad, {
+          ctx,
+          fieldName: 'distrito',
+          message: 'El código de ciudad no es válido',
+        })?.description,
     };
   });
 

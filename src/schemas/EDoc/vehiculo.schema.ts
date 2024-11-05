@@ -3,6 +3,7 @@ import { VehicleIdentification } from '../../constants/vehicleIdentifications.co
 import { enumToZodUnion } from '../../helpers/validation/enumConverter';
 import ZodValidator from '../../helpers/validation/ZodValidator';
 
+/**E10.3. Campos que identifican el vehículo de traslado de mercaderías (E960-E979) */
 export const VehiculoSchema = z
   .object({
     // E961: Debe ser acorde al atributo modalidad (E903)
@@ -10,9 +11,6 @@ export const VehiculoSchema = z
 
     // E962
     marca: z.string().min(1).max(10),
-
-    // E967
-    documentoTipo: z.union(enumToZodUnion(VehicleIdentification)),
 
     // E963
     documentoNumero: z.string().min(1).max(20).optional(),
@@ -25,6 +23,9 @@ export const VehiculoSchema = z
 
     // E966
     numeroVuelo: z.string().optional(),
+
+    // E967
+    documentoTipo: z.union(enumToZodUnion(VehicleIdentification)),
   })
   .superRefine((data, ctx) => {
     const validator = new ZodValidator(ctx, data);

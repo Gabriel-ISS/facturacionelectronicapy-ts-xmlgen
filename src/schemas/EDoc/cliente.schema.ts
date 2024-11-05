@@ -1,20 +1,17 @@
 import { z } from 'zod';
 import { Country } from '../../constants/countries.constants';
+import { IdentityDocumentReceptor } from '../../constants/identityDocumentsReceptors.constants';
 import { OperationType } from '../../constants/operationTypes.constants';
-import { TaxpayerNotTaxpayer } from '../../constants/taxpayerNotTaxpayer.constants';
-import {
-  enumToZodEnum,
-  enumToZodUnion,
-} from '../../helpers/validation/enumConverter';
-import constantsService from '../../services/constants.service';
 import { DEFAULT_NAME } from '../../constants/other.constants';
 import { Taxpayer } from '../../constants/taxpayer.constants';
-import { IdentityDocumentReceptor } from '../../constants/identityDocumentsReceptors.constants';
+import { TaxpayerNotTaxpayer } from '../../constants/taxpayerNotTaxpayer.constants';
 import CommonValidators from '../../helpers/validation/CommonValidators';
-import NumberLength from '../../helpers/validation/NumberLenght';
-import { Department } from '../../constants/departments.constants';
+import { enumToZodUnion } from '../../helpers/validation/enumConverter';
 import ZodValidator from '../../helpers/validation/ZodValidator';
+import constantsService from '../../services/constants.service';
+import dbService from '../../services/db.service';
 
+/** Campos que identifican al receptor del Documento Electrónico DE (D200-D299) */
 export const ClienteSchema = z
   .object({
     // D201
@@ -71,7 +68,7 @@ export const ClienteSchema = z
     // D223
     ciudad: CommonValidators.city().optional(),
   })
-  .superRefine((cliente, ctx) => {
+  .transform((cliente, ctx) => {
     const validator = new ZodValidator(ctx, cliente);
 
     if (cliente.contribuyente == TaxpayerNotTaxpayer.CONTRIBUYENTE) {
@@ -137,6 +134,37 @@ export const ClienteSchema = z
         }),
       );
     }
+
+    return {
+      ...cliente,
+
+      // D204
+      paisDescripcion: dbService.select('countries').findById(cliente.pais)
+        .description,
+
+      // D207: TODO: VERIFICAR SI EL RUC CONTIENE EL DIJITO
+      dijitoVerificadorRuc: cliente.ruc?.split('-')[1],
+
+      // D209
+      descripcionTipoDocumento: dbService
+        .select('identityDocumentsReceptors')
+        .findByIdIfExist(cliente.documentoTipo)?.description,
+
+      // D220
+      descripcionDepartamento: dbService
+        .select('departments')
+        .findByIdIfExist(cliente.departamento)?.description,
+
+      // D222
+      descripcionDistrito: dbService
+        .select('districts')
+        .findByIdIfExist(cliente.distrito)?.description,
+
+      // D224
+      descripcionCiudad: dbService
+        .select('cities')
+        .findByIdIfExist(cliente.ciudad)?.description,
+    };
   });
 
 export type Cliente = z.infer<typeof ClienteSchema>;

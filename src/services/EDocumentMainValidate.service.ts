@@ -732,14 +732,14 @@ class EDocumentMainValidateService {
     }
     if (!data['cliente']['contribuyente'] && data['cliente']['tipoOperacion'] != 4) {
       if (
-        constanteService.typesOfDocumentsReceptors.filter((um: any) => um.codigo === +data['cliente']['documentoTipo'])
+        constanteService.identityDocumentsReceptors.filter((um: any) => um.codigo === +data['cliente']['documentoTipo'])
           .length == 0
       ) {
         this.validator.errors.push(
           "Tipo de Documento '" +
             data['cliente']['documentoTipo'] +
             "' del Cliente en data.cliente.documentoTipo no encontrado. Valores: " +
-            constanteService.typesOfDocumentsReceptors.map((a: any) => a.codigo + '-' + a.descripcion),
+            constanteService.identityDocumentsReceptors.map((a: any) => a.codigo + '-' + a.descripcion),
         );
 
         if (+data['cliente']['documentoTipo'] == 9) {

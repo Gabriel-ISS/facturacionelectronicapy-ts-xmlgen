@@ -1,22 +1,50 @@
-import { Country } from '../constants/countries.constants';
+import { z } from 'zod';
 import constantsService from './constants.service';
 
 type Tables = typeof constantsService;
 
 class DbService {
-  select<K extends Exclude<keyof Tables, 'validateLocation'>, T extends Tables[K]>(tableName: K) {
-
+  select<
+    K extends Exclude<keyof Tables, 'validateLocation'>,
+    T extends Tables[K],
+  >(tableName: K) {
     const table = constantsService[tableName] as T;
 
     type TD = T[number];
 
+    type NotFoundErrorData = {
+      ctx: z.RefinementCtx;
+      fieldName: string;
+      message?: string;
+    };
+
+    const manageNotFoundError = (
+      result: TD | undefined,
+      notFoundErrorData?: NotFoundErrorData,
+    ) => {
+      if (!result && notFoundErrorData) {
+        notFoundErrorData.ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `El valor del campo ${notFoundErrorData.fieldName} no es válido`,
+          path: [notFoundErrorData.fieldName],
+        });
+      }
+    };
+
     return {
-      findById: (_id: TD['_id']): TD | null => {
-        if (!table[0]._id) throw new Error('Invalid table');
-        return table.find((item) => item._id === _id) ?? null;
+      findById(_id: TD['_id'], notFoundErrorData?: NotFoundErrorData): TD {
+        const foundData = table.find((item) => item._id === _id);
+        manageNotFoundError(foundData, notFoundErrorData);
+        return table.find((item) => item._id === _id) as TD;
+      },
+      findByIdIfExist(_id: TD['_id'] | undefined, notFoundErrorData?: NotFoundErrorData): TD | null {
+        if (_id == undefined) return null;
+        const foundData = table.find((item) => item._id === _id);
+        manageNotFoundError(foundData, notFoundErrorData);
+        return foundData ?? null;
       },
     };
   }
 }
 
-export default new DbService;
+export default new DbService();

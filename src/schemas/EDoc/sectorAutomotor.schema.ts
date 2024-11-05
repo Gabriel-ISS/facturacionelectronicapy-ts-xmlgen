@@ -6,6 +6,7 @@ import { enumToZodUnion } from '../../helpers/validation/enumConverter';
 import dbService from '../../services/db.service';
 import ZodValidator from '../../helpers/validation/ZodValidator';
 
+/**E8.5. Sector de automotores nuevos y usados (E770-E789) */
 export const SectorAutomotorSchema = z
   .object({
     // E771
@@ -33,15 +34,6 @@ export const SectorAutomotorSchema = z
       .superRefine((value, ctx) => {
         if (value == undefined) return;
         new NumberLength(value, ctx).int().max(4);
-      }),
-
-    // E785
-    capacidadPasajeros: z
-      .number()
-      .optional()
-      .superRefine((value, ctx) => {
-        if (value == undefined) return;
-        new NumberLength(value, ctx).int().max(3);
       }),
 
     // E777
@@ -94,6 +86,15 @@ export const SectorAutomotorSchema = z
     // E784
     tipoVehiculo: z.string().min(4).max(10).optional(),
 
+    // E785
+    capacidadPasajeros: z
+      .number()
+      .optional()
+      .superRefine((value, ctx) => {
+        if (value == undefined) return;
+        new NumberLength(value, ctx).int().max(3);
+      }),
+
     // E786
     cilindradas: z.string().length(4).optional(),
   })
@@ -109,7 +110,7 @@ export const SectorAutomotorSchema = z
     );
 
     if (data.tipoCombustible == FuelType.OTRO) {
-      validator.requiredField('tipoCombustibleDescripcion')
+      validator.requiredField('tipoCombustibleDescripcion');
     } else if (data.tipoCombustible) {
       const foundFuelType = dbService
         .select('fuelTypes')
@@ -117,7 +118,14 @@ export const SectorAutomotorSchema = z
       data.tipoCombustibleDescripcion = foundFuelType?.description;
     }
 
-    return data;
+    return {
+      ...data,
+
+      // E772
+      tipoDescripcion: dbService
+        .select('vehicleOperationTypes')
+        .findByIdIfExist(data.tipo)?.description,
+    };
   });
 
 export type SectorAutomotor = z.infer<typeof SectorAutomotorSchema>;

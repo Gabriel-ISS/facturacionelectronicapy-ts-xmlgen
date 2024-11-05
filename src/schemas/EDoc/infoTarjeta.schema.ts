@@ -7,6 +7,7 @@ import CommonValidators from '../../helpers/validation/CommonValidators';
 import NumberLength from '../../helpers/validation/NumberLenght';
 import ZodValidator from '../../helpers/validation/ZodValidator';
 
+/**E7.1.1.Campos que describen el pago o entrega inicial de la operación con tarjeta de crédito/débito */
 export const InfoTarjetaSchema = z
   .object({
     // E621

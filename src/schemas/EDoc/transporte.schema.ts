@@ -4,15 +4,14 @@ import { FreightResponsible } from '../../constants/freightResponsibles.constant
 import { TradingCondition } from '../../constants/tradingConditions.constants';
 import { TransportModality } from '../../constants/transportModalities.constants';
 import { TransportType } from '../../constants/transportTypes.constants';
-import DateHelper from '../../helpers/DateHelper';
+import { Path } from '../../helpers/Path';
+import CommonValidators from '../../helpers/validation/CommonValidators';
 import { enumToZodEnum, enumToZodUnion } from '../../helpers/validation/enumConverter';
 import ZodValidator from '../../helpers/validation/ZodValidator';
 import dbService from '../../services/db.service';
 import { SalidaYEntregaSchema } from './salidaYEntrega.schema';
 import { TransportistaSchema } from './transportista.schema';
 import { VehiculoSchema } from './vehiculo.schema';
-import { Path } from '../../helpers/Path';
-import CommonValidators from '../../helpers/validation/CommonValidators';
 
 export const TransporteSchema = z
   .object({
@@ -51,12 +50,16 @@ export const TransporteSchema = z
       .enum(enumToZodEnum<typeof Country, Country>(Country))
       .optional(),
 
+    // E10.1. Campos que identifican el local de salida de las mercaderías (E920-E939)
     salida: SalidaYEntregaSchema.optional(),
 
+    // E10.2. Campos que identifican el local de entrega de las mercaderías (E940-E959)
     entrega: SalidaYEntregaSchema.optional(),
 
+    // E10.3. Campos que identifican el vehículo de traslado de mercaderías (E960-E979)
     vehiculo: VehiculoSchema.optional(),
 
+    // E10.4. Campos que identifican al transportista (persona física o jurídica) (E980-E999)
     transportista: TransportistaSchema.optional(),
   })
   .transform((data, ctx) => {
@@ -89,6 +92,11 @@ export const TransporteSchema = z
 
     return {
       ...data,
+
+      // E904
+      modalidadDescripcion: dbService
+        .select('transportModalities')
+        .findById(data.modalidad).description,
 
       // E912
       paisDestinoNombre,

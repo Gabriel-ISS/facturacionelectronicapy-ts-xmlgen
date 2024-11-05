@@ -1268,7 +1268,7 @@ class JSonDeMainService {
       if (data['cliente']['documentoTipo']) {
         this.json['rDE']['DE']['gDatGralOpe']['gDatRec']['iTipIDRec'] = +data['cliente']['documentoTipo'];
         this.json['rDE']['DE']['gDatGralOpe']['gDatRec']['dDTipIDRec'] =
-          constantService.typesOfDocumentsReceptors.filter((tdr) => tdr._id === +data['cliente']['documentoTipo'])[0][
+          constantService.identityDocumentsReceptors.filter((tdr) => tdr._id === +data['cliente']['documentoTipo'])[0][
             'description'
           ];
       }

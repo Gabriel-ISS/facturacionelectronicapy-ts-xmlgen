@@ -1,10 +1,11 @@
 import { z } from 'zod';
-import { UserIdentityDocument, userIdentityDocuments } from '../../constants/userIdentityDocuments.constants';
+import { UserIdentityDocument } from '../../constants/userIdentityDocuments.constants';
+import CommonValidators from '../../helpers/validation/CommonValidators';
 import { enumToZodUnion } from '../../helpers/validation/enumConverter';
 import ZodValidator from '../../helpers/validation/ZodValidator';
 import dbService from '../../services/db.service';
-import CommonValidators from '../../helpers/validation/CommonValidators';
 
+/** D2.2 Campos que identifican al responsable de la generación del DE (D140-D160) */
 export const UsuarioSchema = z
   .object({
     // D141
@@ -29,7 +30,7 @@ export const UsuarioSchema = z
       validator.requiredField('documentoTipoDescripcion');
     } else {
       const identityDocument = dbService.select('userIdentityDocuments').findById(user.documentoTipo) 
-      user.documentoTipoDescripcion = identityDocument?.description;
+      user.documentoTipoDescripcion = identityDocument.description;
     }
 
     return user;

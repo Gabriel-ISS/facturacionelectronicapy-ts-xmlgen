@@ -7,8 +7,11 @@ import dbService from '../../services/db.service';
 import CommonValidators from '../../helpers/validation/CommonValidators';
 
 /**
+ * E10.1. Campos que identifican el local de salida de las mercaderías (E920-E939)
+ * E10.2. Campos que identifican el local de entrega de las mercaderías (E940-E959)
+ * 
  * @SALIDA
- * @field E911 = direccion
+ * @field E921 = direccion
  * @field E922 = numeroCasa
  * @field E923 = complementoDireccion1
  * @field E924 = complementoDireccion2

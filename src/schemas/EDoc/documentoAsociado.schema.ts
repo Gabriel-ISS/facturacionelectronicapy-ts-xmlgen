@@ -1,13 +1,14 @@
 import { z } from 'zod';
 import { AssociatedDocumentType } from '../../constants/associatedDocumentTypes.constants';
-import { PrintedDocumentType } from '../../constants/printedDocumentTypes.constants';
-import DateHelper from '../../helpers/DateHelper';
-import { enumToZodUnion } from '../../helpers/validation/enumConverter';
-import ZodValidator from '../../helpers/validation/ZodValidator';
 import { ConstancyType } from '../../constants/constancyTypes.constants';
+import { PrintedDocumentType } from '../../constants/printedDocumentTypes.constants';
 import CommonValidators from '../../helpers/validation/CommonValidators';
+import { enumToZodUnion } from '../../helpers/validation/enumConverter';
 import NumberLength from '../../helpers/validation/NumberLenght';
+import ZodValidator from '../../helpers/validation/ZodValidator';
+import dbService from '../../services/db.service';
 
+/**H. Campos que identifican al documento asociado (H001-H049) */
 export const DocumentoAsociadoSchema = z
   .object({
     // H002
@@ -21,7 +22,7 @@ export const DocumentoAsociadoSchema = z
     // H005
     timbrado: z.string().length(8).optional(),
 
-    // H005
+    // H006
     establecimiento: CommonValidators.zeroPadToLength(3).optional(),
 
     // H007
@@ -48,10 +49,13 @@ export const DocumentoAsociadoSchema = z
     constanciaTipo: z.union(enumToZodUnion(ConstancyType)).optional(),
 
     // H016
-    constanciaNumero: z.number().optional().superRefine((value, ctx) => {
-      if (value == undefined) return;
-      new NumberLength(value, ctx).int().length(11);
-    }),
+    constanciaNumero: z
+      .number()
+      .optional()
+      .superRefine((value, ctx) => {
+        if (value == undefined) return;
+        new NumberLength(value, ctx).int().length(11);
+      }),
 
     // H017
     constanciaControl: z.string().length(8).optional(),
@@ -59,7 +63,7 @@ export const DocumentoAsociadoSchema = z
     // H018: TODO: OTRO DESAPARECIDO
     /* rucFusionado: z.string().optional(), */
   })
-  .superRefine((data, ctx) => {
+  .transform((data, ctx) => {
     const validator = new ZodValidator(ctx, data);
 
     if (data.formato == AssociatedDocumentType.IMPRESO) {
@@ -97,6 +101,25 @@ export const DocumentoAsociadoSchema = z
     } else {
       validator.undesiredField('fecha');
     }
+
+    return {
+      ...data,
+
+      // H003
+      formatoDescripcion: dbService
+        .select('associatedDocumentTypes')
+        .findById(data.formato)?.description,
+
+      // H010
+      tipoDocumentoImpresoDescripcion: dbService
+        .select('printedDocumentTypes')
+        .findByIdIfExist(data.tipoDocumentoImpreso)?.description,
+
+      // H015
+      constanciaTipoDescripcion: dbService
+        .select('constancyTypes')
+        .findByIdIfExist(data.constanciaTipo)?.description,
+    };
   });
 
 export type DocumentoAsociado = z.infer<typeof DocumentoAsociadoSchema>;

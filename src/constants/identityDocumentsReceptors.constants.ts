@@ -8,7 +8,7 @@ export enum IdentityDocumentReceptor {
   CARNET_DE_RESIDENCIA = IdentityDocument.CARNET_DE_RESIDENCIA,
   INNOMINADO = IdentityDocument.INNOMINADO,
   TARJETA_DIPLOMATICA_DE_EXONERACION_FISCAL = IdentityDocument.TARJETA_DIPLOMATICA_DE_EXONERACION_FISCAL,
-  NO_ESPECIFICADO = IdentityDocument.OTRO,
+  OTRO = IdentityDocument.OTRO,
 }
 
 export const identityDocumentsReceptors: BasicData<IdentityDocument | IdentityDocumentReceptor>[] =

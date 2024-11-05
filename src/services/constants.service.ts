@@ -44,6 +44,7 @@ import { identityDocumentsCarriers } from '../constants/identityDocumentsCarrier
 import { vehicleIdentifications } from '../constants/vehicleIdentifications.constants';
 import { vehicleOperationTypes } from '../constants/vehicleOperationTypes.constants';
 import { exchangeRateConditions } from '../constants/exchangeRateConditions.constants';
+import { paymentConditions } from '../constants/paymentCondition.constants';
 
 export type BasicData<Code = number> = {
   _id: Code;
@@ -109,10 +110,12 @@ export default Object.freeze({
   obligations,
   currencies,
   regimeTypes,
+
   userIdentityDocuments,
-  typesOfIdentityDocumentsCarriers: identityDocumentsCarriers,
-  typesOfDocumentsReceptors: identityDocumentsReceptors,
-  typesOfDocumentsInnominateReceptors: identityDocumentsInnominateReceptors,
+  identityDocumentsCarriers,
+  identityDocumentsReceptors,
+  identityDocumentsInnominateReceptors,
+
   operationTypes,
   presenceIndicators,
   receptorTypes: taxpayerNotTaxpayer,
@@ -122,6 +125,7 @@ export default Object.freeze({
   remissionResponsibles,
   operatingConditions,
   paymentTypes,
+  paymentConditions,
   creditTypes,
   creditCards,
   creditCardProcessingMethods,

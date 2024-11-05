@@ -1,14 +1,16 @@
 import { z } from 'zod';
 import { Currency } from '../../constants/curencies.constants';
 import { PaymentType } from '../../constants/paymentTypes.constants';
-import { enumToZodUnion, enumToZodEnum } from '../../helpers/validation/enumConverter';
+import CommonValidators from '../../helpers/validation/CommonValidators';
+import { enumToZodUnion } from '../../helpers/validation/enumConverter';
+import NumberLength from '../../helpers/validation/NumberLenght';
+import ZodValidator from '../../helpers/validation/ZodValidator';
+import constantsService from '../../services/constants.service';
 import { InfoChequeSchema } from './infoCheque.schema';
 import { InfoTarjetaSchema } from './infoTarjeta.schema';
-import constantsService from '../../services/constants.service';
-import NumberLength from '../../helpers/validation/NumberLenght';
-import CommonValidators from '../../helpers/validation/CommonValidators';
-import ZodValidator from '../../helpers/validation/ZodValidator';
+import dbService from '../../services/db.service';
 
+/**E7.1. Campos que describen la forma de pago de la operación al contado o del monto de la entrega inicial (E605-E619) */
 export const EntregasSchema = z
   .object({
     // E606
@@ -33,10 +35,10 @@ export const EntregasSchema = z
     // E611
     cambio: CommonValidators.currencyChange().optional(),
 
-    // Campos que describen el pago o entrega inicial de la operación con tarjeta de crédito/débito
+    // E7.1.1.Campos que describen el pago o entrega inicial de la operación con tarjeta de crédito/débito
     infoTarjeta: InfoTarjetaSchema.optional(),
 
-    // Campos que describen el pago o entrega inicial de la operación con cheque
+    // E7.1.2.Campos que describen el pago o entrega inicial de la operación con cheque (E630-E639)
     infoCheque: InfoChequeSchema.optional(),
   })
   .transform((entrega, ctx) => {
@@ -66,6 +68,10 @@ export const EntregasSchema = z
     return {
       ...entrega,
       tipoDescripcion: entrega.tipoDescripcion as string,
+
+      // E610
+      monedaDescripcion: dbService.select('currencies').findById(entrega.moneda)
+        .description,
     }
   });
   
