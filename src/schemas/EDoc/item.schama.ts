@@ -6,12 +6,13 @@ import DateHelper from '../../helpers/DateHelper';
 import NumberLength from '../../helpers/validation/NumberLenght';
 import {
   enumToZodEnum,
-  enumToZodUnion
+  enumToZodUnion,
 } from '../../helpers/validation/enumConverter';
 import dbService from '../../services/db.service';
 import { ItemDncpSchema } from './itemDncp.schema';
 import { SectorAutomotorSchema } from './sectorAutomotor.schema';
 import { TaxRate } from './taxRate.constants';
+import ZodValidator from '../../helpers/validation/ZodValidator';
 
 export const ItemSchema = z
   .object({
@@ -24,16 +25,22 @@ export const ItemSchema = z
       .max(20, { message: 'El código no puede tener más de 20 caracteres' }),
 
     // E702
-    partidaArancelaria: z.number().optional().superRefine((value, ctx) => {
-      if (value == undefined) return;
-      new NumberLength(value, ctx).int().length(4);
-    }),
+    partidaArancelaria: z
+      .number()
+      .optional()
+      .superRefine((value, ctx) => {
+        if (value == undefined) return;
+        new NumberLength(value, ctx).int().length(4);
+      }),
 
     // E703
-    ncm: z.number().optional().superRefine((value, ctx) => {
-      if (value == undefined) return;
-      new NumberLength(value, ctx).int().min(6).max(8);
-    }),
+    ncm: z
+      .number()
+      .optional()
+      .superRefine((value, ctx) => {
+        if (value == undefined) return;
+        new NumberLength(value, ctx).int().min(6).max(8);
+      }),
 
     // E708
     descripcion: z
@@ -47,7 +54,8 @@ export const ItemSchema = z
     unidadMedida: z
       .number({
         required_error: 'La unidad de medida es requerida',
-      }).superRefine((value, ctx) => {
+      })
+      .superRefine((value, ctx) => {
         const foundUnit = dbService.select('measurementUnits').findById(value);
         if (!foundUnit) {
           ctx.addIssue({
@@ -196,69 +204,42 @@ export const ItemSchema = z
       .optional()
       .describe('Obligados por el Art. 1 de la RG N° 106/2021 – Agroquímicos'), */
 
-    // E762: ES BROMA? EL MANUAL SOLO LO MENCIONA EN UNA OBSERVACIÓN
     dncp: ItemDncpSchema.optional(),
 
     sectorAutomotor: SectorAutomotorSchema.optional(),
   })
   .transform((data, ctx) => {
+    const validator = new ZodValidator(ctx, data);
 
     if (data.pais) {
       const foundCountry = dbService.select('countries').findById(data.pais);
 
-      data.paisDescripcion = foundCountry?.description;
+      validator.validate('pais', !foundCountry, 'El pais no es válido');
 
-      if (!foundCountry) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'El pais no es válido',
-          path: ['pais'],
-        });
-      }
+      data.paisDescripcion = foundCountry?.description;
     }
 
     if (data.tolerancia) {
-      if (!data.toleranciaCantidad) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'Debe indicar la cantidad de quiebra o merma',
-          path: ['toleranciaCantidad'],
-        });
-      }
-
-      if (!data.toleranciaPorcentaje) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'Debe indicar el porcentaje de quiebra o merma',
-          path: ['toleranciaPorcentaje'],
-        });
-      }
+      validator.requiredField('toleranciaCantidad');
+      validator.requiredField('toleranciaPorcentaje');
     }
 
-    if (
+    validator.validate(
+      'iva',
       (data.ivaTipo == TaxTreatment.GRAVADO_IVA ||
         data.ivaTipo == TaxTreatment.GRAVADO_PARCIAL__GRAV__EXENTO_) &&
-      data.iva != TaxRate.CINCO &&
-      data.iva != TaxRate.DIEZ
-    ) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'El IVA debe ser cinco o diez',
-        path: ['iva'],
-      });
-    }
+        data.iva != TaxRate.CINCO &&
+        data.iva != TaxRate.DIEZ,
+      'El IVA debe ser cinco o diez',
+    );
 
-    if (
+    validator.validate(
+      'iva',
       (data.ivaTipo == TaxTreatment.EXENTO ||
         data.ivaTipo == TaxTreatment.EXONERADO__ART__100___LEY_6380_2019_) &&
-      data.iva != TaxRate.CERO
-    ) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'El IVA debe ser cero',
-        path: ['iva'],
-      });
-    }
+        data.iva != TaxRate.CERO,
+      'El IVA debe ser cero',
+    );
 
     return data;
   });

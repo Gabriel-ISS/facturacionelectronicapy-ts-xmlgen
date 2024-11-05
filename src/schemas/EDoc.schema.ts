@@ -53,7 +53,6 @@ import { UsuarioSchema } from './EDoc/usuario.schema';
  */
 export const EDocDataSchema = z
   .object({
-    // TODO DAVITD: APLICAR ZodValidator
     // C002
     tipoDocumento: z.union(enumToZodUnion(ValidDocumentType)),
 
@@ -132,11 +131,9 @@ export const EDocDataSchema = z
     // D019
     condicionAnticipo: z.union(enumToZodUnion(GlobalAndPerItem)).optional(),
 
-
     // D030 - NT18 ?
     // ⚠️ TODO: EL CÓDIGO NO ESTA EN EL MANUAL TÉCNICO NI EN NINGÚN LADO
     /* obligaciones: z.array(ObligacionSchema).optional(), */
-
 
     // Relacionado a EA004
     descuentoGlobal: z
@@ -182,6 +179,8 @@ export const EDocDataSchema = z
     const transportPath = new Path<Data>('transporte');
     const associatedDocumentPath = new Path<Data>('documentoAsociado');
     const clientePath = new Path<Data>('cliente');
+    const itemsPath = new Path<Data>('items');
+    const additionalSectorPath = new Path<Data>('sectorAdicional');
 
     // POR EL TIPO DE DOCUMENTO (C002)
     if (
@@ -226,6 +225,13 @@ export const EDocDataSchema = z
     // POR EL TIPO DE OPERACIÓN (D202)
     if (data.cliente.tipoOperacion == OperationType.B2G) {
       validator.requiredField('dncp');
+      data.items.forEach((_item, i) => {
+        const path = itemsPath
+          .concat(i)
+          .concat('dncp')
+          .concat('codigoNivelGeneral');
+        validator.requiredField(path);
+      });
     }
 
     // POR EL TIPO DE TRANSACCIÓN (D011)
@@ -262,6 +268,23 @@ export const EDocDataSchema = z
       validator.requiredField(
         transportPath.concat('numeroDespachoImportacion'),
       );
+    }
+
+    if (data.sectorSupermercados) {
+      // POR E811
+      if (data.sectorSupermercados?.nombreCajero) {
+        validator.requiredField(additionalSectorPath.concat('inicioCiclo'));
+      } else {
+        validator.undesiredField(additionalSectorPath.concat('inicioCiclo'));
+      }
+      //POR E812
+      // TODO: PREGUNTAR A LA DNIT SI ESTO ES UN ERROR DEL MANUAL
+      // CREO QUE DEBERIA DEPENDER DEL INICIO DE CICLO
+      if (data.sectorSupermercados?.efectivo) {
+        validator.requiredField(additionalSectorPath.concat('finCiclo'));
+      } else {
+        validator.undesiredField(additionalSectorPath.concat('finCiclo'));
+      }
     }
 
     // Y POR LA GLORIA!!! (TODO: ELIMINAR ESTO)

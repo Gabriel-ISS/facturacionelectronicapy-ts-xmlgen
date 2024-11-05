@@ -2,10 +2,9 @@ import { z } from 'zod';
 import { FuelType } from '../../constants/fuelTypes.constants';
 import { VehicleOperationType } from '../../constants/vehicleOperationTypes.constants';
 import NumberLength from '../../helpers/validation/NumberLenght';
-import {
-  enumToZodUnion
-} from '../../helpers/validation/enumConverter';
+import { enumToZodUnion } from '../../helpers/validation/enumConverter';
 import dbService from '../../services/db.service';
+import ZodValidator from '../../helpers/validation/ZodValidator';
 
 export const SectorAutomotorSchema = z
   .object({
@@ -84,10 +83,13 @@ export const SectorAutomotorSchema = z
       }),
 
     // E783
-    año: z.number().optional().superRefine((value, ctx) => {
-      if (value == undefined) return;
-      new NumberLength(value, ctx).int().length(4);
-    }),
+    año: z
+      .number()
+      .optional()
+      .superRefine((value, ctx) => {
+        if (value == undefined) return;
+        new NumberLength(value, ctx).int().length(4);
+      }),
 
     // E784
     tipoVehiculo: z.string().min(4).max(10).optional(),
@@ -96,22 +98,18 @@ export const SectorAutomotorSchema = z
     cilindradas: z.string().length(4).optional(),
   })
   .transform((data, ctx) => {
-    if (data.pesoNeto && data.pesoBruto && data.pesoNeto > data.pesoBruto) {
-      ctx.addIssue({
-        path: ['pesoNeto'],
-        message: 'El peso neto no puede ser mayor que el peso bruto.',
-        code: z.ZodIssueCode.custom,
-      });
-    }
+    const validator = new ZodValidator(ctx, data);
+
+    validator.validate(
+      'pesoNeto',
+      Boolean(
+        data.pesoNeto && data.pesoBruto && data.pesoNeto > data.pesoBruto,
+      ),
+      'El peso neto no puede ser mayor que el peso bruto.',
+    );
 
     if (data.tipoCombustible == FuelType.OTRO) {
-      if (!data.tipoCombustibleDescripcion) {
-        ctx.addIssue({
-          path: ['tipoCombustibleDescripcion'],
-          message: 'Debe especificar la descripción del tipo de combustible',
-          code: z.ZodIssueCode.custom,
-        });
-      }
+      validator.requiredField('tipoCombustibleDescripcion')
     } else if (data.tipoCombustible) {
       const foundFuelType = dbService
         .select('fuelTypes')

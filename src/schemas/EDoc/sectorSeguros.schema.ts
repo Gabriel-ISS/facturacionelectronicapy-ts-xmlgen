@@ -28,7 +28,7 @@ export const SectorSegurosSchema = z.object({
   finVigencia: CommonValidators.isoDateTime().optional(),
 
   // EA797
-  codigoInternoItem: z.string().min(3).max(20).optional(),
+  codigoInternoItem: z.string().min(1).max(20).optional(),
 });
 
 export type SectorSeguros = z.infer<typeof SectorSegurosSchema>;

@@ -6,6 +6,7 @@ import {
   enumToZodUnion
 } from '../../helpers/validation/enumConverter';
 import dbService from '../../services/db.service';
+import ZodValidator from '../../helpers/validation/ZodValidator';
 
 export const CargaSchema = z
   .object({
@@ -44,15 +45,10 @@ export const CargaSchema = z
     caracteristicaCargaDescripcion: z.string().optional(),
   })
   .transform((data, ctx) => {
+    const validator = new ZodValidator(ctx, data)
+
     if (data.caracteristicaCarga == CargoCharacteristic.OTRO) {
-      if (!data.caracteristicaCargaDescripcion) {
-        ctx.addIssue({
-          path: ['caracteristicaCargaDescripcion'],
-          code: z.ZodIssueCode.custom,
-          message:
-            'Debe especificar la descripción de la característica de carga',
-        });
-      }
+      validator.requiredField('caracteristicaCargaDescripcion')
     } else if (data.caracteristicaCarga) {
       const foundCharacteristic = dbService
         .select('cargoCharacteristics')
