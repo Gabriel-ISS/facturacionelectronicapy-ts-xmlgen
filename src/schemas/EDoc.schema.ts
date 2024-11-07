@@ -30,6 +30,7 @@ import { SectorSegurosSchema } from './EDoc/sectorSeguros.schema';
 import { SectorSupermercadosSchema } from './EDoc/sectorSupermercados.schema';
 import { TransporteSchema } from './EDoc/transporte.schema';
 import { UsuarioSchema } from './EDoc/usuario.schema';
+import { ObligacionSchema } from './EDoc/obligacion.schema';
 
 // TODO: COMPLETAR VALORES FALTANTES
 // TODO: ASEGURARSE DE QUE LAS DESCRIPCIONES ESTEN BIEN VALIDADAS, CONSIDERAR undefined Y "OTRO"
@@ -128,9 +129,8 @@ export const EDocDataSchema = z
     // D019
     condicionAnticipo: z.union(enumToZodUnion(GlobalAndPerItem)).optional(),
 
-    // D030 - NT18 ?
-    // ⚠️ TODO: EL CÓDIGO NO ESTA EN EL MANUAL TÉCNICO NI EN NINGÚN LADO
-    /* obligaciones: z.array(ObligacionSchema).optional(), */
+    // D1.1. Campos que identifican las obligaciones afectadas (D030-D040)
+    obligaciones: z.array(ObligacionSchema).optional(),
 
     // EA004
     descuentoGlobal: z.number().superRefine((value, ctx) => {
@@ -752,9 +752,9 @@ export const EDocDataSchema = z
         .select('documentTypes')
         .findById(data.tipoDocumento).description,
 
-      // TODO: C004 (Número del timbrado)
+      // TODO: C004
 
-      // TODO: C008 (Fecha inicio de vigencia del timbrado)
+      // TODO: C008
 
       // D012
       descripcionTipoTransaccion: dbService

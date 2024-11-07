@@ -60,7 +60,7 @@ export const DocumentoAsociadoSchema = z
     // H017
     constanciaControl: z.string().length(8).optional(),
 
-    // H018: TODO: OTRO DESAPARECIDO
+    // H018: TODO: NO APARECE EN EL MANUAL
     /* rucFusionado: z.string().optional(), */
   })
   .transform((data, ctx) => {

@@ -47,7 +47,7 @@ export const RemisionSchema = z
     // E506
     fechaFactura: CommonValidators.isoDate().optional(),
 
-    // E507: TODO: CÓDIGO NO ENCONTRADO
+    // E507: TODO: NO APARECE EN EL MANUAL
     /* costoFlete: z.number().optional(), */
   })
   .transform((data, ctx) => {

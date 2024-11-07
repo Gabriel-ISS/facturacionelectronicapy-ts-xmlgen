@@ -199,7 +199,7 @@ export const ItemSchema = z
     // E760
     registroEntidadComercial: z.string().length(20).optional(),
 
-    // E761: TODO: OTRO DESAPARECIDO
+    // E761: TODO: NO APARECE EN EL MANUAL
     /* nombreProducto: z
       .string()
       .optional()
@@ -328,12 +328,10 @@ export const ItemSchema = z
         .findByIdIfExist(data.tolerancia),
 
       // E727
-      // TODO: REDONDEAR SEGÚN SE REQUIERA
       precioTotal: data.precioUnitario * data.cantidad,
 
       // EA003: TODO: PREGUNTAR A LA DNIT SI ESTO ES UN ERROR DEL MANUAL
       // DEBERÍA DIVIDIRSE POR LA CANTIDAD
-      // TODO: REDONDEAR SEGÚN SE REQUIERA
       procentajeDescuentoPorItem:
         data.descuento && data.descuento > 0
           ? (data.descuento * 100) / data.precioUnitario
