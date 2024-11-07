@@ -43,19 +43,19 @@ export const EntregasSchema = z
     // E7.1.2.Campos que describen el pago o entrega inicial de la operación con cheque (E630-E639)
     infoCheque: InfoChequeSchema.optional(),
   })
-  .transform((entrega, ctx) => {
-    const validator = new ZodValidator(ctx, entrega);
+  .transform((data, ctx) => {
+    const validator = new ZodValidator(ctx, data);
 
     /**E606 = 99 */
-    const isOtherPaymentType = entrega.tipo == PaymentType.OTRO;
+    const isOtherPaymentType = data.tipo == PaymentType.OTRO;
     /**E606 = 2 */
-    const isCheckPayment = entrega.tipo == PaymentType.CHEQUE;
+    const isCheckPayment = data.tipo == PaymentType.CHEQUE;
     /**E606 = 3 */
-    const isCreditCartPayment = entrega.tipo == PaymentType.TARJETA_DE_CREDITO;
+    const isCreditCartPayment = data.tipo == PaymentType.TARJETA_DE_CREDITO;
     /**E606 = 4 */
-    const isDebitCartPayment = entrega.tipo == PaymentType.TARJETA_DE_DEBITO;
+    const isDebitCartPayment = data.tipo == PaymentType.TARJETA_DE_DEBITO;
     /**E609 = PYG */
-    const isGuarani = entrega.moneda == Currency.GUARANI;
+    const isGuarani = data.moneda == Currency.GUARANI;
 
     // E607 - tipoDescripcion
     {
@@ -67,11 +67,11 @@ export const EntregasSchema = z
       } else {
         const foundPaymentType = dbService
           .select('paymentTypes')
-          .findById(entrega.tipo, {
+          .findById(data.tipo, {
             ctx,
             fieldName: 'entregas.tipoDescripcion',
           });
-        entrega.tipoDescripcion = foundPaymentType?.description;
+        data.tipoDescripcion = foundPaymentType?.description;
       }
     }
 
@@ -106,11 +106,11 @@ export const EntregasSchema = z
     }
 
     return {
-      ...entrega,
-      tipoDescripcion: entrega.tipoDescripcion as string,
+      ...data,
+      tipoDescripcion: data.tipoDescripcion as string,
 
       // E610
-      monedaDescripcion: dbService.select('currencies').findById(entrega.moneda)
+      monedaDescripcion: dbService.select('currencies').findById(data.moneda)
         .description,
     };
   });

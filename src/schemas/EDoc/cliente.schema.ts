@@ -68,17 +68,17 @@ export const ClienteSchema = z
     // D223
     ciudad: CommonValidators.city().optional(),
   })
-  .transform((cliente, ctx) => {
-    const validator = new ZodValidator(ctx, cliente);
+  .transform((data, ctx) => {
+    const validator = new ZodValidator(ctx, data);
 
     /**D201==1 */
     const isTaxpayer =
-      cliente.contribuyente == TaxpayerNotTaxpayer.CONTRIBUYENTE;
+      data.contribuyente == TaxpayerNotTaxpayer.CONTRIBUYENTE;
     /**D201==2 */
     const isNotTaxpayer =
-      cliente.contribuyente == TaxpayerNotTaxpayer.NO_CONTRIBUYENTE;
+      data.contribuyente == TaxpayerNotTaxpayer.NO_CONTRIBUYENTE;
     /**D202==4 */
-    const isB2F = cliente.tipoOperacion == OperationType.B2F;
+    const isB2F = data.tipoOperacion == OperationType.B2F;
 
     // D205 - tipoContribuyente
     {
@@ -149,7 +149,7 @@ export const ClienteSchema = z
       Campo obligatorio si se informa el campo D213
       TODO: Cuando D201 = 1, debe corresponder a lo declarado en el RUC
       */
-      if (cliente.direccion) {
+      if (data.direccion) {
         validator.requiredField('numeroCasa');
       }
     }
@@ -161,7 +161,7 @@ export const ClienteSchema = z
       campo D213 y D202≠4, no se debe
       informar cuando D202 = 4.
       */
-      if (cliente.direccion && !isB2F) {
+      if (data.direccion && !isB2F) {
         validator.requiredField('departamento');
       } else if (isB2F) {
         validator.undesiredField('departamento');
@@ -175,7 +175,7 @@ export const ClienteSchema = z
       campo D213 y D202≠4, no se debe
       informar cuando D202 = 4
       */
-      if (cliente.direccion && !isB2F) {
+      if (data.direccion && !isB2F) {
         validator.requiredField('ciudad');
       } else if (isB2F) {
         validator.undesiredField('ciudad');
@@ -183,34 +183,34 @@ export const ClienteSchema = z
     }
 
     return {
-      ...cliente,
+      ...data,
 
       // D204
-      paisDescripcion: dbService.select('countries').findById(cliente.pais)
+      paisDescripcion: dbService.select('countries').findById(data.pais)
         .description,
 
       // D207: TODO: VERIFICAR SI EL RUC CONTIENE EL DIJITO
-      dijitoVerificadorRuc: cliente.ruc?.split('-')[1],
+      dijitoVerificadorRuc: data.ruc?.split('-')[1],
 
       // D209
       descripcionTipoDocumento: dbService
         .select('identityDocumentsReceptors')
-        .findByIdIfExist(cliente.documentoTipo)?.description,
+        .findByIdIfExist(data.documentoTipo)?.description,
 
       // D220
       descripcionDepartamento: dbService
         .select('departments')
-        .findByIdIfExist(cliente.departamento)?.description,
+        .findByIdIfExist(data.departamento)?.description,
 
       // D222
       descripcionDistrito: dbService
         .select('districts')
-        .findByIdIfExist(cliente.distrito)?.description,
+        .findByIdIfExist(data.distrito)?.description,
 
       // D224
       descripcionCiudad: dbService
         .select('cities')
-        .findByIdIfExist(cliente.ciudad)?.description,
+        .findByIdIfExist(data.ciudad)?.description,
     };
   });
 

@@ -30,10 +30,7 @@ import { SectorSegurosSchema } from './EDoc/sectorSeguros.schema';
 import { SectorSupermercadosSchema } from './EDoc/sectorSupermercados.schema';
 import { TransporteSchema } from './EDoc/transporte.schema';
 import { UsuarioSchema } from './EDoc/usuario.schema';
-import { TaxRate } from '../constants/taxRate.constants';
-import { TaxTreatment } from '../constants/taxTreatments.constants';
 
-// TODO: VERIFICAR LOS VALORES QUE DEPENDEN DE VALORES "GLOBALES"
 // TODO: COMPLETAR VALORES FALTANTES
 // TODO: ASEGURARSE DE QUE LAS DESCRIPCIONES ESTEN BIEN VALIDADAS, CONSIDERAR undefined Y "OTRO"
 // TODO: para todos los findByIdIfExist agregar ctx si ese necesario bajo alguna condición
@@ -53,8 +50,6 @@ import { TaxTreatment } from '../constants/taxTreatments.constants';
  * A. Campos firmados del Documento Electrónico (A001-A099)
  * D2. Campos que identifican al emisor del Documento Electrónico DE (D100-D129)
  * D2.1 Campos que describen la actividad económica del emisor (D130-D139)
- * E7.2. Campos que describen la operación a crédito (E640-E649)
- * E7.2.1.Campos que describen las cuotas (E650-E659)
  * F. Campos que describen los subtotales y totales de la transacción documentada (F001-F099)
  * J. Campos fuera de la Firma Digital (J001-J049)
  */
@@ -206,13 +201,14 @@ export const EDocDataSchema = z
   .transform((data, ctx) => {
     type Data = typeof data;
     const validator = new ZodValidator(ctx, data);
+
     const transportPath = new Path<Data>('transporte');
     const associatedDocumentPath = new Path<Data>('documentoAsociado');
     const clientePath = new Path<Data>('cliente');
     const dncpPath = new Path<Data>('dncp');
     const remisionPath = new Path<Data>('remision');
     const itemsPath = new Path<Data>('items');
-    const additionalSectorPath = new Path<Data>('sectorAdicional');
+    const complementariosPath = new Path<Data>('complementarios');
 
     /**C002 = 1 */
     const isElectronicInvoice =
@@ -242,8 +238,12 @@ export const EDocDataSchema = z
     /**D011 = 9 */
     const transactionTypeIsAsociatedInvoice =
       data.tipoTransaccion == TransactionType.ANTICIPO;
+    /**D011 = 12 */
+    const transactionTypeIsTaxCreditSale =
+      data.tipoTransaccion == TransactionType.VENTA_DE_CREDITO_FISCAL;
     /**E501 = 5 */
-    const remissionReasonIsImport = data.remision?.motivo == RemissionReason.IMPORTACION;
+    const remissionReasonIsImport =
+      data.remision?.motivo == RemissionReason.IMPORTACION;
 
     // B006 - descripcion
     {
@@ -509,7 +509,9 @@ export const EDocDataSchema = z
       Obligatorio si E501 = 5
       */
       if (remissionReasonIsImport) {
-        validator.requiredField(transportPath.concat('numeroDespachoImportacion'));
+        validator.requiredField(
+          transportPath.concat('numeroDespachoImportacion'),
+        );
       }
     }
 
@@ -576,7 +578,8 @@ export const EDocDataSchema = z
       }
     }
 
-    const E980_transportista = () => {
+    // E980 - transporte.transportista
+    {
       /*
       Obligatorio si C002 = 7
       No informar si C002 = 4, 5, 6
@@ -592,93 +595,63 @@ export const EDocDataSchema = z
       ) {
         validator.undesiredField(transportPath.concat('transportista'));
       }
-    };
-    E980_transportista();
-
-    // POR EL TIPO DE MONEDA (D015)
-    if (data.moneda != Currency.GUARANI) {
-      validator.requiredField('condicionTipoCambio');
-      validator.requiredField('cambio');
-    } else {
-      validator.undesiredField('condicionTipoCambio');
-      validator.undesiredField('cambio');
     }
 
-    // POR EL TIPO DE CAMBIO (D017)
-    if (data.condicionTipoCambio == GlobalAndPerItem.GLOBAL) {
-      validator.requiredField('cambio');
-    } else if (data.condicionTipoCambio == GlobalAndPerItem.POR_ITEM) {
-      validator.undesiredField('cambio');
+    // G050 - complementarios.carga
+    {
+      /*
+      Opcional cuando C002=1 o C002=7
+      No informar para C002 ≠ 1 y C002≠7
+      */
+      if (!isElectronicInvoice && !isElectronicRemissionNote) {
+        validator.undesiredField(complementariosPath.concat('carga'));
+      }
+    }
+
+    // H001 - documentoAsociado
+    {
+      /*
+      Obligatorio si C002 = 4, 5, 6
+      Opcional si C002=1 o 7
+      */
+      if (isAutoInvoice || isElectronicCreditNote || isElectronicDebitNote) {
+        validator.requiredField(associatedDocumentPath.concat('formato'));
+      }
+    }
+
+    // H012 - documentoAsociado.numeroRetencion
+    {
+      /*
+      No informar si E606 ≠ 10
+      */
+      if (
+        !data.condicion?.entregas?.some((d) => d.tipo == PaymentType.RETENCION)
+      ) {
+        validator.undesiredField(
+          associatedDocumentPath.concat('numeroRetencion'),
+        );
+      }
+    }
+
+    // H013 - documentoAsociado.resolucionCreditoFiscal
+    {
+      /*
+      Si D011 = 12 obligatorio informar
+      número de resolución de crédito fiscal
+      No informar si D011 ≠ 12
+      */
+      if (transactionTypeIsTaxCreditSale) {
+        validator.requiredField(
+          associatedDocumentPath.concat('resolucionCreditoFiscal'),
+        );
+      } else {
+        validator.undesiredField(
+          associatedDocumentPath.concat('resolucionCreditoFiscal'),
+        );
+      }
     }
 
     // TODO: VALIDAR CDC
-
-    // POR EL TIPO DE OPERACIÓN (D202)
-    if (data.cliente.tipoOperacion == OperationType.B2G) {
-      validator.requiredField('dncp');
-      data.items.forEach((_item, i) => {
-        const path = itemsPath
-          .concat(i)
-          .concat('dncp')
-          .concat('codigoNivelGeneral');
-        validator.requiredField(path);
-      });
-    }
-
-    // POR EL TIPO DE TRANSACCIÓN (D011)
-    if (data.tipoTransaccion == TransactionType.ANTICIPO) {
-      const itemsPath = new Path<Data>('items');
-      data.items.forEach((_item, i) => {
-        validator.requiredField(itemsPath.concat(i).concat('cdcAnticipo'));
-      });
-    } else if (
-      data.tipoTransaccion == TransactionType.VENTA_DE_CREDITO_FISCAL
-    ) {
-      validator.requiredField(
-        associatedDocumentPath.concat('resolucionCreditoFiscal'),
-      );
-    } else {
-      validator.undesiredField(
-        associatedDocumentPath.concat('resolucionCreditoFiscal'),
-      );
-    }
-
-    // POR EL TIPO DE PAGO DE ENTREGA (E606)
-    if (
-      data.condicion?.entregas?.some((d) => d.tipo == PaymentType.RETENCION)
-    ) {
-      validator.requiredField(associatedDocumentPath.concat('numeroRetencion'));
-    } else {
-      validator.undesiredField(
-        associatedDocumentPath.concat('numeroRetencion'),
-      );
-    }
-
-    // POR EL MOTIVO DE REMISION (E501)
-    if (data.remision?.motivo == RemissionReason.IMPORTACION) {
-      validator.requiredField(
-        transportPath.concat('numeroDespachoImportacion'),
-      );
-    }
-
-    if (data.sectorSupermercados) {
-      // POR E811
-      if (data.sectorSupermercados?.nombreCajero) {
-        validator.requiredField(additionalSectorPath.concat('inicioCiclo'));
-      } else {
-        validator.undesiredField(additionalSectorPath.concat('inicioCiclo'));
-      }
-      //POR E812
-      // TODO: PREGUNTAR A LA DNIT SI ESTO ES UN ERROR DEL MANUAL
-      // CREO QUE DEBERIA DEPENDER DEL INICIO DE CICLO
-      if (data.sectorSupermercados?.efectivo) {
-        validator.requiredField(additionalSectorPath.concat('finCiclo'));
-      } else {
-        validator.undesiredField(additionalSectorPath.concat('finCiclo'));
-      }
-    }
-
-    // Y POR LA GLORIA!!! (TODO: ELIMINAR ESTO)
 
     // EA008 - totalOperacion
     const getTotalOperacion = (item: Item) => {

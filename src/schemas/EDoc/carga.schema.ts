@@ -48,7 +48,18 @@ export const CargaSchema = z
   .transform((data, ctx) => {
     const validator = new ZodValidator(ctx, data)
 
-    if (data.caracteristicaCarga == CargoCharacteristic.OTRO) {
+    /**G057 = 3 */
+    const isCargoOther = data.caracteristicaCarga == CargoCharacteristic.OTRO;
+
+    // G058 - caracteristicaCargaDescripcion
+    {
+      /*
+      Si G057 = 3, informar la
+      característica de la carga
+      OBS: Obligatorio para
+      KUDE
+      */
+     if (isCargoOther) {
       validator.requiredField('caracteristicaCargaDescripcion')
     } else if (data.caracteristicaCarga) {
       const foundCharacteristic = dbService
@@ -56,6 +67,7 @@ export const CargaSchema = z
         .findById(data.caracteristicaCarga);
 
       data.caracteristicaCargaDescripcion = foundCharacteristic?.description;
+    }
     }
 
     return {

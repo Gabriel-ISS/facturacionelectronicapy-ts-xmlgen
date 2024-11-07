@@ -4,6 +4,7 @@ import { enumToZodUnion } from '../../helpers/validation/enumConverter';
 import { EntregasSchema } from './entregas.schema';
 import dbService from '../../services/db.service';
 import ZodValidator from '../../helpers/validation/ZodValidator';
+import { CreditoSchema } from './credito.schema';
 
 export const CondicionSchema = z
   .object({
@@ -15,23 +16,36 @@ export const CondicionSchema = z
     // E7.1. Campos que describen la forma de pago de la operación al contado o del monto de la entrega inicial (E605-E619)
     entregas: z.array(EntregasSchema).optional(),
 
-    // TODO: SIN CÓDIGO
-    /* credito: z
-    .string()
-    .optional(), */
+    // E7.2. Campos que describen la operación a crédito (E640-E649)
+    credito: CreditoSchema.optional(),
   })
   .superRefine((data, ctx) => {
     const validator = new ZodValidator(ctx, data);
+
+    const isInCash = data.tipo == PaymentCondition.CONTADO;
+    const isInCredit = data.tipo == PaymentCondition.CREDITO;
 
     // E605 - entregas
     {
       /*
       Obligatorio si E601 = 1
-      TODO: Obligatorio si existe el campo
-      E645 (para eso debe existir la sección E7.2)
+      Obligatorio si existe el campo E645
       */
-     if (data.tipo == PaymentCondition.CONTADO) {
+     if (isInCash || data.credito?.montoEntregaInicial) {
         validator.requiredField('entregas');
+      }
+    }
+
+    // E640 - credito
+    {
+      /*
+      Obligatorio si E601 = 2
+      No informar si E601 ≠ 2
+      */
+      if (isInCredit) {
+        validator.requiredField('credito');
+      } else {
+        validator.undesiredField('credito');
       }
     }
 

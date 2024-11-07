@@ -6,6 +6,7 @@ import ZodValidator from '../../helpers/validation/ZodValidator';
 import { AgenteSchema } from './agente.schema';
 import { ChoferSchema } from './chofer.schema';
 import dbService from '../../services/db.service';
+import { TaxpayerNotTaxpayer } from '../../constants/taxpayerNotTaxpayer.constants';
 
 /**E10.4. Campos que identifican al transportista (persona física o jurídica) (E980-E999) */
 export const TransportistaSchema = z
@@ -42,16 +43,46 @@ export const TransportistaSchema = z
   .transform((data, ctx) => {
     const validator = new ZodValidator(ctx, data);
 
-    if (!data.contribuyente) {
-      validator.undesiredField('ruc');
-      validator.requiredField('documentoTipo');
-    } else {
-      validator.requiredField('ruc');
-      validator.undesiredField('documentoTipo');
+    /**E981 = 1 */
+    const isTaxpayer = data.contribuyente == TaxpayerNotTaxpayer.CONTRIBUYENTE;
+    /**E981 = 2 */
+    const isNotTaxpayer =
+      data.contribuyente == TaxpayerNotTaxpayer.NO_CONTRIBUYENTE;
+
+    // E983 - ruc
+    {
+      /*
+      Obligatorio si E981 = 1
+      No informar si E981 ≠ 1
+      */
+      if (isTaxpayer) {
+        validator.requiredField('ruc');
+      } else {
+        validator.undesiredField('ruc');
+      }
     }
 
-    if (data.documentoTipo) {
-      validator.requiredField('documentoNumero');
+    // E985 - documentoTipo
+    {
+      /*
+      Obligatorio si E981 = 2
+      No informar si E981 = 1
+      */
+      if (isNotTaxpayer) {
+        validator.requiredField('documentoTipo');
+      } else if (isTaxpayer) {
+        validator.undesiredField('documentoTipo');
+      }
+    }
+
+    // E987 - documentoNumero
+    {
+      /*
+      Obligatorio si existe el campo E985
+      */
+      if (data.documentoTipo) {
+        validator.requiredField('documentoNumero');
+      }
     }
 
     return {

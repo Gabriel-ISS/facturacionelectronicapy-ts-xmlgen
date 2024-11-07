@@ -13,35 +13,36 @@ export const UsuarioSchema = z
 
     // D142
     documentoTipoDescripcion: z.string().min(9).max(41).optional(),
-    
+
     // D143
     documentoNumero: CommonValidators.identityDocNumber(),
 
     // D144
     nombre: CommonValidators.name(),
-    
+
     // D145
     cargo: z.string().min(4).max(100),
   })
-  .transform((user, ctx) => {
-    const validator = new ZodValidator(ctx, user);
+  .transform((data, ctx) => {
+    const validator = new ZodValidator(ctx, data);
 
-    const D142_documentoTipoDescripcion = () => {
+    // D141 - documentoTipoDescripcion
+    {
       /*
       Si D141 = 9 informar el tipo de
       documento de identidad del
       responsable de la generación del DE
       */
-      if (user.documentoTipo == UserIdentityDocument.OTRO) {
+      if (data.documentoTipo == UserIdentityDocument.OTRO) {
         validator.requiredField('documentoTipoDescripcion');
       } else {
-        const identityDocument = dbService.select('userIdentityDocuments').findById(user.documentoTipo) 
-        user.documentoTipoDescripcion = identityDocument.description;
+        data.documentoTipoDescripcion = dbService
+          .select('userIdentityDocuments')
+          .findById(data.documentoTipo).description;
       }
-    };
-    D142_documentoTipoDescripcion();
+    }
 
-    return user;
+    return data;
   });
 
 export type Usuario = z.infer<typeof UsuarioSchema>;

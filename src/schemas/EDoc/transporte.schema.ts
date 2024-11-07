@@ -80,12 +80,14 @@ export const TransporteSchema = z
     }
 
     // ⚠️ esto no esta en el manual
-    if (data.inicioEstimadoTranslado && data.finEstimadoTranslado) {
-      validator.validate(
-        'finEstimadoTranslado',
-        data.finEstimadoTranslado < data.inicioEstimadoTranslado,
-        'El valor de finEstimadoTranslado no puede ser menor que el valor de inicioEstimadoTranslado',
-      );
+    {
+      if (data.inicioEstimadoTranslado && data.finEstimadoTranslado) {
+        validator.validate(
+          'finEstimadoTranslado',
+          data.finEstimadoTranslado < data.inicioEstimadoTranslado,
+          'El valor de finEstimadoTranslado no puede ser menor que el valor de inicioEstimadoTranslado',
+        );
+      }
     }
 
     // E912 - paisDestinoNombre
@@ -108,13 +110,9 @@ export const TransporteSchema = z
       Obligatorio si E903 = 3
       No informar si E903 ≠ 3
       */
-     
-    }
-
-
-
-    if (data.modalidad == TransportModality.AEREO) {
-      validator.requiredField(vehiclePath.concat('numeroVuelo'));
+      if (data.modalidad == TransportModality.AEREO) {
+        validator.requiredField(vehiclePath.concat('numeroVuelo'));
+      }
     }
 
     return {

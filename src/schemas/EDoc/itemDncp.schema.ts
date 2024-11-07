@@ -1,8 +1,6 @@
 import { z } from 'zod';
-import { enumToZodUnion } from '../../helpers/validation/enumConverter';
-import { GtinCodes } from '../../constants/gtinCodes.constants';
-import ZodValidator from '../../helpers/validation/ZodValidator';
 import CommonValidators from '../../helpers/validation/CommonValidators';
+import ZodValidator from '../../helpers/validation/ZodValidator';
 
 export const ItemDncpSchema = z
   .object({
