@@ -3,6 +3,7 @@ import { PaymentCondition } from '../../constants/paymentCondition.constants';
 import { enumToZodUnion } from '../../helpers/validation/enumConverter';
 import { EntregasSchema } from './entregas.schema';
 import dbService from '../../services/db.service';
+import ZodValidator from '../../helpers/validation/ZodValidator';
 
 export const CondicionSchema = z
   .object({
@@ -20,6 +21,20 @@ export const CondicionSchema = z
     .optional(), */
   })
   .superRefine((data, ctx) => {
+    const validator = new ZodValidator(ctx, data);
+
+    // E605 - entregas
+    {
+      /*
+      Obligatorio si E601 = 1
+      TODO: Obligatorio si existe el campo
+      E645 (para eso debe existir la sección E7.2)
+      */
+     if (data.tipo == PaymentCondition.CONTADO) {
+        validator.requiredField('entregas');
+      }
+    }
+
     return {
       ...data,
 

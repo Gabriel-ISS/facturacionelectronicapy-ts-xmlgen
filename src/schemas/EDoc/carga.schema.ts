@@ -42,7 +42,7 @@ export const CargaSchema = z
       .union(enumToZodUnion(CargoCharacteristic))
       .optional(),
 
-    // G058:  TODO: OBLIGATORIO PARA KUDE
+    // G058: OBS: OBLIGATORIO PARA KUDE
     caracteristicaCargaDescripcion: z.string().optional(),
   })
   .transform((data, ctx) => {

@@ -55,20 +55,9 @@ export const ItemSchema = z
       .max(120),
 
     // E709
-    unidadMedida: z
-      .number({
-        required_error: 'La unidad de medida es requerida',
-      })
-      .superRefine((value, ctx) => {
-        const foundUnit = dbService.select('measurementUnits').findById(value);
-        if (!foundUnit) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: 'Unidad de medida no encontrada',
-            path: ctx.path,
-          });
-        }
-      }),
+    unidadMedida: z.number({
+      required_error: 'La unidad de medida es requerida',
+    }),
 
     // E711
     cantidad: z
@@ -81,9 +70,6 @@ export const ItemSchema = z
 
     // E712
     pais: z.enum(enumToZodEnum<typeof Country, Country>(Country)).optional(),
-
-    // E713
-    paisDescripcion: z.string().optional(),
 
     // E714
     observacion: z.string().min(1).max(500).optional(),
@@ -155,15 +141,12 @@ export const ItemSchema = z
       required_error: 'El tipo de IVA es requerido',
     }),
 
+    // E733
+    proporcionGravada: z.number().min(0).max(100).optional(),
+
     // E734
     iva: z.union(enumToZodUnion(TaxRate), {
       required_error: 'La tasa del IVA es requerida',
-    }),
-
-    // E735
-    ivaBase: z.number().superRefine((value, ctx) => {
-      if (value == undefined) return;
-      new NumberLength(value, ctx).max(15).maxDecimals(8);
     }),
 
     // E8.4. Grupo de rastreo de la mercadería (E750-E760)
@@ -228,38 +211,107 @@ export const ItemSchema = z
   .transform((data, ctx) => {
     const validator = new ZodValidator(ctx, data);
 
-    if (data.pais) {
-      const foundCountry = dbService.select('countries').findById(data.pais);
+    /**E731 = 1 */
+    const isIvaGravado = data.ivaTipo == TaxTreatment.GRAVADO_IVA;
+    /**E731 = 2 */
+    const isIvaExonerado =
+      data.ivaTipo == TaxTreatment.EXONERADO__ART__100___LEY_6380_2019_;
+    /**E731 = 3 */
+    const isIvaExento = data.ivaTipo == TaxTreatment.EXENTO;
+    /**E731 = 4 */
+    const isIvaGravadoParcial =
+      data.ivaTipo == TaxTreatment.GRAVADO_PARCIAL__GRAV__EXENTO_;
+    /**E734 = 0 */
+    const taxRateIs0 = data.iva == TaxRate.CERO;
+    /**E734 = 5 */
+    const taxRateIs5 = data.iva == TaxRate.CINCO;
+    /**E734 = 10 */
+    const taxRateIs10 = data.iva == TaxRate.DIEZ;
 
-      validator.validate('pais', !foundCountry, 'El pais no es válido');
-
-      data.paisDescripcion = foundCountry?.description;
+    // E717 - toleranciaCantidad
+    {
+      /*
+      Obligatorio si se informa E715 
+      */
+      if (data.tolerancia) {
+        validator.requiredField('toleranciaCantidad');
+      }
     }
 
-    if (data.tolerancia) {
-      validator.requiredField('toleranciaCantidad');
-      validator.requiredField('toleranciaPorcentaje');
+    // E718 - toleranciaPorcentaje
+    {
+      /*
+      Obligatorio si se informa E715 
+      */
+      if (data.tolerancia) {
+        validator.requiredField('toleranciaPorcentaje');
+      }
     }
 
-    validator.validate(
-      'iva',
-      (data.ivaTipo == TaxTreatment.GRAVADO_IVA ||
-        data.ivaTipo == TaxTreatment.GRAVADO_PARCIAL__GRAV__EXENTO_) &&
-        data.iva != TaxRate.CINCO &&
-        data.iva != TaxRate.DIEZ,
-      'El IVA debe ser cinco o diez',
-    );
+    // E733 - proporcionGravada
+    {
+      // ⚠️ esto no es del manual
+      if (data.proporcionGravada != undefined) {
+        if (isIvaGravado) {
+          validator.validate(
+            'proporcionGravada',
+            data.proporcionGravada != 100,
+            'La proporcion gravada deve ser de 100% para el tipo de IVA gravado',
+          );
+        } else if (isIvaExonerado || isIvaExento) {
+          validator.validate(
+            'proporcionGravada',
+            data.proporcionGravada != 0,
+            'La proporcion gravada debe ser de 0% para el tipo de IVA exonerado o exento',
+          );
+        }
+      } else {
+        if (isIvaGravado) {
+          data.proporcionGravada = 100;
+        } else if (isIvaExonerado || isIvaExento) {
+          data.proporcionGravada = 0;
+        } else if (isIvaGravadoParcial) {
+          validator.requiredField(
+            'proporcionGravada',
+            'Si el tipo de IVA es parcial, la proporcion gravada es requerida',
+          );
+        }
+      }
+    }
 
-    validator.validate(
-      'iva',
-      (data.ivaTipo == TaxTreatment.EXENTO ||
-        data.ivaTipo == TaxTreatment.EXONERADO__ART__100___LEY_6380_2019_) &&
-        data.iva != TaxRate.CERO,
-      'El IVA debe ser cero',
-    );
+    // E734 - iva
+    {
+      /*
+      0 (para E731 = 2 o 3)
+      5 (para E731 = 1 o 4)
+      10 (para E731 = 1 o 4)
+      */
+
+      validator.validate(
+        'iva',
+        (isIvaGravado || isIvaGravadoParcial) && !(taxRateIs5 || taxRateIs10),
+        'El IVA debe ser cinco o diez',
+      );
+
+      validator.validate(
+        'iva',
+        (isIvaExonerado || isIvaExento) && !taxRateIs0,
+        'El IVA debe ser cero',
+      );
+    }
 
     return {
       ...data,
+      proporcionGravada: data.proporcionGravada as number,
+      
+      // E713
+      paisDescripcion: dbService
+        .select('countries')
+        .findByIdIfExist(data.pais, {
+          ctx,
+          fieldName: 'pais',
+          message: 'El pais no es válido',
+        }),
 
       // E710
       unidadMedidaDescripcion: dbService
@@ -282,27 +334,18 @@ export const ItemSchema = z
       // EA003: TODO: PREGUNTAR A LA DNIT SI ESTO ES UN ERROR DEL MANUAL
       // DEBERÍA DIVIDIRSE POR LA CANTIDAD
       // TODO: REDONDEAR SEGÚN SE REQUIERA
-      procentajeDescuentoPorItem: data.descuento
-        ? (data.descuento * 100) / data.precioUnitario 
-        : undefined,
+      procentajeDescuentoPorItem:
+        data.descuento && data.descuento > 0
+          ? (data.descuento * 100) / data.precioUnitario
+          : undefined,
 
-      // EA004: TODO
-
-      // EA007: TODO
-
-      // EA008: TODO
-
-      // EA009: TODO
+      // EA004 y EA007 se declaran en EDocSchema
+      // EA008, EA009, E735 y E736 se calculan en EDocSchema
 
       // E732
       ivaTipoDescripcion: dbService
         .select('taxTreatments')
         .findById(data.ivaTipo).description,
-
-      // E733: TODO
-
-      // E736
-      liquidacionIvaPorItem: data.ivaBase * (data.iva / 100),
     };
   });
 export type Item = z.infer<typeof ItemSchema>;

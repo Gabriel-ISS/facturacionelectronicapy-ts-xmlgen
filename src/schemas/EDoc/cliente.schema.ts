@@ -44,7 +44,7 @@ export const ClienteSchema = z
     // D213
     direccion: CommonValidators.address().optional(),
 
-    // D214
+    // D214: TODO: Debe incluir el prefijo de la ciudad si D203 = PRY
     telefono: z.string().min(6).max(15).optional(),
 
     // D215
@@ -71,68 +71,115 @@ export const ClienteSchema = z
   .transform((cliente, ctx) => {
     const validator = new ZodValidator(ctx, cliente);
 
-    if (cliente.contribuyente == TaxpayerNotTaxpayer.CONTRIBUYENTE) {
-      validator.requiredField('ruc');
-      validator.requiredField('tipoContribuyente');
-    } else if (cliente.tipoOperacion != OperationType.B2F) {
-      // no es contribuyente y no es b2f
-      validator.requiredField('documentoTipo');
-      validator.requiredField('documentoNumero');
-    }
+    /**D201==1 */
+    const isTaxpayer =
+      cliente.contribuyente == TaxpayerNotTaxpayer.CONTRIBUYENTE;
+    /**D201==2 */
+    const isNotTaxpayer =
+      cliente.contribuyente == TaxpayerNotTaxpayer.NO_CONTRIBUYENTE;
+    /**D202==4 */
+    const isB2F = cliente.tipoOperacion == OperationType.B2F;
 
-    if (
-      cliente.contribuyente == TaxpayerNotTaxpayer.CONTRIBUYENTE ||
-      cliente.tipoOperacion == OperationType.B2F
-    ) {
-      // es contribuyente o es b2f
-      validator.undesiredField('documentoTipo');
-      validator.undesiredField('documentoNumero');
-    }
-
-    if (cliente.tipoOperacion == OperationType.B2F) {
-      validator.requiredField('direccion');
-    }
-
-    if (cliente.direccion) {
-      validator.requiredField('numeroCasa');
-
-      if (cliente.contribuyente) {
-        // TODO: cuando es contribuyente debe corresponder a lo declarado en el RUC
+    // D205 - tipoContribuyente
+    {
+      /*
+      Obligatorio si D201 = 1
+      No informar si D201 = 2
+      */
+      if (isTaxpayer) {
+        validator.requiredField('tipoContribuyente');
+      } else if (isNotTaxpayer) {
+        validator.undesiredField('tipoContribuyente');
       }
+    }
 
-      if (cliente.tipoOperacion != OperationType.B2F) {
+    // D206 - ruc
+    {
+      /*
+      Obligatorio si D201 = 1
+      No informar si D201 = 2
+      */
+      if (isTaxpayer) {
+        validator.requiredField('ruc');
+      } else if (isNotTaxpayer) {
+        validator.undesiredField('ruc');
+      }
+    }
+
+    // D208 - documentoTipo
+    {
+      /*
+      Obligatorio si D201 = 2 y D202 ≠ 4
+      No informar si D201 = 1 o D202=4
+      */
+      if (isNotTaxpayer && !isB2F) {
+        validator.requiredField('documentoTipo');
+      } else if (isTaxpayer || isB2F) {
+        validator.undesiredField('documentoTipo');
+      }
+    }
+
+    // D210 - documentoNumero
+    {
+      /*
+      Obligatorio si D201 = 2 y D202 ≠ 4
+      No informar si D201 = 1 o D202=4
+      */
+      if (isNotTaxpayer && !isB2F) {
+        validator.requiredField('documentoNumero');
+      } else if (isTaxpayer || isB2F) {
+        validator.undesiredField('documentoNumero');
+      }
+    }
+
+    // D213 - dirección
+    {
+      /*
+      Campo obligatorio cuando C002=7 (se valida en EDocSchema)
+      o cuando D202=4
+      */
+      if (isB2F) {
+        validator.requiredField('direccion');
+      }
+    }
+
+    // D218 - numeroCasa
+    {
+      /*
+      Campo obligatorio si se informa el campo D213
+      TODO: Cuando D201 = 1, debe corresponder a lo declarado en el RUC
+      */
+      if (cliente.direccion) {
+        validator.requiredField('numeroCasa');
+      }
+    }
+
+    // D219 - departamento
+    {
+      /*
+      Campo obligatorio si se informa el
+      campo D213 y D202≠4, no se debe
+      informar cuando D202 = 4.
+      */
+      if (cliente.direccion && !isB2F) {
         validator.requiredField('departamento');
-        validator.requiredField('ciudad');
-      } else {
+      } else if (isB2F) {
         validator.undesiredField('departamento');
+      }
+    }
+
+    // D223 - ciudad
+    {
+      /*
+      Campo obligatorio si se informa el
+      campo D213 y D202≠4, no se debe
+      informar cuando D202 = 4
+      */
+      if (cliente.direccion && !isB2F) {
+        validator.requiredField('ciudad');
+      } else if (isB2F) {
         validator.undesiredField('ciudad');
       }
-    }
-
-    if (cliente.telefono) {
-      if (cliente.pais == Country.PARAGUAY) {
-        // TODO: EL telefono debe incluir el prefijo de la ciudad
-      }
-    }
-
-    // TODO: ESTA VALIDACIÓN ES CORRECTA?
-    if (cliente.departamento && cliente.distrito && cliente.ciudad) {
-      let errors: string[] = [];
-      constantsService.validateLocation(
-        'cliente',
-        cliente.departamento,
-        cliente.distrito,
-        cliente.ciudad,
-        errors,
-      );
-      // TODO: AGREGAR RUTAS EXACTAS
-      errors.forEach((error) =>
-        ctx.addIssue({
-          path: ['direccion'],
-          code: z.ZodIssueCode.custom,
-          message: error,
-        }),
-      );
     }
 
     return {

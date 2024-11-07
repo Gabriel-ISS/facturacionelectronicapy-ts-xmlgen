@@ -42,7 +42,6 @@ export const SectorEnergiaElectricaSchema = z
       ...data,
 
       // E797
-      // TODO: "Corresponde a la diferencia entre E785-E784" AVISAR A LA DNIT DEL ERROR
       consumo:
         data.lecturaActual && data.lecturaAnterior
           ? data.lecturaActual - data.lecturaAnterior

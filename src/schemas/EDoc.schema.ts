@@ -21,7 +21,7 @@ import { CondicionSchema } from './EDoc/condicion.schema';
 import { DncpSchema } from './EDoc/dncp.schema';
 import { DocumentoAsociadoSchema } from './EDoc/documentoAsociado.schema';
 import { FacturaSchema } from './EDoc/factura.schema';
-import { ItemSchema } from './EDoc/item.schema';
+import { Item, ItemSchema } from './EDoc/item.schema';
 import { NotaCreditoDebitoSchema } from './EDoc/notaCheditoDebito.schema';
 import { RemisionSchema } from './EDoc/remision.schema';
 import { SectorAdicionalSchema } from './EDoc/sectorAdicional.schema';
@@ -30,9 +30,17 @@ import { SectorSegurosSchema } from './EDoc/sectorSeguros.schema';
 import { SectorSupermercadosSchema } from './EDoc/sectorSupermercados.schema';
 import { TransporteSchema } from './EDoc/transporte.schema';
 import { UsuarioSchema } from './EDoc/usuario.schema';
+import { TaxRate } from '../constants/taxRate.constants';
+import { TaxTreatment } from '../constants/taxTreatments.constants';
 
 // TODO: VERIFICAR LOS VALORES QUE DEPENDEN DE VALORES "GLOBALES"
-// TODO: VALIDAR FECHAS DE INICIO Y FIN
+// TODO: COMPLETAR VALORES FALTANTES
+// TODO: ASEGURARSE DE QUE LAS DESCRIPCIONES ESTEN BIEN VALIDADAS, CONSIDERAR undefined Y "OTRO"
+// TODO: para todos los findByIdIfExist agregar ctx si ese necesario bajo alguna condición
+
+// TODO: UTILIDAD DE REDONDEO (como aplicarlo en zod de manera opcional?)
+
+// TODO: VALIDAR FECHAS DE INICIO Y FIN (creo que ya esta)
 // TODO: VALIDAR NÚMEROS DE TELÉFONOS
 
 // TODO: VALIDAR DATOS RELACIONADOS A TIMBRADO
@@ -129,15 +137,12 @@ export const EDocDataSchema = z
     // ⚠️ TODO: EL CÓDIGO NO ESTA EN EL MANUAL TÉCNICO NI EN NINGÚN LADO
     /* obligaciones: z.array(ObligacionSchema).optional(), */
 
-    // Relacionado a EA004 (TODO: IVESTIGAR)
-    descuentoGlobal: z
-      .number()
-      .default(0)
-      .superRefine((value, ctx) => {
-        new NumberLength(value, ctx).max(15).maxDecimals(8);
-      }),
+    // EA004
+    descuentoGlobal: z.number().superRefine((value, ctx) => {
+      new NumberLength(value, ctx).max(15).maxDecimals(8);
+    }),
 
-    // Relacionado a EA007 (TODO: IVESTIGAR)
+    // EA007
     anticipoGlobal: z
       .number()
       .default(0)
@@ -165,7 +170,7 @@ export const EDocDataSchema = z
 
     // E5. Campos que componen la Nota de Crédito/Débito Electrónica NCE-NDE (E400-E499)
     notaCreditoDebito: NotaCreditoDebitoSchema.optional(),
-    
+
     // E6. Campos que componen la Nota de Remisión Electrónica (E500-E599)
     remision: RemisionSchema.optional(),
 
@@ -179,7 +184,7 @@ export const EDocDataSchema = z
 
     // E9.2. Sector Energía Eléctrica (E791-E799)
     sectorEnergiaElectrica: SectorEnergiaElectricaSchema.optional(),
-    
+
     // E9.3. Sector de Seguros (E800-E809)
     sectorSeguros: SectorSegurosSchema.optional(),
 
@@ -188,7 +193,7 @@ export const EDocDataSchema = z
 
     // E9.5. Grupo de datos adicionales de uso comercial (E820-E829)
     sectorAdicional: SectorAdicionalSchema.optional(),
-    
+
     // E10. Campos que describen el transporte de las mercaderías (E900-E999)
     transporte: TransporteSchema.optional(),
 
@@ -204,32 +209,391 @@ export const EDocDataSchema = z
     const transportPath = new Path<Data>('transporte');
     const associatedDocumentPath = new Path<Data>('documentoAsociado');
     const clientePath = new Path<Data>('cliente');
+    const dncpPath = new Path<Data>('dncp');
+    const remisionPath = new Path<Data>('remision');
     const itemsPath = new Path<Data>('items');
     const additionalSectorPath = new Path<Data>('sectorAdicional');
 
-    // POR EL TIPO DE DOCUMENTO (C002)
-    if (
-      data.tipoDocumento == ValidDocumentType.FACTURA_ELECTRONICA ||
-      data.tipoDocumento == ValidDocumentType.AUTOFACTURA_ELECTRONICA
-    ) {
-      validator.requiredField('tipoTransaccion');
-    } else if (
-      data.tipoDocumento == ValidDocumentType.NOTA_DE_REMISION_ELECTRONICA
-    ) {
-      validator.requiredField('descripcion');
-      validator.requiredField('transporte');
+    /**C002 = 1 */
+    const isElectronicInvoice =
+      data.tipoDocumento == ValidDocumentType.FACTURA_ELECTRONICA;
+    /**C002 = 4 */
+    const isAutoInvoice =
+      data.tipoDocumento == ValidDocumentType.AUTOFACTURA_ELECTRONICA;
+    /**C002 = 5 */
+    const isElectronicCreditNote =
+      data.tipoDocumento == ValidDocumentType.NOTA_DE_CREDITO_ELECTRONICA;
+    /**C002 = 6 */
+    const isElectronicDebitNote =
+      data.tipoDocumento == ValidDocumentType.NOTA_DE_DEBITO_ELECTRONICA;
+    /**C002 = 7 */
+    const isElectronicRemissionNote =
+      data.tipoDocumento == ValidDocumentType.NOTA_DE_REMISION_ELECTRONICA;
+    /**D015 = PYG */
+    const currencyIsGuarani = data.moneda == Currency.GUARANI;
+    /**D017 = 1 */
+    const currencyChangeConditionIsGlobal =
+      data.condicionTipoCambio == GlobalAndPerItem.GLOBAL;
+    /**D017 = 2 */
+    const currencyChangeConditionIsPerItem =
+      data.condicionTipoCambio == GlobalAndPerItem.POR_ITEM;
+    /**D202 = 3 */
+    const operationIsB2G = data.cliente.tipoOperacion == OperationType.B2G;
+    /**D011 = 9 */
+    const transactionTypeIsAsociatedInvoice =
+      data.tipoTransaccion == TransactionType.ANTICIPO;
+    /**E501 = 5 */
+    const remissionReasonIsImport = data.remision?.motivo == RemissionReason.IMPORTACION;
 
-      validator.requiredField(transportPath.concat('tipo'));
-      validator.requiredField(transportPath.concat('inicioEstimadoTranslado'));
-      validator.requiredField(transportPath.concat('salida'));
-      validator.requiredField(transportPath.concat('entrega'));
-      validator.requiredField(transportPath.concat('vehiculo'));
-      validator.requiredField(transportPath.concat('transportista'));
-
-      validator.requiredField(clientePath.concat('direccion'));
-    } else {
-      validator.undesiredField('tipoTransaccion');
+    // B006 - descripcion
+    {
+      /*
+      Cuando el tipo de documento es
+      Nota de remisión (C002=7) es
+      obligatorio informar el mensaje
+      */
+      if (isElectronicRemissionNote) {
+        validator.requiredField('descripcion');
+      }
     }
+
+    // D011 - tipoTransaccion
+    {
+      /*
+      Obligatorio si C002 = 1 o 4
+      No informar si C002 ≠ 1 o 4
+      */
+      if (isElectronicInvoice || isAutoInvoice) {
+        validator.requiredField('tipoTransaccion');
+      } else {
+        validator.undesiredField('tipoTransaccion');
+      }
+    }
+
+    // D017 - condicionTipoCambio
+    {
+      /*
+      Obligatorio si D015 ≠ PYG
+      No informar si D015 = PYG
+      */
+      if (!currencyIsGuarani) {
+        validator.requiredField('condicionTipoCambio');
+      } else {
+        validator.undesiredField('condicionTipoCambio');
+      }
+    }
+
+    // D018 - cambio
+    {
+      /*
+      Obligatorio si D017 = 1
+      No informar si D017 = 2
+      */
+      if (currencyChangeConditionIsGlobal) {
+        validator.requiredField('cambio');
+      } else if (currencyChangeConditionIsPerItem) {
+        validator.undesiredField('cambio');
+      }
+    }
+
+    // D213 - cliente.direccion
+    {
+      /*
+      Campo obligatorio cuando C002=7
+      o cuando D202=4 (se valida en ClienteSchema)
+      */
+      if (isElectronicRemissionNote) {
+        validator.requiredField(clientePath.concat('direccion'));
+      }
+    }
+
+    // E010 - factura
+    {
+      /*
+      Obligatorio si C002 = 1
+      No informar si C002 ≠ 1
+      */
+      if (isElectronicInvoice) {
+        validator.requiredField('factura');
+      } else {
+        validator.undesiredField('factura');
+      }
+    }
+
+    // E020 - dncp
+    {
+      /*
+      Obligatorio si D202 = 3 (Tipo de operación B2G)
+      */
+      if (operationIsB2G) {
+        validator.requiredField('dncp');
+      }
+    }
+
+    // E025 - dncp.fecha
+    {
+      /*
+      Esta fecha debe ser anterior a la fecha
+      de emisión de la FE
+      */
+      validator.validate(
+        dncpPath.concat('fecha'),
+        Boolean(
+          isElectronicInvoice && data.dncp && data.dncp.fecha > data.fecha,
+        ),
+        'La fecha de emisión de la FE debe ser anterior a la fecha de la DNCP',
+      );
+    }
+
+    // E400 - notaCreditoDebito
+    {
+      /*
+      Obligatorio si C002 = 5 o 6 (NCE y NDE)
+      No informar si C002 ≠ 5 o 6
+      */
+      if (isElectronicCreditNote || isElectronicDebitNote) {
+        validator.requiredField('notaCreditoDebito');
+      } else {
+        validator.undesiredField('notaCreditoDebito');
+      }
+    }
+
+    // E500 - remission
+    {
+      /*
+      Obligatorio si C002 = 7
+      No informar si C002 ≠ 7
+      */
+      if (isElectronicRemissionNote) {
+        validator.requiredField('remision');
+      } else {
+        validator.undesiredField('remision');
+      }
+    }
+
+    // E506 - fechaFactura
+    {
+      /*
+      Obs.: Informar cuando no se ha
+      emitido aún la factura electrónica,
+      en caso que corresponda
+      */
+      if (data.remision?.fechaFactura) {
+        const fechaFactura = new Date(data.remision.fechaFactura);
+        const fechaEmision = new Date(data.fecha);
+
+        validator.validate(
+          remisionPath.concat('fechaFactura'),
+          fechaFactura.getTime() > fechaEmision.getTime(),
+          'remission.fechaFactura debe ser antes de la fecha de emisión',
+        );
+      }
+    }
+
+    // E600 - condicion
+    {
+      /*
+      Obligatorio si C002 = 1 o 4
+      No informar si C002 ≠ 1 o 4
+      */
+      if (isElectronicInvoice || isAutoInvoice) {
+        validator.requiredField('condicion');
+      } else {
+        validator.undesiredField('condicion');
+      }
+    }
+
+    // E704 - item.dncp.codigoNivelGeneral
+    {
+      /*
+      Obligatorio si D202 = 3
+      TODO: Informar se existe el código de la DNCP (cual de todos?)
+      */
+      if (operationIsB2G) {
+        data.items.forEach((_item, i) => {
+          validator.requiredField(
+            itemsPath.concat(i).concat('dncp').concat('codigoNivelGeneral'),
+          );
+        });
+      }
+    }
+
+    // E719 - item.cdcAnticipo
+    {
+      /*
+        Obligatorio cuando se utilice una
+        factura asociada con el tipo de
+        transacción igual a Anticipo (D011 de la factura asociada 
+        igual a 9)
+      */
+      if (transactionTypeIsAsociatedInvoice) {
+        data.items.forEach((_item, i) => {
+          validator.requiredField(itemsPath.concat(i).concat('cdcAnticipo'));
+        });
+      }
+    }
+
+    // E720 - (E720-E729)
+    {
+      /*
+      Obligatorio si C002 ≠ 7
+      No informar si C002 = 7
+      TODO: de momento voy a asumir que es un error explicado
+      en las notas de desarrollador
+      */
+      /* if (isElectronicRemissionNote) {
+      
+      } else {
+
+      } */
+    }
+
+    // E725 - item.cambio
+    {
+      /*
+      Obligatorio si D017 = 2
+      No informar si D017 = 1
+      */
+      if (currencyChangeConditionIsPerItem) {
+        data.items.forEach((_item, i) => {
+          validator.requiredField(itemsPath.concat(i).concat('cambio'));
+        });
+      } else if (currencyChangeConditionIsGlobal) {
+        data.items.forEach((_item, i) => {
+          validator.undesiredField(itemsPath.concat(i).concat('cambio'));
+        });
+      }
+    }
+
+    // E730 - Campos que describen el IVA de la operación por ítem
+    {
+      /*
+      Obligatorio si D013=1, 3, 4 o 5 y
+      C002 ≠ 4 o 7
+      No informar si D013=2 y C002= 4
+      o 7. TODO: TODO, ASUMIRÉ QUE ES UN ERROR HASTA LEER LAS DEV-NOTES
+      */
+    }
+
+    // E900 - transporte
+    {
+      /*
+        Obligatorio si C002 = 7
+        Opcional si C002 = 1
+        No informar si C002= 4, 5, 6 
+      */
+      if (isElectronicRemissionNote) {
+        validator.requiredField('transporte');
+      } else if (
+        isAutoInvoice ||
+        isElectronicCreditNote ||
+        isElectronicDebitNote
+      ) {
+        validator.undesiredField('transporte');
+      }
+    }
+
+    // E901 - transporte.tipo
+    {
+      /*
+      Obligatorio si C002 = 7
+      */
+      if (isElectronicRemissionNote) {
+        validator.requiredField(transportPath.concat('tipo'));
+      }
+    }
+
+    // E908 - transporte.numeroDespachoImportacion
+    {
+      /*
+      Obligatorio si E501 = 5
+      */
+      if (remissionReasonIsImport) {
+        validator.requiredField(transportPath.concat('numeroDespachoImportacion'));
+      }
+    }
+
+    // E909 - transporte.inicioEstimadoTranslado
+    {
+      /*
+      Obligatorio si C002 = 7
+      */
+      if (isElectronicRemissionNote) {
+        validator.requiredField(
+          transportPath.concat('inicioEstimadoTranslado'),
+        );
+      }
+    }
+
+    // E920 - transporte.salida
+    {
+      /*
+      Obligatorio si C002 = 7
+      No informar si C002 = 4, 5, 6
+      */
+      if (isElectronicRemissionNote) {
+        validator.requiredField(transportPath.concat('salida'));
+      } else if (
+        isAutoInvoice ||
+        isElectronicCreditNote ||
+        isElectronicDebitNote
+      ) {
+        validator.undesiredField(transportPath.concat('salida'));
+      }
+    }
+
+    // E940 - transporte.entrega
+    {
+      /*
+      Obligatorio si C002 = 7
+      No informar si C002 = 4, 5, 6
+      */
+      if (isElectronicRemissionNote) {
+        validator.requiredField(transportPath.concat('entrega'));
+      } else if (
+        isAutoInvoice ||
+        isElectronicCreditNote ||
+        isElectronicDebitNote
+      ) {
+        validator.undesiredField(transportPath.concat('entrega'));
+      }
+    }
+
+    // E960 - transporte.vehiculo
+    {
+      /*
+      Obligatorio si C002 = 7
+      No informar si C002 = 4, 5, 6
+      */
+      if (isElectronicRemissionNote) {
+        validator.requiredField(transportPath.concat('vehiculo'));
+      } else if (
+        isAutoInvoice ||
+        isElectronicCreditNote ||
+        isElectronicDebitNote
+      ) {
+        validator.undesiredField(transportPath.concat('vehiculo'));
+      }
+    }
+
+    const E980_transportista = () => {
+      /*
+      Obligatorio si C002 = 7
+      No informar si C002 = 4, 5, 6
+      TODO: Opcional cuando E903=1 y
+      E967=1
+      */
+      if (isElectronicRemissionNote) {
+        validator.requiredField(transportPath.concat('transportista'));
+      } else if (
+        isAutoInvoice ||
+        isElectronicCreditNote ||
+        isElectronicDebitNote
+      ) {
+        validator.undesiredField(transportPath.concat('transportista'));
+      }
+    };
+    E980_transportista();
 
     // POR EL TIPO DE MONEDA (D015)
     if (data.moneda != Currency.GUARANI) {
@@ -316,6 +680,91 @@ export const EDocDataSchema = z
 
     // Y POR LA GLORIA!!! (TODO: ELIMINAR ESTO)
 
+    // EA008 - totalOperacion
+    const getTotalOperacion = (item: Item) => {
+      /*
+      Si D013 = 1, 3, 4 o 5 (afectado al
+      IVA, Renta, ninguno, IVA - Renta),
+      entonces EA008 corresponde al
+      cálculo aritmético: (E721 (Precio
+      unitario) – EA002 (Descuento
+      particular) – EA004 (Descuento
+      global) – EA006 (Anticipo
+      particular) – EA007 (Anticipo
+      global)) * E711(cantidad)
+      Cálculo para Autofactura
+      (C002=4):
+      E721*E711
+      */
+
+      // TODO: que pasa si es ISC y no es auto-factura? ahora retorna 0, pero no se como se debería de tratar
+
+      if (data.tipoDocumento == ValidDocumentType.AUTOFACTURA_ELECTRONICA) {
+        return item.precioUnitario * item.cantidad;
+      }
+      if (
+        [
+          TaxType.IVA,
+          TaxType.RENTA,
+          TaxType.NINGUNO,
+          TaxType.IVA___RENTA,
+        ].includes(data.tipoImpuesto)
+      ) {
+        return (
+          item.precioUnitario -
+          data.descuentoGlobal -
+          data.anticipoGlobal -
+          (item.descuento || 0) -
+          (item.anticipo || 0)
+        );
+      }
+
+      return 0;
+    };
+
+    // EA009 - totalOperacionGuaranies
+    const getTotalOperacionGuaranies = (item: Item, totalOperacion: number) => {
+      if (item.cambio == undefined) return 0;
+
+      return totalOperacion * item.cambio;
+    };
+
+    // E735 - ivaBase
+    const getIvaBase = (item: Item, totalOperacion: number) => {
+      /*
+      Si E731 = 1 o 4 este campo es
+      igual al resultado del cálculo
+      [EA008* (E733/100)] / 1,1 si la
+      tasa es del 10%
+      [EA008* (E733/100)] / 1,05 si la
+      tasa es del 5%
+      Si E731 = 2 o 3 este campo es
+      igual 0
+      E8.2 E736 dLiqIVAItem Liquidación del IVA por
+      ítem E730 N 1-15p(0-8) 1-1
+      Correspond
+      */
+
+      // ESTO RESUME EL CALCULO POR LAS CONDICIONES DE item.iva
+      if (!item.iva) return 0;
+      return (
+        totalOperacion * (item.proporcionGravada / 100) * (1 + item.iva / 100)
+      );
+    };
+
+    // E736 - liquidacionIvaPorItem
+    const getLiquidacionIvaPorItem = (item: Item, ivaBase: number) => {
+      /*
+      Corresponde al cálculo aritmético:
+      E735 * (E734/100)
+      Si E731 = 2 o 3 este campo es
+      igual 0
+      */
+      // esto resume el calculo
+      // si es exonerado o exento (E731 = 2 o 3) iva cera 0 y el resto son matemáticas
+      return ivaBase * (item.iva / 100);
+    };
+
     return {
       ...data,
       // B003
@@ -352,6 +801,31 @@ export const EDocDataSchema = z
       descripcripcionCondicionAnticipo: dbService
         .select('advancePaymentConditions')
         .findByIdIfExist(data.condicionAnticipo)?.description,
+
+      items: data.items.map((item) => {
+        const totalOperacion = getTotalOperacion(item);
+        const totalOperacionGuaranies = getTotalOperacionGuaranies(
+          item,
+          totalOperacion,
+        );
+        const ivaBase = getIvaBase(item, totalOperacion);
+
+        return {
+          ...item,
+
+          // EA008
+          totalOperacion,
+
+          // EA009
+          totalOperacionGuaranies,
+
+          // E735
+          ivaBase,
+
+          // E736
+          liquidacionIvaPorItem: getLiquidacionIvaPorItem(item, ivaBase),
+        };
+      }),
     };
   });
 

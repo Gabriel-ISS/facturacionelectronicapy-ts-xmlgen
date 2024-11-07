@@ -364,7 +364,7 @@ class JSonDteItemService {
       dDesAfecIVA: constanteService.taxTreatments.filter((ca) => ca._id === +item['ivaTipo'])[0][
         'description'
       ],
-      dPropIVA: item['ivaBase'], //E733
+      dPropIVA: item['ivaBase'], //E733 (yo: esto es E735 segun el manual y facturasend)
       dTasaIVA: item['iva'], //E734
     };
 

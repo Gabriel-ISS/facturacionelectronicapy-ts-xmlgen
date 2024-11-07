@@ -26,12 +26,20 @@ export const UsuarioSchema = z
   .transform((user, ctx) => {
     const validator = new ZodValidator(ctx, user);
 
-    if (user.documentoTipo == UserIdentityDocument.OTRO) {
-      validator.requiredField('documentoTipoDescripcion');
-    } else {
-      const identityDocument = dbService.select('userIdentityDocuments').findById(user.documentoTipo) 
-      user.documentoTipoDescripcion = identityDocument.description;
-    }
+    const D142_documentoTipoDescripcion = () => {
+      /*
+      Si D141 = 9 informar el tipo de
+      documento de identidad del
+      responsable de la generación del DE
+      */
+      if (user.documentoTipo == UserIdentityDocument.OTRO) {
+        validator.requiredField('documentoTipoDescripcion');
+      } else {
+        const identityDocument = dbService.select('userIdentityDocuments').findById(user.documentoTipo) 
+        user.documentoTipoDescripcion = identityDocument.description;
+      }
+    };
+    D142_documentoTipoDescripcion();
 
     return user;
   });

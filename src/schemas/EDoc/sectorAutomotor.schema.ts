@@ -57,8 +57,7 @@ export const SectorAutomotorSchema = z
     // E779
     tipoCombustible: z.union(enumToZodUnion(FuelType)).optional(),
 
-    // E780: TODO: ESTE CAMPO ESTA UN POCO RARO
-    // ASUMO QUE CONFUNDIO EL CAMPO E779 CON EL DE E770
+    // E780
     tipoCombustibleDescripcion: z.string().min(3).max(20).optional(),
 
     // E781
@@ -101,6 +100,28 @@ export const SectorAutomotorSchema = z
   .transform((data, ctx) => {
     const validator = new ZodValidator(ctx, data);
 
+    /**E769 = 9 */
+    const isOtherFuelType = data.tipoCombustible == FuelType.OTRO;
+
+    // E780 - tipoCombustibleDescripcion
+    {
+      /*
+      Si E769 = 9 describir el tipo de
+      combustible
+      */
+      if (data.tipoCombustible) {
+        if (isOtherFuelType) {
+          validator.requiredField('tipoCombustibleDescripcion');
+        } else if (data.tipoCombustible) {
+          const foundFuelType = dbService
+            .select('fuelTypes')
+            .findById(data.tipoCombustible);
+          data.tipoCombustibleDescripcion = foundFuelType.description;
+        }
+      }
+    }
+
+    // ⚠️ esto no es del manual
     validator.validate(
       'pesoNeto',
       Boolean(
@@ -108,15 +129,6 @@ export const SectorAutomotorSchema = z
       ),
       'El peso neto no puede ser mayor que el peso bruto.',
     );
-
-    if (data.tipoCombustible == FuelType.OTRO) {
-      validator.requiredField('tipoCombustibleDescripcion');
-    } else if (data.tipoCombustible) {
-      const foundFuelType = dbService
-        .select('fuelTypes')
-        .findById(data.tipoCombustible);
-      data.tipoCombustibleDescripcion = foundFuelType?.description;
-    }
 
     return {
       ...data,

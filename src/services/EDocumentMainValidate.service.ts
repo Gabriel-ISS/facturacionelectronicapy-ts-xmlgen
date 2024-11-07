@@ -133,6 +133,12 @@ class GenericValidator {
   }
 }
 
+/**
+ * El CDC se valida
+ * El RUC debe contener dígito verificador
+ * El timbrado se valida
+ */
+
 class EDocumentMainValidateService {
   validator: GenericValidator = new GenericValidator();
 
@@ -164,29 +170,6 @@ class EDocumentMainValidateService {
    */
   public validateValues(params: EDocumentParams, data: EDocumentData, config: XmlGenConfig) {
     this.validator.clearErrors();
-
-    const documentTypeFound = constanteService.documentTypes.find((dt) => dt._id == data.tipoDocumento);
-
-    if (!documentTypeFound) {
-      const validDocumentTypes = constanteService.documentTypes.map((a) => a._id + '-' + a.description);
-      this.validator.errors.push(
-        `Tipo de Documento '${data.tipoDocumento}' en data.tipoDocumento no válido. Valores: ${validDocumentTypes}`,
-      );
-    }
-
-    if (!data.cliente) {
-      this.validator.errors.push('Debe especificar los datos del Cliente en data.cliente');
-    } else {
-      if (typeof data.cliente.contribuyente != 'boolean') {
-        this.validator.errors.push(
-          'Debe indicar si el Cliente es o no un Contribuyente true|false en data.cliente.contribuyente',
-        );
-      }
-
-      if (!(data.cliente.contribuyente == true || data.cliente.contribuyente == false)) {
-        this.validator.errors.push('data.cliente.contribuyente debe ser true|false');
-      }
-    }
 
     this.validateCdc(params, data);
 
@@ -302,7 +285,7 @@ class EDocumentMainValidateService {
     }
   }
 
-  /**CDC (Código de Control Digital) */
+  /** CDC (Código de Control Digital) */
   validateCdc(params: EDocumentParams, data: EDocumentData) {
     if (!data.cdc || data.cdc.length != 44) return;
 
@@ -387,44 +370,11 @@ class EDocumentMainValidateService {
       `La parte que corresponde al DV del RUC '${params.ruc}' debe ser del $min al $max`,
     );
 
-    // TIMBRADO NUMERO
-    this.validator.length(params.timbradoNumero, 8, `Debe especificar un Timbrado de $length caracteres`);
-
     // TIMBRADO FECHA
     this.validator.isIsoDate(
       params.timbradoFecha,
       `Valor de la Fecha de Timbrado '$value' no válido. Formato: YYYY-MM-DD`,
     );
-
-    // TIPO DE REGIMEN
-    if (params.tipoRegimen) {
-      this.validator.oneOf(
-        constanteService.regimeTypes,
-        params.tipoRegimen,
-        `Tipo de Regimen '$value' no válido. Valores: $validValues`,
-      );
-    }
-
-    // RAZÓN SOCIAL
-    const companyNameExist = this.validator.require(params.razonSocial, 'La razón social del emisor es requerida');
-    if (companyNameExist) {
-      this.validator.lengthRange(
-        params.razonSocial,
-        4,
-        250,
-        `La Razón Social del Emisor '$value' debe tener entre $min y $max caracteres`,
-      );
-    }
-
-    // NOMBRE DE FANTASIA
-    if (params.nombreFantasia && params.nombreFantasia.length > 0) {
-      this.validator.lengthRange(
-        params.nombreFantasia,
-        4,
-        250,
-        `El nombre de Fantasia del Emisor '$value' debe tener entre $min y $max caracteres`,
-      );
-    }
 
     //Aqui hay que verificar los datos de las sucursales
     const establishmentsIsArray = this.validator.isArray(
@@ -475,30 +425,14 @@ class EDocumentMainValidateService {
     }
   }
 
+  // ???
   private generateDatosOperacionValidate(params: EDocumentParams, data: EDocumentData) {
     /*if (params.ruc.indexOf('-') == -1) { //removido temporalmente, parece que no hace falta
       this.validator.errors.push('RUC debe contener dígito verificador en params.ruc');
     }*/
-
-    if (constanteService.emissionTypes.filter((um) => um._id === data.tipoEmision).length == 0) {
-      this.validator.errors.push(
-        "Tipo de Emisión '" +
-          data.tipoEmision +
-          "' en data.tipoEmision no válido. Valores: " +
-          constanteService.emissionTypes.map((a) => a._id + '-' + a.description),
-      );
-    }
-
-    //Validar aqui "dInfoFisc"
-    if (data.tipoDocumento == 7) {
-      //Nota de Remision
-      if (!(data['descripcion'] && (data['descripcion'] + '').trim().length > 0)) {
-        //Segun dicen en TDE no es obligatorio, entonces se retira la validacion.
-        //this.validator.errors.push('Debe informar la Descripción en data.descripcion para el Documento Electrónico');
-      }
-    }
   }
 
+  // ???
   private generateDatosGeneralesValidate(params: EDocumentParams, data: EDocumentData, config: XmlGenConfig) {
     this.generateDatosGeneralesInherentesOperacionValidate(params, data);
 
@@ -515,43 +449,9 @@ class EDocumentMainValidateService {
   }
 
   private generateDatosGeneralesInherentesOperacionValidate(params: EDocumentParams, data: EDocumentData) {
-    if (data.tipoDocumento == 7) {
-      //C002
-      return; //No informa si el tipo de documento es 7
-    }
 
-    if (!fechaUtilService.isIsoDateTime(data['fecha'])) {
-      this.validator.errors.push(
-        "Valor de la Fecha '" + data['fecha'] + "' en data.fecha no válido. Formato: yyyy-MM-ddTHH:mm:ss",
-      );
-    }
 
-    if (!data['tipoImpuesto']) {
-      this.validator.errors.push('Debe especificar el Tipo de Impuesto en data.tipoImpuesto');
-    } else {
-      if (constanteService.taxTypes.filter((um) => um._id === +data['tipoImpuesto']).length == 0) {
-        this.validator.errors.push(
-          "Tipo de Impuesto '" +
-            data['tipoImpuesto'] +
-            "' en data.tipoImpuesto no válido. Valores: " +
-            constanteService.taxTypes.map((a) => a._id + '-' + a.description),
-        );
-      }
-    }
 
-    let moneda = data.moneda;
-    if (!moneda) {
-      moneda = 'PYG';
-    }
-
-    if (constanteService.currencies.filter((um) => um._id === moneda).length == 0) {
-      this.validator.errors.push(
-        "Moneda '" +
-          moneda +
-          "' en data.moneda no válido. Valores: " +
-          constanteService.currencies.map((a) => a._id + '-' + a.description),
-      );
-    }
 
     if (data['condicionAnticipo']) {
       if (constanteService.advancePaymentConditions.filter((um) => um._id === data['condicionAnticipo']).length == 0) {

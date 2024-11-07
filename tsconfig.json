@@ -1,15 +1,16 @@
 {
   "compilerOptions": {
-    "target": "es2016",
-    "module": "commonjs",
+    "target": "ESNext",
+    "module": "CommonJS",
     "outDir": "./dist",
     "strict": true,
     "declaration": true,
     "esModuleInterop": true,
-    "inlineSourceMap": true
+    "skipLibCheck": true,
+    //"inlineSourceMap": true
   },
   "include": [
-    "src"
+    "src/**/*"
   ],
   "exclude": [
     "node_modules",

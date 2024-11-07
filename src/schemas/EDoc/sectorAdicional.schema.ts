@@ -28,7 +28,34 @@ export const SectorAdicionalSchema = z.object({
   
 }).superRefine((data, ctx) => {
   const validator = new ZodValidator(ctx, data)
+  
+  // E822 - inicioCiclo
+  {
+    /*
+    Obligatorio si se informa el campo E821
+    No completar si no se informa el campo E821
+    */
+    if (data.ciclo) {
+      validator.requiredField('inicioCiclo');
+    } else {
+      validator.undesiredField('inicioCiclo');
+    }
+  }
 
+  // E823 - finCiclo
+  {
+    /*
+    Obligatorio si se informa el campo E822
+    No completar si no se informa el campo E822
+    */
+    if (data.inicioCiclo) {
+      validator.requiredField('finCiclo');
+    } else {
+      validator.undesiredField('finCiclo');
+    }
+  }
+
+  // ⚠️ esto no es del manual
   if (data.inicioCiclo && data.finCiclo) {
     const inicio = new Date(data.inicioCiclo);
     const fin = new Date(data.finCiclo);

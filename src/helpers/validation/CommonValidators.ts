@@ -13,6 +13,7 @@ type Type = { invalid_type?: string };
 type Int = { int?: string };
 type Min = { min?: string };
 type Max = { max?: string };
+type Lengths = { length?: string };
 
 class CommonValidators {
   zeroPadToLength(maxLength: number, messages?: Required & Type & Int & Max) {
@@ -180,7 +181,26 @@ class CommonValidators {
       });
   }
 
-  // TODO: AGREGAR MAS VALIDACIONES COMUNES
+  gtinCode(messages?: Required & Type & Lengths) {
+    return z
+      .number({
+        required_error: messages?.required,
+        invalid_type_error: messages?.invalid_type,
+      })
+      .refine(value => {
+        if (value == undefined) return;
+        const nStr = value.toString();
+        const validLenghts = [8, 12, 13, 14];
+        if (!validLenghts.includes(nStr.length)) {
+          return false;
+        }
+        return true;
+      }, {
+        message: 
+        messages?.length ??
+        `El valor debe ser del tipo de código GTIN de 8 o 12 o 13 o 14 caracteres`,,
+      });
+  }
 }
 
 export default new CommonValidators();

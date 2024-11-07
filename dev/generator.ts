@@ -9,8 +9,8 @@ import constantsService, { BasicData } from '../src/services/constants.service';
  */
 class Progress {
   constructor(
-    readonly PROGRESS_FILE,
-    readonly SKIP_FILE,
+    readonly PROGRESS_FILE: string,
+    readonly SKIP_FILE: string,
     readonly SEPARATOR = '\n',
   ) {}
 
@@ -108,7 +108,7 @@ class ToTableTransformer<
     tableName: string,
     csvFilePath: string,
   ): string {
-    let r = '';
+    let r = `import Table, { Schema } from '../src/helpers/Table';\n\n`;
     r += this.getEnumContent(fs.readFileSync(currentConstantFilePath, 'utf8'));
     r += this.getTypeStr();
     r += this.getTableStr(tableName, csvFilePath);
@@ -135,7 +135,7 @@ class ToTableTransformer<
       }
     }
 
-    return fileContent.substring(startIndex, endIndex) + '\n\n';
+    return fileContent.substring(startIndex, endIndex) + '}\n\n';
   }
 
   private getTypeStr(): string {
@@ -148,9 +148,9 @@ class ToTableTransformer<
 
   private getTableStr(tableName: string, csvFilePath: string): string {
     let table = '';
-    table += `const table: Table<S> = new Table<S>(\n`;
+    table += `export const table = new Table<S>(\n`;
     table += `  '${tableName}',\n`;
-    table += `  ${csvFilePath},\n`;
+    table += `  '${csvFilePath}',\n`;
     table += `);\n\n`;
 
     return table;
@@ -183,7 +183,7 @@ async function createFiles(object: Record<string, any>) {
     }
 
     const exampleData = data[0];
-    if (!exampleData.code || !exampleData.description) {
+    if (!exampleData._id) {
       await progress.addToSkip(key);
       console.log(`\nSe ignora ${key} porque no tiene codigo o descripcion`);
       continue;
@@ -201,23 +201,32 @@ async function createFiles(object: Record<string, any>) {
       continue;
     }
 
-    const currentConstantFilePath = key + '.constants.ts';
+    const constantsPath = '../src/constants/'
+    const dataPath = '../data/'
+
+    const currentConstantFilePath = constantsPath + key + '.constants.ts';
     const u_currentConstantFilePath = await rl.ask(
       `Ruta al archivo con los datos (${currentConstantFilePath}):`,
     );
     const u_tableName = await rl.ask(`Nombre de tabla (${key}):`);
-    const tableName = u_tableName ?? key;
+    const tableName = u_tableName ? u_tableName : key;
     const fileName = tableName + '.table.ts';
-    const csvFilePath = '../data/' + tableName + '.csv';
 
-    const fileContent = new ToTableTransformer(data).getTableFileContent(
-      u_currentConstantFilePath ?? currentConstantFilePath,
+    const tableFilePath = dataPath + fileName;
+    const csvFilePath = dataPath + tableName + '.csv';
+
+    const tt = new ToTableTransformer(data)
+
+    const tableFileContent = tt.getTableFileContent(
+      u_currentConstantFilePath ? u_currentConstantFilePath : currentConstantFilePath,
       fileName,
       csvFilePath,
     );
+    const csvFileContent = tt.getCsvFileContent()
 
     try {
-      await createFile('../data/' + fileName, fileContent);
+      await createFile(tableFilePath, tableFileContent);
+      await createFile(csvFilePath, csvFileContent);
       await progress.addToProgress(key);
     } catch (error) {
       console.error('Error al crear el archivo:', (error as Error).message);

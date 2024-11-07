@@ -22,12 +22,14 @@ export const EntregasSchema = z
     tipoDescripcion: z.string().min(4).max(30).optional(),
 
     // E608
-    monto: z.number({
-      required_error: 'El monto por tipo de pago es requerido',
-    }).superRefine((value, ctx) => {
-      if (value == undefined) return;
-      new NumberLength(value, ctx).max(15).maxDecimals(4);
-    }),
+    monto: z
+      .number({
+        required_error: 'El monto por tipo de pago es requerido',
+      })
+      .superRefine((value, ctx) => {
+        if (value == undefined) return;
+        new NumberLength(value, ctx).max(15).maxDecimals(4);
+      }),
 
     // E609: TODO: "Se requiere la misma moneda para todos los ítems del DE"
     moneda: CommonValidators.currency(),
@@ -35,7 +37,7 @@ export const EntregasSchema = z
     // E611
     cambio: CommonValidators.currencyChange().optional(),
 
-    // E7.1.1.Campos que describen el pago o entrega inicial de la operación con tarjeta de crédito/débito
+    // (E620) E7.1.1.Campos que describen el pago o entrega inicial de la operación con tarjeta de crédito/débito
     infoTarjeta: InfoTarjetaSchema.optional(),
 
     // E7.1.2.Campos que describen el pago o entrega inicial de la operación con cheque (E630-E639)
@@ -44,25 +46,63 @@ export const EntregasSchema = z
   .transform((entrega, ctx) => {
     const validator = new ZodValidator(ctx, entrega);
 
-    if (entrega.tipo == PaymentType.OTRO) {
-      validator.requiredField('tipoDescripcion');
-    } else {
-      const foundPaymentType = constantsService.paymentTypes.find(
-        (d) => d._id == entrega.tipo,
-      );
+    /**E606 = 99 */
+    const isOtherPaymentType = entrega.tipo == PaymentType.OTRO;
+    /**E606 = 2 */
+    const isCheckPayment = entrega.tipo == PaymentType.CHEQUE;
+    /**E606 = 3 */
+    const isCreditCartPayment = entrega.tipo == PaymentType.TARJETA_DE_CREDITO;
+    /**E606 = 4 */
+    const isDebitCartPayment = entrega.tipo == PaymentType.TARJETA_DE_DEBITO;
+    /**E609 = PYG */
+    const isGuarani = entrega.moneda == Currency.GUARANI;
 
-      entrega.tipoDescripcion = foundPaymentType?.description;
+    // E607 - tipoDescripcion
+    {
+      /*
+      Si E606 = 99, informar el tipo de pago
+      */
+      if (isOtherPaymentType) {
+        validator.requiredField('tipoDescripcion');
+      } else {
+        const foundPaymentType = dbService
+          .select('paymentTypes')
+          .findById(entrega.tipo, {
+            ctx,
+            fieldName: 'entregas.tipoDescripcion',
+          });
+        entrega.tipoDescripcion = foundPaymentType?.description;
+      }
     }
 
-    if (entrega.moneda != Currency.GUARANI) {
-      validator.requiredField('cambio');
+    // E611 - cambio
+    {
+      /*
+      Obligatorio si E609 ≠ PYG
+      */
+      if (!isGuarani) {
+        validator.requiredField('cambio');
+      }
     }
 
-    if (
-      entrega.tipo == PaymentType.TARJETA_DE_CREDITO ||
-      entrega.tipo == PaymentType.TARJETA_DE_DEBITO
-    ) {
-      validator.requiredField('infoTarjeta');
+    // E620 - infoTarjeta
+    {
+      /*
+      Se activa si E606 = 3 o 4
+      */
+      if (isCreditCartPayment || isDebitCartPayment) {
+        validator.requiredField('infoTarjeta');
+      }
+    }
+
+    // E630 - infoCheque
+    {
+      /*
+      Se activa si E606 = 2
+      */
+      if (isCheckPayment) {
+        validator.requiredField('infoCheque');
+      }
     }
 
     return {
@@ -72,7 +112,7 @@ export const EntregasSchema = z
       // E610
       monedaDescripcion: dbService.select('currencies').findById(entrega.moneda)
         .description,
-    }
+    };
   });
-  
+
 export type Entregas = z.infer<typeof EntregasSchema>;

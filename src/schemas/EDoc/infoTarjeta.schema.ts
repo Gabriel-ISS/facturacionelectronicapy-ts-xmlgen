@@ -6,8 +6,9 @@ import constantsService from '../../services/constants.service';
 import CommonValidators from '../../helpers/validation/CommonValidators';
 import NumberLength from '../../helpers/validation/NumberLenght';
 import ZodValidator from '../../helpers/validation/ZodValidator';
+import dbService from '../../services/db.service';
 
-/**E7.1.1.Campos que describen el pago o entrega inicial de la operación con tarjeta de crédito/débito */
+/** (E620) E7.1.1.Campos que describen el pago o entrega inicial de la operación con tarjeta de crédito/débito */
 export const InfoTarjetaSchema = z
   .object({
     // E621
@@ -30,10 +31,13 @@ export const InfoTarjetaSchema = z
     }),
 
     // E627
-    codigoAutorizacion: z.number().optional().superRefine((value, ctx) => {
-      if (value == undefined) return;
-      new NumberLength(value, ctx).int().min(6).max(10);
-    }),
+    codigoAutorizacion: z
+      .number()
+      .optional()
+      .superRefine((value, ctx) => {
+        if (value == undefined) return;
+        new NumberLength(value, ctx).int().min(6).max(10);
+      }),
 
     // E628
     titular: z.string().min(4).max(30).optional(),
@@ -44,19 +48,25 @@ export const InfoTarjetaSchema = z
   .transform((data, ctx) => {
     const validator = new ZodValidator(ctx, data);
 
-    if (data.tipo == CreditCard.OTRO) {
-      validator.requiredField('tipoDescripcion')
-    } else {
-      const foundCreditCard = constantsService.creditCards.find(
-        (d) => d._id == data.tipo,
-      );
+    const isOtherCreditCard = data.tipo == CreditCard.OTRO;
 
-      data.tipoDescripcion = foundCreditCard?.description;
+    // E622 - tipoDescripcion
+    {
+      /*
+      Si E621 = 99 informar la
+      descripción de la denominación
+      de la tarjeta
+      */
+      if (isOtherCreditCard) {
+        validator.requiredField('tipoDescripcion');
+      }
     }
 
     return {
       ...data,
-      tipoDescripcion: data.tipoDescripcion as string,
+      tipoDescripcion:
+        data.tipoDescripcion ??
+        dbService.select('creditCards').findById(data.tipo),
     };
   });
 

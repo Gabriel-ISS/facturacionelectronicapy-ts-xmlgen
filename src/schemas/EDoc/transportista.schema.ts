@@ -28,9 +28,6 @@ export const TransportistaSchema = z
     // E988 (nacionalidad)
     pais: CommonValidators.country(),
 
-    // TODO: SIN CÓDIGO
-    /* obs: z.string().optional(), */
-
     // E990 - E993 (excluyendo E992)
     chofer: ChoferSchema,
 

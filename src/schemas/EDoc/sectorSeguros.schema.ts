@@ -14,10 +14,10 @@ export const SectorSegurosSchema = z.object({
   codigoPoliza: z.string().min(1).max(20),
 
   // EA792
-  vigencia: z.string().min(3).max(15),
+  vigenciaUnidad: z.string().min(3).max(15),
 
   // EA793
-  vigenciaUnidad: z.number().superRefine((value, ctx) => {
+  vigencia: z.number().superRefine((value, ctx) => {
     new NumberLength(value, ctx).max(5).decimalsLength(1);
   }),
 

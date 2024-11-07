@@ -30,18 +30,35 @@ export const VehiculoSchema = z
   .superRefine((data, ctx) => {
     const validator = new ZodValidator(ctx, data);
 
-    if (
+    /**E967 = 1 */
+    const docTypeIsIdentificationNumber =
       data.documentoTipo ==
-      VehicleIdentification.NUMERO_DE_IDENTIFICACION_DEL_VEHICULO
-    ) {
-      validator.requiredField('documentoNumero');
+      VehicleIdentification.NUMERO_DE_IDENTIFICACION_DEL_VEHICULO;
+    /**E967 = 2 */
+    const docTypeIsMatricula =
+      data.documentoTipo ==
+      VehicleIdentification.NUMERO_DE_MATRICULA_DEL_VEHICULO;
+
+    // E963 - documentoNumero
+    {
+      /*
+      Debe informarse cuando el E967=1
+      */
+
+      if (docTypeIsIdentificationNumber) {
+        validator.requiredField('documentoNumero');
+      }
     }
 
-    if (
-      data.documentoTipo ==
-      VehicleIdentification.NUMERO_DE_MATRICULA_DEL_VEHICULO
-    ) {
-      validator.requiredField('numeroMatricula');
+    // E965 - numeroMatricula
+    {
+      /*
+      Debe informarse cuando el E967=2
+      */
+
+      if (docTypeIsMatricula) {
+        validator.requiredField('numeroMatricula');
+      }
     }
   });
 

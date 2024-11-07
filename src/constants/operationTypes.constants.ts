@@ -4,6 +4,10 @@ export enum OperationType {
   B2B = 1,
   B2C = 2,
   B2G = 3,
+  /**Esta última opción debe utilizarse
+  solo en caso de servicios para
+  empresas o personas físicas del
+  exterior */
   B2F = 4,
 }
 
