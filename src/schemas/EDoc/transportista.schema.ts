@@ -17,7 +17,7 @@ export const TransportistaSchema = z
     // E982
     nombre: CommonValidators.name(),
 
-    // E983
+    // para obtener E983 y E984
     ruc: CommonValidators.ruc(),
 
     // E985
@@ -33,9 +33,8 @@ export const TransportistaSchema = z
     chofer: ChoferSchema,
 
     // E992
+    // VER: https://www.dnit.gov.py/documents/20123/420595/NT_E_KUATIA_010_MT_V150.pdf/d64a693b-6c63-86e1-ec6a-d4fe5ec4eeea?t=1687353747196
     direccion: z.string().min(1).max(150),
-
-    // E993: TODO
 
     // E994 - E997
     agente: AgenteSchema.optional(),
@@ -85,11 +84,16 @@ export const TransportistaSchema = z
       }
     }
 
+    const [rucID, rucDV] = data.ruc.split('-');
+
     return {
       ...data,
 
-      // E984: TODO: VERIFICAR SI EL RUC CONTIENE EL DIJITO
-      digitoVerificadorRuc: data.ruc.split('-')[1],
+      // E983
+      rucID,
+
+      // E984
+      rucDV,
 
       // E986
       documentoTipoDescripcion: dbService

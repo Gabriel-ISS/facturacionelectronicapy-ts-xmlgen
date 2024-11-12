@@ -1,11 +1,11 @@
 import fechaUtilService from '../helpers/DateHelper';
-import { EDocumentData } from './EDocumentData.type';
+import { EDocumentData } from '../schemas/EDoc.schema';
 
-class JSonDteAlgoritmosService {
+class CdcHelper {
   /**
    * Calcula Digito Verificador numérico con entrada alfanumérica y basemax 11
    */
-  public calcularDigitoVerificador(cdc: String, baseMax: number = 11) {
+  calcularDigitoVerificador(cdc: String, baseMax: number = 11) {
     let v_total = 0;
     let v_resto = 0;
     let k = 0;
@@ -64,10 +64,10 @@ class JSonDteAlgoritmosService {
    * @param data
    * @returns
    */
-  public generateCodigoControl(
+  generateCodigoControl(
     params: any,
     data: EDocumentData,
-    codigoSeguridadAleatorio: any,
+    codigoSeguridadAleatorio: number,
   ) {
     if (params.ruc.indexOf('-') == -1) {
       throw new Error('RUC debe contener dígito verificador en params.ruc');
@@ -81,14 +81,9 @@ class JSonDteAlgoritmosService {
 
     rucEmisor = rucEmisor.padStart(8, '0');
 
-    const establecimiento = data.establecimiento.padStart(3, '0');
-    const punto = data.punto.padStart(3, '0');
-    const numero = data.numero.padStart(7, '0');
+    const { establecimiento, punto, numero, fecha, tipoEmision } = data;
     const tipoContribuyente = params['tipoContribuyente'];
-    const fechaEmision = fechaUtilService.getCdcFormatDate(
-      new Date(data['fecha']),
-    );
-    const tipoEmision = data.tipoEmision; //1=Normal 2=Contingencia
+    const fechaEmision = fechaUtilService.getCdcFormatDate(new Date(fecha));
 
     let cdc =
       tipoDocumento.toString().padStart(2, '0') +
@@ -111,23 +106,10 @@ class JSonDteAlgoritmosService {
     rucEmisorParaCalculoDV = rucEmisorParaCalculoDV.replace('c', '99');
     rucEmisorParaCalculoDV = rucEmisorParaCalculoDV.padStart(8, '0');
 
-    let cdcParaCalculoDV =
-      tipoDocumento.toString().padStart(2, '0') +
-      rucEmisorParaCalculoDV +
-      dvEmisorParaCalculoDV +
-      establecimiento +
-      punto +
-      numero +
-      tipoContribuyente +
-      fechaEmision +
-      tipoEmision +
-      codigoSeguridadAleatorio;
-
-    //const digitoVerificador = this.calcularDigitoVerificador(cdcParaCalculoDV, 11);
     const digitoVerificador = this.calcularDigitoVerificador(cdc, 11);
     cdc += digitoVerificador;
     return cdc;
   }
 }
 
-export default new JSonDteAlgoritmosService();
+export default new CdcHelper();

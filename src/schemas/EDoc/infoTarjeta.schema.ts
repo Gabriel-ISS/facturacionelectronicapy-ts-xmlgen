@@ -22,7 +22,7 @@ export const InfoTarjetaSchema = z
     // E623
     razonSocial: z.string().min(4).max(60).optional(),
 
-    // E624
+    // para obtener E624 y E625
     ruc: CommonValidators.ruc().optional(),
 
     // E626
@@ -62,11 +62,19 @@ export const InfoTarjetaSchema = z
       }
     }
 
+    const [rucID, rucDV] = data.ruc?.split('-') ?? [];
+
     return {
       ...data,
       tipoDescripcion:
         data.tipoDescripcion ??
         dbService.select('creditCards').findById(data.tipo),
+
+      // E624
+      rucID,
+
+      // E625
+      rucDV,
     };
   });
 

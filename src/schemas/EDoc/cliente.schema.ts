@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { Country } from '../../constants/countries.constants';
 import { IdentityDocumentReceptor } from '../../constants/identityDocumentsReceptors.constants';
 import { OperationType } from '../../constants/operationTypes.constants';
 import { DEFAULT_NAME } from '../../constants/other.constants';
@@ -8,7 +7,6 @@ import { TaxpayerNotTaxpayer } from '../../constants/taxpayerNotTaxpayer.constan
 import CommonValidators from '../../helpers/validation/CommonValidators';
 import { enumToZodUnion } from '../../helpers/validation/enumConverter';
 import ZodValidator from '../../helpers/validation/ZodValidator';
-import constantsService from '../../services/constants.service';
 import dbService from '../../services/db.service';
 
 /** Campos que identifican al receptor del Documento Electrónico DE (D200-D299) */
@@ -26,7 +24,7 @@ export const ClienteSchema = z
     // D205
     tipoContribuyente: z.union(enumToZodUnion(Taxpayer)).optional(),
 
-    // D206
+    // para obtener D206 y D207
     ruc: CommonValidators.ruc().optional(),
 
     // D208
@@ -71,13 +69,13 @@ export const ClienteSchema = z
   .transform((data, ctx) => {
     const validator = new ZodValidator(ctx, data);
 
-    /**D201==1 */
+    /**D201 = 1 */
     const isTaxpayer =
       data.contribuyente == TaxpayerNotTaxpayer.CONTRIBUYENTE;
-    /**D201==2 */
+    /**D201 = 2 */
     const isNotTaxpayer =
       data.contribuyente == TaxpayerNotTaxpayer.NO_CONTRIBUYENTE;
-    /**D202==4 */
+    /**D202 = 4 */
     const isB2F = data.tipoOperacion == OperationType.B2F;
 
     // D205 - tipoContribuyente
@@ -108,13 +106,14 @@ export const ClienteSchema = z
 
     // D208 - documentoTipo
     {
-      /*
-      Obligatorio si D201 = 2 y D202 ≠ 4
-      No informar si D201 = 1 o D202=4
+      /* 
+      VER: https://www.dnit.gov.py/documents/20123/420595/NT_E_KUATIA_023_MT_V150.pdf/9580922b-5dd5-60f9-4857-ae66a757898f?t=1724956850006
+      Obligatorio si D201 = 2
+      No informar si D201 = 1
       */
-      if (isNotTaxpayer && !isB2F) {
+      if (isNotTaxpayer) {
         validator.requiredField('documentoTipo');
-      } else if (isTaxpayer || isB2F) {
+      } else if (isTaxpayer) {
         validator.undesiredField('documentoTipo');
       }
     }
@@ -123,12 +122,11 @@ export const ClienteSchema = z
     {
       /*
       Obligatorio si D201 = 2 y D202 ≠ 4
-      No informar si D201 = 1 o D202=4
+      VER: https://www.dnit.gov.py/documents/20123/420595/NT_E_KUATIA_002_MT_V150.pdf/b3656789-f42a-e578-4141-45046e452f41?t=1687353745841
+      TODO: En caso de DE innominado, completar con 0 (cero)
       */
       if (isNotTaxpayer && !isB2F) {
         validator.requiredField('documentoNumero');
-      } else if (isTaxpayer || isB2F) {
-        validator.undesiredField('documentoNumero');
       }
     }
 
@@ -157,13 +155,10 @@ export const ClienteSchema = z
     // D219 - departamento
     {
       /*
-      Campo obligatorio si se informa el
-      campo D213 y D202≠4, no se debe
-      informar cuando D202 = 4.
+      No se debe informar cuando D202 = 4.
+      VER: https://www.dnit.gov.py/documents/20123/420595/NT_E_KUATIA_003_MT_V150.pdf/dd4689ee-164a-29b3-9c3f-44cbef55bcf5?t=1687353745998
       */
-      if (data.direccion && !isB2F) {
-        validator.requiredField('departamento');
-      } else if (isB2F) {
+      if (isB2F) {
         validator.undesiredField('departamento');
       }
     }
@@ -171,16 +166,15 @@ export const ClienteSchema = z
     // D223 - ciudad
     {
       /*
-      Campo obligatorio si se informa el
-      campo D213 y D202≠4, no se debe
-      informar cuando D202 = 4
+      No se debe informar cuando D202 = 4
+      VER: https://www.dnit.gov.py/documents/20123/420595/NT_E_KUATIA_003_MT_V150.pdf/dd4689ee-164a-29b3-9c3f-44cbef55bcf5?t=1687353745998
       */
-      if (data.direccion && !isB2F) {
-        validator.requiredField('ciudad');
-      } else if (isB2F) {
+      if (isB2F) {
         validator.undesiredField('ciudad');
       }
     }
+
+    const [rucID, rucDV] = data.ruc?.split('-') ?? []
 
     return {
       ...data,
@@ -189,8 +183,11 @@ export const ClienteSchema = z
       paisDescripcion: dbService.select('countries').findById(data.pais)
         .description,
 
-      // D207: TODO: VERIFICAR SI EL RUC CONTIENE EL DIJITO
-      dijitoVerificadorRuc: data.ruc?.split('-')[1],
+      // D206
+      rucID,
+
+      // D207
+      rucDV,
 
       // D209
       descripcionTipoDocumento: dbService

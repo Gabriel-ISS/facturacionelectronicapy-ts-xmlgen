@@ -2,7 +2,6 @@ import { BasicData } from '../services/constants.service';
 import { Department } from './departments.constants';
 
 type Data = BasicData<number> & { department: Department };
-// TODO: reemplazar numero de departamento por enum del departamento
 export const districts: Data[] = [
   { _id: 1, description: 'ASUNCION (DISTRITO)', department: 1 },
   { _id: 2, description: 'CONCEPCION (MUNICIPIO)', department: 2 },

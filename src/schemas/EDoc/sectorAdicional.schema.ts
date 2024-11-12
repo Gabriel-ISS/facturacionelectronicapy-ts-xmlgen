@@ -25,7 +25,10 @@ export const SectorAdicionalSchema = z.object({
     if (value == undefined) return;
     new NumberLength(value, ctx).max(15).maxDecimals(4);
   }),
-  
+
+  // E827: VER: https://www.dnit.gov.py/documents/20123/420595/NT_E_KUATIA_020_MT_V150.pdf/f9a47078-748e-db87-bf2f-e6826ef048b9?t=1700242734040
+  codigoContratacionDncp: z.string().min(1).max(30).optional(),
+
 }).superRefine((data, ctx) => {
   const validator = new ZodValidator(ctx, data)
   

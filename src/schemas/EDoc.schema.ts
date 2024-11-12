@@ -21,7 +21,7 @@ import { CondicionSchema } from './EDoc/condicion.schema';
 import { DncpSchema } from './EDoc/dncp.schema';
 import { DocumentoAsociadoSchema } from './EDoc/documentoAsociado.schema';
 import { FacturaSchema } from './EDoc/factura.schema';
-import { Item, ItemSchema } from './EDoc/item.schema';
+import { CompleteItem, Item, ItemSchema } from './EDoc/item.schema';
 import { NotaCreditoDebitoSchema } from './EDoc/notaCheditoDebito.schema';
 import { RemisionSchema } from './EDoc/remision.schema';
 import { SectorAdicionalSchema } from './EDoc/sectorAdicional.schema';
@@ -31,6 +31,9 @@ import { SectorSupermercadosSchema } from './EDoc/sectorSupermercados.schema';
 import { TransporteSchema } from './EDoc/transporte.schema';
 import { UsuarioSchema } from './EDoc/usuario.schema';
 import { ObligacionSchema } from './EDoc/obligacion.schema';
+import { TaxTreatment } from '../constants/taxTreatments.constants';
+import { TaxRate } from '../constants/taxRate.constants';
+import getTotals from '../helpers/getTotals';
 
 // TODO: COMPLETAR VALORES FALTANTES
 // TODO: ASEGURARSE DE QUE LAS DESCRIPCIONES ESTEN BIEN VALIDADAS, CONSIDERAR undefined Y "OTRO"
@@ -69,6 +72,9 @@ export const EDocDataSchema = z
     tipoEmision: z
       .union(enumToZodUnion(EmissionType))
       .default(EmissionType.NORMAL),
+
+    // B004
+    codigoSeguridadAleatorio: z.string().length(9).optional(),
 
     // B005
     observacion: z.string().min(1).max(3000).optional(),
@@ -129,21 +135,19 @@ export const EDocDataSchema = z
     // D019
     condicionAnticipo: z.union(enumToZodUnion(GlobalAndPerItem)).optional(),
 
+    // https://www.dnit.gov.py/documents/20123/420595/NT_E_KUATIA_018_MT_V150-+Junio.pdf/2ace18c4-5c03-c339-7f5c-bed6d5b5eb5e?t=1717699899642
     // D1.1. Campos que identifican las obligaciones afectadas (D030-D040)
     obligaciones: z.array(ObligacionSchema).optional(),
 
-    // EA004
-    descuentoGlobal: z.number().superRefine((value, ctx) => {
-      new NumberLength(value, ctx).max(15).maxDecimals(8);
-    }),
+    // ⚠️ No es del manual, pero si del repo original
+    // Es el valor monetario total a descontar de la suma de los items
+    // Se usa para calcular EA004
+    descuentoGlobal: z.number().default(0),
 
-    // EA007
-    anticipoGlobal: z
-      .number()
-      .default(0)
-      .superRefine((value, ctx) => {
-        new NumberLength(value, ctx).max(15).maxDecimals(8);
-      }),
+    // ⚠️ No es del manual, pero si del repo original
+    // Es el valor monetario total que se aplica como anticipo a la suma de los items
+    // Se usa para calcular EA007
+    anticipoGlobal: z.number().default(0),
 
     // TODO: PARECE DE FS, sin código asociado
     /* cdc: z.string().length(44).optional(), */
@@ -177,6 +181,8 @@ export const EDocDataSchema = z
 
     // E9. Campos complementarios comerciales de uso específico (E790-E899)
 
+    // TODO: ahora puede aparecer hasta 9 veces, como es eso?
+    // VER: https://www.dnit.gov.py/documents/20123/420595/NT_E_KUATIA_023_MT_V150.pdf/9580922b-5dd5-60f9-4857-ae66a757898f?t=1724956850006
     // E9.2. Sector Energía Eléctrica (E791-E799)
     sectorEnergiaElectrica: SectorEnergiaElectricaSchema.optional(),
 
@@ -191,6 +197,15 @@ export const EDocDataSchema = z
 
     // E10. Campos que describen el transporte de las mercaderías (E900-E999)
     transporte: TransporteSchema.optional(),
+
+    // F025
+    comision: z
+      .number()
+      .optional()
+      .superRefine((value, ctx) => {
+        if (value == undefined) return;
+        new NumberLength(value, ctx).max(15).maxDecimals(8);
+      }),
 
     // G. Campos complementarios comerciales de uso general (G001-G049)
     complementarios: ComplementariosSchema.optional(),
@@ -251,6 +266,29 @@ export const EDocDataSchema = z
       Cuando el tipo de documento es
       Nota de remisión (C002=7) es
       obligatorio informar el mensaje
+
+      En caso de realizar Factura
+      Exportación, en este campo en
+      la FE se debe completar con los
+      siguientes datos y en este orden
+      de conformidad al Art 20
+      numeral 15 del Decreto N°
+      10797/2013:
+      a) Tipo de Operación,
+      b) Condición de Negociación, (CIF, FOB, otros.)
+      c) País de Destino,
+      d) Empresa Fletera o Exportador Nacional,
+      e) Agente de Transporte,
+      f) Instrucciones de Pago para el cliente (Beneficiario, Banco, N°
+      de cuenta, Código SWIFT, Cartas de Crédito, otro).
+      g) Número/s de Conocimiento/s de Embarque.
+      h) Número/s de Manifiesto/s Internacional/es de Carga.
+      i) Número de barcaza o remolcador, descripción y
+      cantidad del bien transportado (en los casos de Flete Internacional),
+      j) Las demás informaciones que sean fijadas por la
+      Administración Tributaria, en normas de carácter general ".
+
+      VER: https://www.dnit.gov.py/documents/20123/420595/NT_E_KUATIA_007_MT_V150.pdf/d6b31757-8906-a326-4e92-f9ec4b5d7706?t=1687353746603
       */
       if (isElectronicRemissionNote) {
         validator.requiredField('descripcion');
@@ -583,8 +621,7 @@ export const EDocDataSchema = z
       /*
       Obligatorio si C002 = 7
       No informar si C002 = 4, 5, 6
-      TODO: Opcional cuando E903=1 y
-      E967=1
+      VER: https://www.dnit.gov.py/documents/20123/420595/NT_E_KUATIA_010_MT_V150.pdf/d64a693b-6c63-86e1-ec6a-d4fe5ec4eeea?t=1687353747196
       */
       if (isElectronicRemissionNote) {
         validator.requiredField(transportPath.concat('transportista'));
@@ -653,8 +690,58 @@ export const EDocDataSchema = z
 
     // TODO: VALIDAR CDC
 
+    // TODO: VER CALCULO
+    const totalItemsPrice = data.items.reduce(
+      (acc, item) => acc + item.precioUnitario * item.cantidad,
+      0,
+    );
+
+    // EA004 - descuentoGlobalItem
+    const calcDescuentoGlobalItem = (
+      item: Item,
+      itemPercentageOfAllItems: number,
+    ) => {
+      /*
+      Calculo según manual: https://www.dnit.gov.py/documents/20123/420595/NT_E_KUATIA_001_MT_V150.pdf/c4d2ab8e-632b-dc8f-d3f6-6a144a3a3d9c?t=1687353745680
+      ⚠️ Calculo del repo original
+      */
+      if (!data.descuentoGlobal) return undefined;
+      const globalDiscountItem =
+        (data.descuentoGlobal * itemPercentageOfAllItems) / 100;
+      const globalDiscountItemUnit = globalDiscountItem / item.cantidad;
+
+      /*TODO: (por que lo dejo comentado?)
+      if (data.moneda === 'PYG') {
+        //jsonResult['dDescGloItem'] = parseFloat(jsonResult['dDescGloItem']).toFixed(config.pygDecimals);
+      }
+      */
+
+      return globalDiscountItemUnit;
+    };
+
+    // EA007 - anticipoGlobalItem
+    const calcAnticipoGlobalItem = (
+      item: Item,
+      itemPercentageOfAllItems: number,
+    ) => {
+      // ⚠️ Calculo del repo original
+
+      if (!data.anticipoGlobal) return undefined;
+      const globalDiscountItem =
+        (data.anticipoGlobal * itemPercentageOfAllItems) / 100;
+      const globalDiscountItemUnit = globalDiscountItem / item.cantidad;
+
+      /* TODO:
+      if (data.moneda === 'PYG') {
+        jsonResult['dAntGloPreUniIt'] = parseFloat(jsonResult['dAntGloPreUniIt']).toFixed(config.pygDecimals);
+      }
+      */
+
+      return globalDiscountItemUnit;
+    };
+
     // EA008 - totalOperacion
-    const getTotalOperacion = (item: Item) => {
+    const calcTotalOperacion = (item: Item) => {
       /*
       Si D013 = 1, 3, 4 o 5 (afectado al
       IVA, Renta, ninguno, IVA - Renta),
@@ -696,37 +783,53 @@ export const EDocDataSchema = z
     };
 
     // EA009 - totalOperacionGuaranies
-    const getTotalOperacionGuaranies = (item: Item, totalOperacion: number) => {
+    const calcTotalOperacionGuaranies = (
+      item: Item,
+      totalOperacion_EA008: number,
+    ) => {
       if (item.cambio == undefined) return 0;
 
-      return totalOperacion * item.cambio;
+      return totalOperacion_EA008 * item.cambio;
     };
 
     // E735 - ivaBase
-    const getIvaBase = (item: Item, totalOperacion: number) => {
+    const calcIvaBase = (item: Item, totalOperacion_EA008: number) => {
       /*
-      Si E731 = 1 o 4 este campo es
-      igual al resultado del cálculo
-      [EA008* (E733/100)] / 1,1 si la
-      tasa es del 10%
-      [EA008* (E733/100)] / 1,05 si la
-      tasa es del 5%
-      Si E731 = 2 o 3 este campo es
-      igual 0
-      E8.2 E736 dLiqIVAItem Liquidación del IVA por
-      ítem E730 N 1-15p(0-8) 1-1
-      Correspond
+      Si E731 = 1 o 4 este campo es igual al resultado del cálculo:
+      [100 * EA008 * E733] / [10000 + (E734 * E733)]
+
+      Si E731 = 2 o 3 este campo es igual 0
+
+      VER: https://www.dnit.gov.py/documents/20123/420595/NT_E_KUATIA_013_MT_V150.pdf/ba73ec3b-5901-ae28-5d8c-9bed5632ab89?t=1687353747529
       */
 
-      // ESTO RESUME EL CALCULO POR LAS CONDICIONES DE item.iva
-      if (!item.iva) return 0;
-      return (
-        totalOperacion * (item.proporcionGravada / 100) * (1 + item.iva / 100)
-      );
+      /**E731 = 1 */
+      const isGravado = item.ivaTipo == TaxTreatment.GRAVADO_IVA;
+      /**E731 = 2 */
+      const isExonerado =
+        item.ivaTipo == TaxTreatment.EXONERADO__ART__100___LEY_6380_2019_;
+      /**E731 = 3 */
+      const isExento = item.ivaTipo == TaxTreatment.EXENTO;
+      /**E731 = 4 */
+      const isGravadoParcial =
+        item.ivaTipo == TaxTreatment.GRAVADO_PARCIAL__GRAV__EXENTO_;
+
+      if (isGravado || isGravadoParcial) {
+        return (
+          (100 * totalOperacion_EA008 * item.proporcionGravada) /
+          (10000 + item.iva * item.proporcionGravada)
+        );
+      } else if (isExonerado || isExento) {
+        return 0;
+      } else {
+        throw new Error(
+          'El tipo de iva no se reconoce en el calculo de E735 en NT013',
+        );
+      }
     };
 
     // E736 - liquidacionIvaPorItem
-    const getLiquidacionIvaPorItem = (item: Item, ivaBase: number) => {
+    const calcLiquidacionIvaPorItem = (item: Item, ivaBase: number) => {
       /*
       Corresponde al cálculo aritmético:
       E735 * (E734/100)
@@ -738,6 +841,88 @@ export const EDocDataSchema = z
       return ivaBase * (item.iva / 100);
     };
 
+    // E737 - baseExentaIva
+    // VER: https://www.dnit.gov.py/documents/20123/420595/NT_E_KUATIA_013_MT_V150.pdf/ba73ec3b-5901-ae28-5d8c-9bed5632ab89?t=1687353747529
+    const calcBaseExentaIva = (item: Item, totalOperacion_EA008: number) => {
+      /*
+      Si E731 = 4 este campo es igual al resultado del cálculo:
+      [100 * EA008 * (100 – E733)] / [10000 + (E734 * E733)]
+
+      Si E731 = 1 , 2 o 3 este campo es igual 0 
+      */
+
+      /**E731 = 1 */
+      const isGravado = item.ivaTipo == TaxTreatment.GRAVADO_IVA;
+      /**E731 = 2 */
+      const isExonerado =
+        item.ivaTipo == TaxTreatment.EXONERADO__ART__100___LEY_6380_2019_;
+      /**E731 = 3 */
+      const isExento = item.ivaTipo == TaxTreatment.EXENTO;
+      /**E731 = 4 */
+      const isGravadoParcial =
+        item.ivaTipo == TaxTreatment.GRAVADO_PARCIAL__GRAV__EXENTO_;
+
+      if (isGravadoParcial) {
+        return (
+          (100 * totalOperacion_EA008 * (100 - item.proporcionGravada)) /
+          (10000 + item.iva * item.proporcionGravada)
+        );
+      } else if (isGravado || isExonerado || isExento) {
+        return 0;
+      } else {
+        throw new Error(
+          'El tipo de iva no se reconoce en el calculo de E737 en NT013',
+        );
+      }
+    };
+
+    const items = data.items.map((item) => {
+      const totalItemPrice = item.precioUnitario * item.cantidad;
+      const percentageInAllItems = (totalItemPrice * 100) / totalItemsPrice;
+
+      const descuentoGlobalItem = calcDescuentoGlobalItem(
+        item,
+        percentageInAllItems,
+      );
+      const anticipoGlobalItem = calcAnticipoGlobalItem(
+        item,
+        percentageInAllItems,
+      );
+
+      const totalOperacion = calcTotalOperacion(item);
+      const totalOperacionGuaranies = calcTotalOperacionGuaranies(
+        item,
+        totalOperacion,
+      );
+      const ivaBase = calcIvaBase(item, totalOperacion);
+      const baseExentaIva = calcBaseExentaIva(item, totalOperacion);
+
+      return {
+        ...item,
+
+        /**EA004 */
+        descuentoGlobalItem,
+
+        /**EA007 */
+        anticipoGlobalItem,
+
+        /**EA008 */
+        totalOperacion,
+
+        /**EA009 */
+        totalOperacionGuaranies,
+
+        /**E735 */
+        ivaBase,
+
+        /**E736 */
+        liquidacionIvaPorItem: calcLiquidacionIvaPorItem(item, ivaBase),
+
+        /**E737 */
+        baseExentaIva,
+      } satisfies CompleteItem;
+    });
+
     return {
       ...data,
       // B003
@@ -745,16 +930,15 @@ export const EDocDataSchema = z
         .select('emissionTypes')
         .findById(data.tipoEmision).description,
 
-      // TODO: B004
-
       // C003
       descripcionDocumento: dbService
         .select('documentTypes')
         .findById(data.tipoDocumento).description,
 
-      // TODO: C004
+      // TODO: C004 (viene de params)
 
-      // TODO: C008
+      // TODO: C008 (viene de params)
+      // VER: https://www.dnit.gov.py/documents/20123/420595/NT_E_KUATIA_010_MT_V150.pdf/d64a693b-6c63-86e1-ec6a-d4fe5ec4eeea?t=1687353747196
 
       // D012
       descripcionTipoTransaccion: dbService
@@ -775,29 +959,19 @@ export const EDocDataSchema = z
         .select('advancePaymentConditions')
         .findByIdIfExist(data.condicionAnticipo)?.description,
 
-      items: data.items.map((item) => {
-        const totalOperacion = getTotalOperacion(item);
-        const totalOperacionGuaranies = getTotalOperacionGuaranies(
-          item,
-          totalOperacion,
-        );
-        const ivaBase = getIvaBase(item, totalOperacion);
+      items,
 
-        return {
-          ...item,
-
-          // EA008
-          totalOperacion,
-
-          // EA009
-          totalOperacionGuaranies,
-
-          // E735
-          ivaBase,
-
-          // E736
-          liquidacionIvaPorItem: getLiquidacionIvaPorItem(item, ivaBase),
-        };
+      // F001
+      totales: getTotals({
+        items,
+        isElectronicRemissionNote,
+        isAutoInvoice,
+        tipoImpuesto: data.tipoImpuesto,
+        isGuarani: currencyIsGuarani,
+        currencyChangeConditionIsGlobal,
+        currencyChangeConditionIsPerItem,
+        cambio: data.cambio,
+        comision: data.comision,
       }),
     };
   });

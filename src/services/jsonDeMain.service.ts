@@ -862,7 +862,7 @@ class JSonDeMainService {
         Id: _id,
       },
       dDVId: digitoVerificadorString.substring(digitoVerificadorString.length - 1, digitoVerificadorString.length),
-      dFecFirma: dateUtilService.getIsoDateTimeString(fechaFirmaDigital),
+      dFecFirma: dateUtilService.getIsoDateTime(fechaFirmaDigital),
       dSisFact: 1,
     };
 

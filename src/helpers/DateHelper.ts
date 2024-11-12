@@ -2,17 +2,17 @@ class DateHelper {
   /**
    * @returns {string} la fecha en formato AAAAMMDD
    */
-  getCdcFormatDateString(date: Date) {
+  getCdcFormatDate(date: Date) {
     const [dateStr] = date.toISOString().split('T')
     return dateStr.split('-').join('');
   }
   
-  getIsoDateString(date: Date) {
+  getIsoDate(date: Date) {
     const [dateStr] = date.toISOString().split('T');
     return dateStr;
   }
 
-  getIsoDateTimeString(date: Date) {
+  getIsoDateTime(date: Date) {
     const [validISO] = date.toISOString().split('.');
     return validISO;
   }

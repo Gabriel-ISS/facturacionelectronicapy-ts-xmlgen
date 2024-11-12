@@ -19,7 +19,8 @@ export const VehiculoSchema = z
     obs: z.string().min(1).max(20).optional(),
 
     // E965
-    numeroMatricula: z.string().length(6).optional(),
+    // VER: https://www.dnit.gov.py/documents/20123/420595/NT_E_KUATIA_005_MT_V150.pdf/098e75de-e878-7bcd-49ec-55c33a45a0a7?t=1687353746324
+    numeroMatricula: z.string().min(6).max(7).optional(),
 
     // E966
     numeroVuelo: z.string().optional(),

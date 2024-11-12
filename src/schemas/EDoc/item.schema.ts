@@ -18,12 +18,13 @@ import ZodValidator from '../../helpers/validation/ZodValidator';
 export const ItemSchema = z
   .object({
     // E701
+    // VER: https://www.dnit.gov.py/documents/20123/420595/NT_E_KUATIA_009_MT_V150.pdf/c268a447-11e3-ee1e-b4d5-8d83dd408401?t=1687353746900
     codigo: z
       .string({
         required_error: 'El código es requerido',
       })
       .min(1)
-      .max(20, { message: 'El código no puede tener más de 20 caracteres' }),
+      .max(50, { message: 'El código no puede tener más de 20 caracteres' }),
 
     // E702
     partidaArancelaria: z
@@ -47,25 +48,26 @@ export const ItemSchema = z
     dncp: ItemDncpSchema.optional(),
 
     // E708
+    // VER: https://www.dnit.gov.py/documents/20123/420595/NT_E_KUATIA_009_MT_V150.pdf/c268a447-11e3-ee1e-b4d5-8d83dd408401?t=1687353746900
     descripcion: z
       .string({
         required_error: 'La descripción es requerida',
       })
       .min(1)
-      .max(120),
+      .max(2000),
 
     // E709
     unidadMedida: z.number({
       required_error: 'La unidad de medida es requerida',
     }),
 
-    // E711
+    // E711: VER: https://www.dnit.gov.py/documents/20123/420595/NT_E_KUATIA_023_MT_V150.pdf/9580922b-5dd5-60f9-4857-ae66a757898f?t=1724956850006
     cantidad: z
       .number({
         required_error: 'La cantidad es requerida',
       })
       .superRefine((value, ctx) => {
-        new NumberLength(value, ctx).max(10).maxDecimals(4);
+        new NumberLength(value, ctx).max(10).maxDecimals(8);
       }),
 
     // E712
@@ -149,7 +151,7 @@ export const ItemSchema = z
       required_error: 'La tasa del IVA es requerida',
     }),
 
-    // E8.4. Grupo de rastreo de la mercadería (E750-E760)
+    // E8.4. Grupo de rastreo de la mercadería (E750-E761)
 
     // E751
     lote: z
@@ -168,7 +170,7 @@ export const ItemSchema = z
       .optional()
       .transform((value) => {
         if (!value) return value;
-        return DateHelper.getIsoDateString(value);
+        return DateHelper.getIsoDate(value);
       }),
 
     // E753
@@ -187,11 +189,8 @@ export const ItemSchema = z
     // E755
     numeroSeguimiento: z.string().min(1).max(20).optional(),
 
-    // E756: TODO
-
-    // E757: TODO
-
-    // E758: TODO
+    // E756, E757 y E758 (eliminados)
+    // VER: https://www.dnit.gov.py/documents/20123/420595/NT_E_KUATIA_010_MT_V150.pdf/d64a693b-6c63-86e1-ec6a-d4fe5ec4eeea?t=1687353747196
 
     // E759
     registroSenave: z.string().length(20).optional(),
@@ -199,11 +198,13 @@ export const ItemSchema = z
     // E760
     registroEntidadComercial: z.string().length(20).optional(),
 
-    // E761: TODO: NO APARECE EN EL MANUAL
-    /* nombreProducto: z
+    // E761
+    // VER: https://www.dnit.gov.py/documents/20123/420595/NT_E_KUATIA_010_MT_V150.pdf/d64a693b-6c63-86e1-ec6a-d4fe5ec4eeea?t=1687353747196
+    nombreProducto: z
       .string()
-      .optional()
-      .describe('Obligados por el Art. 1 de la RG N° 106/2021 – Agroquímicos'), */
+      .min(1)
+      .max(30)
+      .optional(),
 
     // E8.5. Sector de automotores nuevos y usados (E770-E789)
     sectorAutomotor: SectorAutomotorSchema.optional(),
@@ -303,7 +304,7 @@ export const ItemSchema = z
     return {
       ...data,
       proporcionGravada: data.proporcionGravada as number,
-      
+
       // E713
       paisDescripcion: dbService
         .select('countries')
@@ -330,8 +331,7 @@ export const ItemSchema = z
       // E727
       precioTotal: data.precioUnitario * data.cantidad,
 
-      // EA003: TODO: PREGUNTAR A LA DNIT SI ESTO ES UN ERROR DEL MANUAL
-      // DEBERÍA DIVIDIRSE POR LA CANTIDAD
+      // EA003
       procentajeDescuentoPorItem:
         data.descuento && data.descuento > 0
           ? (data.descuento * 100) / data.precioUnitario
@@ -346,4 +346,27 @@ export const ItemSchema = z
         .findById(data.ivaTipo).description,
     };
   });
+
 export type Item = z.infer<typeof ItemSchema>;
+export type CompleteItem = Item & {
+  /**EA004 */
+  descuentoGlobalItem?: number;
+
+  /**EA007 */
+  anticipoGlobalItem?: number;
+
+  /**EA008 */
+  totalOperacion: number;
+
+  /**EA009 */
+  totalOperacionGuaranies: number;
+
+  /**E735 */
+  ivaBase: number;
+
+  /**E736 */
+  liquidacionIvaPorItem: number;
+
+  /**E737 */
+  baseExentaIva: number;
+};

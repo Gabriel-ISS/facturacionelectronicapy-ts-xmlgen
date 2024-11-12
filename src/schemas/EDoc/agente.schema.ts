@@ -5,17 +5,23 @@ export const AgenteSchema = z.object({
   // E994
   nombre: CommonValidators.name().optional(),
 
-  // E995
+  // para obtener E995 y E996
   ruc: CommonValidators.ruc().optional(),
 
   // E997
   direccion: CommonValidators.address().optional(),
 }).transform((data, ctx) => {
+
+  const [rucID, rucDV] = data.ruc?.split('-') ?? []
+
   return {
     ...data,
 
-    // E996: TODO: VERIFICAR SI EL RUC CONTIENE EL DIJITO
-    digitoVerificadorRuc: data.ruc?.split('-')[1],
+    // E995
+    rucID,
+
+    // E996
+    rucDV,
   }
 })
 

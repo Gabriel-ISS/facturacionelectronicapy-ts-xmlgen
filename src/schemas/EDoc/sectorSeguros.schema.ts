@@ -31,7 +31,8 @@ export const SectorSegurosSchema = z.object({
   finVigencia: CommonValidators.isoDateTime().optional(),
 
   // EA797
-  codigoInternoItem: z.string().min(1).max(20).optional(),
+  // VER: https://www.dnit.gov.py/documents/20123/420595/NT_E_KUATIA_008_MT_V150.pdf/81fba389-0f27-e757-88c3-ec7b3dbab90b?t=1687353746734
+  codigoInternoItem: z.string().min(1).max(50).optional(),
 });
 
 export type SectorSeguros = z.infer<typeof SectorSegurosSchema>;

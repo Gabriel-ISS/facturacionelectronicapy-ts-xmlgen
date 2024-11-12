@@ -38,17 +38,19 @@ export const RemisionSchema = z
       .number({
         required_error: 'Los kilómetros estimados de recorrido son requeridos',
       })
-      .optional()
       .superRefine((value, ctx) => {
-        if (value == undefined) return;
         new NumberLength(value, ctx).int().max(5);
       }),
 
     // E506
     fechaFactura: CommonValidators.isoDate().optional(),
 
-    // E507: TODO: NO APARECE EN EL MANUAL
-    /* costoFlete: z.number().optional(), */
+    // E507
+    // VER: https://www.dnit.gov.py/documents/20123/420595/NT_E_KUATIA_010_MT_V150.pdf/d64a693b-6c63-86e1-ec6a-d4fe5ec4eeea?t=1687353747196
+    costoFlete: z.number().optional().superRefine((value, ctx) => {
+      if (value == undefined) return;
+      new NumberLength(value, ctx).max(15).maxDecimals(8);
+    }),
   })
   .transform((data, ctx) => {
     const validator = new ZodValidator(ctx, data);

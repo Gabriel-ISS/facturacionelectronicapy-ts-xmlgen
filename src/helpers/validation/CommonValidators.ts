@@ -40,7 +40,7 @@ class CommonValidators {
       })
       .transform((value) => {
         if (!value) return value;
-        return DateHelper.getIsoDateString(value);
+        return DateHelper.getIsoDate(value);
       });
   }
 
@@ -52,7 +52,7 @@ class CommonValidators {
       })
       .transform((value) => {
         if (!value) return value;
-        return DateHelper.getIsoDateTimeString(value);
+        return DateHelper.getIsoDateTime(value);
       });
   }
 
@@ -76,7 +76,42 @@ class CommonValidators {
         invalid_type_error: messages?.invalid_type,
       })
       .min(3, messages?.min)
-      .max(8, messages?.max);
+      .max(8, messages?.max)
+      .superRefine((value, ctx) => {
+        const [id, dv] = value.split('-');
+
+        if (id.length > 8) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: messages?.max,
+          });
+        } else if (id.length < 3) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: messages?.min,
+          });
+        } else if (Number.isNaN(Number(id))) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: 'El numero de identificación del RUC debe ser un número',
+          });
+        }
+
+        if (!dv) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: 'El ruc debe contener el dígito verificador',
+          })
+        } else {
+          const dvNumber = Number(dv);
+          if (Number.isNaN(dvNumber) || dvNumber < 1 || dvNumber > 9) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: 'El dígito verificador debe ser un número entre 1 y 9',
+            })
+          }
+        }
+      });
   }
 
   name(messages?: Required & Type & Min & Max) {
