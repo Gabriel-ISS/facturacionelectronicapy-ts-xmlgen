@@ -11,7 +11,7 @@ import { InfoTarjetaSchema } from './infoTarjeta.schema';
 import dbService from '../../services/db.service';
 
 /**E7.1. Campos que describen la forma de pago de la operación al contado o del monto de la entrega inicial (E605-E619) */
-export const EntregasSchema = z
+export const EntregaSchema = z
   .object({
     // E606
     tipo: z.union(enumToZodUnion(PaymentType), {
@@ -115,4 +115,4 @@ export const EntregasSchema = z
     };
   });
 
-export type Entregas = z.infer<typeof EntregasSchema>;
+export type Entrega = z.infer<typeof EntregaSchema>;

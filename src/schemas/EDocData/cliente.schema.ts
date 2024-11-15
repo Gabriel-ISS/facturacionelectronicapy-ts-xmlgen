@@ -34,22 +34,22 @@ export const ClienteSchema = z
     documentoNumero: CommonValidators.identityDocNumber().optional(),
 
     // D211
-    razonSocial: z.string().min(4).max(255).default(DEFAULT_NAME),
+    razonSocial: CommonValidators.legalName(),
 
     // D212
-    nombreFantasia: z.string().min(4).max(255).optional(),
+    nombreFantasia: CommonValidators.tradeName().optional(),
 
     // D213
     direccion: CommonValidators.address().optional(),
 
     // D214: TODO: Debe incluir el prefijo de la ciudad si D203 = PRY
-    telefono: z.string().min(6).max(15).optional(),
+    telefono: CommonValidators.tel(),
 
     // D215
     celular: z.string().min(10).max(20).optional(),
 
     // D216
-    email: z.string().email().min(3).max(80).optional(),
+    email: CommonValidators.email().optional(),
 
     // D217 TODO: INVESTIGAR, PORQUE  NO SE ESPECIFICA QUE ES
     codigo: z.string().min(3).max(15).optional(),
@@ -77,6 +77,8 @@ export const ClienteSchema = z
       data.contribuyente == TaxpayerNotTaxpayer.NO_CONTRIBUYENTE;
     /**D202 = 4 */
     const isB2F = data.tipoOperacion == OperationType.B2F;
+    /**D208 = 5 */
+    const isNameless = data.documentoTipo == IdentityDocumentReceptor.INNOMINADO;
 
     // D205 - tipoContribuyente
     {
@@ -122,11 +124,25 @@ export const ClienteSchema = z
     {
       /*
       Obligatorio si D201 = 2 y D202 ≠ 4
+      En caso de DE innominado, completar con 0 (cero)
       VER: https://www.dnit.gov.py/documents/20123/420595/NT_E_KUATIA_002_MT_V150.pdf/b3656789-f42a-e578-4141-45046e452f41?t=1687353745841
-      TODO: En caso de DE innominado, completar con 0 (cero)
       */
       if (isNotTaxpayer && !isB2F) {
         validator.requiredField('documentoNumero');
+      }
+
+      if (isNameless) {
+        data.documentoNumero = '0';
+      }
+    }
+
+    // D211 - razonSocial
+    {
+      /*
+      En caso de ser innominado, completar con "Sin Nombre"
+      */
+      if (isNameless) {
+        data.razonSocial = DEFAULT_NAME;
       }
     }
 
@@ -184,10 +200,10 @@ export const ClienteSchema = z
         .description,
 
       // D206
-      rucID,
+      rucID: rucID as string | undefined,
 
       // D207
-      rucDV,
+      rucDV: rucDV as string | undefined,
 
       // D209
       descripcionTipoDocumento: dbService

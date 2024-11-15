@@ -26,6 +26,8 @@ export const UsuarioSchema = z
   .transform((data, ctx) => {
     const validator = new ZodValidator(ctx, data);
 
+    const isOtherDocument = data.documentoTipo == UserIdentityDocument.OTRO;
+
     // D141 - documentoTipoDescripcion
     {
       /*
@@ -33,16 +35,18 @@ export const UsuarioSchema = z
       documento de identidad del
       responsable de la generación del DE
       */
-      if (data.documentoTipo == UserIdentityDocument.OTRO) {
+      if (isOtherDocument) {
         validator.requiredField('documentoTipoDescripcion');
-      } else {
-        data.documentoTipoDescripcion = dbService
-          .select('userIdentityDocuments')
-          .findById(data.documentoTipo).description;
       }
     }
 
-    return data;
+    return {
+      ...data,
+      documentoTipoDescripcion: !isOtherDocument
+        ? dbService.select('userIdentityDocuments').findById(data.documentoTipo)
+            .description
+        : (data.documentoTipoDescripcion as string),
+    };
   });
 
 export type Usuario = z.infer<typeof UsuarioSchema>;

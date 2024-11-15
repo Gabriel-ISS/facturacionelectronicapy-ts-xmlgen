@@ -97,6 +97,9 @@ class CommonValidators {
           });
         }
 
+        /*TODO: en el numero de identificación del RUC, si es ruc de emisor 
+        no es necesario que use solo digitos numericos */
+
         if (!dv) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
@@ -122,6 +125,40 @@ class CommonValidators {
       })
       .min(4, messages?.min)
       .max(60, messages?.max);
+  }
+
+  legalName(messages?: Required & Type & Min & Max) {
+    return z
+      .string({
+        required_error: messages?.required,
+        invalid_type_error: messages?.invalid_type,
+      })
+      .min(4, messages?.min)
+      .max(255, messages?.max);
+  }
+
+  tradeName(messages?: Required & Type & Min & Max) {
+    return z
+      .string({
+        required_error: messages?.required,
+        invalid_type_error: messages?.invalid_type,
+      })
+      .min(4, messages?.min)
+      .max(255, messages?.max);
+  }
+  
+  tel(messages?: Required & Type & Min & Max) {
+    return z.string({
+      required_error: messages?.required,
+      invalid_type_error: messages?.invalid_type
+    }).min(6, messages?.min).max(15, messages?.max)
+  }
+
+  email(messages?: Required & Type & Min & Max) {
+    return z.string({
+      required_error: messages?.required,
+      invalid_type_error: messages?.invalid_type
+    }).email().min(3, messages?.min).max(80, messages?.max)
   }
 
   identityDocNumber(messages?: Required & Type & Min & Max) {
@@ -233,7 +270,7 @@ class CommonValidators {
       }, {
         message: 
         messages?.length ??
-        `El valor debe ser del tipo de código GTIN de 8 o 12 o 13 o 14 caracteres`,,
+        `El valor debe ser del tipo de código GTIN de 8 o 12 o 13 o 14 caracteres`,
       });
   }
 }

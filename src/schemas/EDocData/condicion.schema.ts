@@ -1,10 +1,10 @@
 import { z } from 'zod';
 import { PaymentCondition } from '../../constants/paymentCondition.constants';
 import { enumToZodUnion } from '../../helpers/validation/enumConverter';
-import { EntregasSchema } from './entregas.schema';
+import { EntregaSchema } from './entregas.schema';
 import dbService from '../../services/db.service';
 import ZodValidator from '../../helpers/validation/ZodValidator';
-import { CreditoSchema } from './credito.schema';
+import { Credito, CreditoSchema } from './credito.schema';
 
 export const CondicionSchema = z
   .object({
@@ -14,12 +14,12 @@ export const CondicionSchema = z
     }),
 
     // E7.1. Campos que describen la forma de pago de la operación al contado o del monto de la entrega inicial (E605-E619)
-    entregas: z.array(EntregasSchema).optional(),
+    entregas: z.array(EntregaSchema).optional(),
 
     // E7.2. Campos que describen la operación a crédito (E640-E649)
     credito: CreditoSchema.optional(),
   })
-  .superRefine((data, ctx) => {
+  .transform((data, ctx) => {
     const validator = new ZodValidator(ctx, data);
 
     const isInCash = data.tipo == PaymentCondition.CONTADO;
@@ -29,9 +29,10 @@ export const CondicionSchema = z
     {
       /*
       Obligatorio si E601 = 1
-      Obligatorio si existe el campo E645
+      Obligatorio si existe el campo E645: esto no se aplica en este repo ya que
+      E645 se calcula automáticamente en base a entregas
       */
-     if (isInCash || data.credito?.montoEntregaInicial) {
+      if (isInCash) {
         validator.requiredField('entregas');
       }
     }
@@ -49,8 +50,21 @@ export const CondicionSchema = z
       }
     }
 
+    // E645 - credito.montoEntregaInicial
+    let credito: Credito = data.credito as Credito;
+    {
+      // ⚠️ esto no es del manual, pero si del repo original
+      if (data.credito && data.entregas) {
+        credito.montoEntregaInicial = data.entregas.reduce(
+          (acc, entrega) => acc + entrega.monto,
+          0,
+        );
+      }
+    }
+
     return {
       ...data,
+      credito,
 
       // E602
       tipoDescripcion: dbService.select('paymentConditions').findById(data.tipo)

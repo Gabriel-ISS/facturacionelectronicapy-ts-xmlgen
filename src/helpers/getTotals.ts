@@ -1,7 +1,7 @@
 import { TaxRate } from '../constants/taxRate.constants';
 import { TaxTreatment } from '../constants/taxTreatments.constants';
 import { TaxType } from '../constants/taxTypes.constants';
-import { CompleteItem } from '../schemas/EDoc/item.schema';
+import { CompleteItem } from '../schemas/EDocData/item.schema';
 
 type Props = {
   items: CompleteItem[];

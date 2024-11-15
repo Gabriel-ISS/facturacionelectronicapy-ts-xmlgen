@@ -118,6 +118,11 @@ export const TransporteSchema = z
     return {
       ...data,
 
+      // E902
+      tipoDescripcion: dbService
+        .select('transportTypes')
+        .findByIdIfExist(data.tipo)?.description,
+
       // E904
       modalidadDescripcion: dbService
         .select('transportModalities')

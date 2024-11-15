@@ -19,11 +19,7 @@ export const CreditoSchema = z.object({
     new NumberLength(value, ctx).int().max(3);
   }),
 
-  // E645: OBS: NO APARECE EN FACTURASEND
-  montoEntregaInicial: z.number().optional().superRefine((value, ctx) => {
-    if (value == undefined) return;
-    new NumberLength(value, ctx).max(15).maxDecimals(4);
-  }),
+  // E645: lo calculamos en CondicionSchema
 
   // E7.2.1.Campos que describen las cuotas (E650-E659)
   infoCuotas: z.array(InfoCuotaSchema),
@@ -38,4 +34,7 @@ export const CreditoSchema = z.object({
   };
 });
 
-export type Credito = z.infer<typeof CreditoSchema>;
+export type Credito = z.infer<typeof CreditoSchema> & {
+  // E645
+  montoEntregaInicial?: number | undefined;
+};

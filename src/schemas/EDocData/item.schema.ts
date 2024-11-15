@@ -312,7 +312,7 @@ export const ItemSchema = z
           ctx,
           fieldName: 'pais',
           message: 'El pais no es válido',
-        }),
+        })?.description,
 
       // E710
       unidadMedidaDescripcion: dbService
@@ -321,12 +321,12 @@ export const ItemSchema = z
           ctx,
           fieldName: 'unidadMedida',
           message: 'Unidad de medida no encontrada',
-        }),
+        }).description,
 
       // E716
       toleranciaDescripcion: dbService
         .select('merchandiseRelevances')
-        .findByIdIfExist(data.tolerancia),
+        .findByIdIfExist(data.tolerancia)?.description,
 
       // E727
       precioTotal: data.precioUnitario * data.cantidad,

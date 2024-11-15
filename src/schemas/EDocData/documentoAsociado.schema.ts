@@ -61,14 +61,11 @@ export const DocumentoAsociadoSchema = z
     constanciaControl: z.string().length(8).optional(),
 
     /*
-    TODO:
-    Obligatorio cuando
-    el CDC del DTE
-    referenciado
-    corresponda a un
-    RUC fusionado
+    TODO: Obligatorio cuando el CDC del DTE referenciado
+    corresponda a un RUC fusionado
     */
-    // H018: VER: https://www.dnit.gov.py/documents/20123/420595/NT_E_KUATIA_023_MT_V150.pdf/9580922b-5dd5-60f9-4857-ae66a757898f?t=1724956850006
+    // H018
+    // VER: https://www.dnit.gov.py/documents/20123/420595/NT_E_KUATIA_023_MT_V150.pdf/9580922b-5dd5-60f9-4857-ae66a757898f?t=1724956850006
     rucFusionado: z.string().min(3).max(8).optional(),
   })
   .transform((data, ctx) => {
