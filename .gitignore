@@ -11,3 +11,6 @@ dist/
 logs/
 *.log
 npm-debug.log*
+
+# development
+.vscode/
