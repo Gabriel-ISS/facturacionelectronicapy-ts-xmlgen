@@ -27,10 +27,20 @@ class FacturaXMLSG {
     if (!dncp) return;
 
     return {
+
+      // E021
       dModCont: dncp.modalidad,
+
+      // E022
       dEntCont: dncp.entidad,
+
+      // E023
       dAnoCont: dncp.año,
+
+      // E024
       dSecCont: dncp.secuencia,
+
+      // E025
       dFeCodCont: dncp.fecha,
     };
   }

@@ -7,7 +7,10 @@ class NotaCreditoDebitoXMLSG {
     if (!notaCreditoDebito) return;
 
     return {
+      // E401
       iMotEmi: notaCreditoDebito.motivo,
+
+      // E402
       dDesMotEmi: notaCreditoDebito.motivoDescripcion,
     };
   }

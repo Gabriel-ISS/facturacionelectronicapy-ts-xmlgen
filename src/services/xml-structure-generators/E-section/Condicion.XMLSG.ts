@@ -26,11 +26,22 @@ class CondicionXMLSG {
   /**E7.1. Campos que describen la forma de pago de la operación al contado o del monto*/
   private get_gPaConEIni(data: EDocData) {
     return data.condicion?.entregas?.map((entrega) => ({
+      // E606
       iTiPago: entrega.tipo,
+
+      // E607
       dDesTiPag: entrega.tipoDescripcion,
+
+      // E608
       dMonTiPag: entrega.monto,
+
+      // E609
       cMoneTiPag: entrega.moneda,
+
+      // E610
       dDMoneTiPag: entrega.monedaDescripcion,
+
+      // E611
       dTiCamTiPag: entrega.cambio,
 
       // E7.1.1.Campos que describen el pago o entrega inicial de la operación con tarjeta de crédito/débito
@@ -47,14 +58,31 @@ class CondicionXMLSG {
     if (!infoTarjeta) return;
 
     return {
+      // E621
       iDenTarj: infoTarjeta.tipo,
+
+      // E622
       dDesDenTarj: infoTarjeta.tipoDescripcion,
+
+      // E623
       dRSProTar: infoTarjeta.razonSocial,
+
+      // E624
       dRUCProTar: infoTarjeta.rucID,
+
+      // E625
       dDVProTar: infoTarjeta.rucDV,
+
+      // E626
       iForProPa: infoTarjeta.medioPago,
+
+      // E627
       dCodAuOpe: infoTarjeta.codigoAutorizacion,
+
+      // E628
       dNomTit: infoTarjeta.titular,
+
+      // E629
       dNumTarj: infoTarjeta.numero,
     };
   }
@@ -65,7 +93,10 @@ class CondicionXMLSG {
     if (!infoCheque) return;
 
     return {
+      // E631
       dNumCheq: infoCheque.numeroCheque,
+
+      // E632
       dBcoEmi: infoCheque.banco,
     };
   }

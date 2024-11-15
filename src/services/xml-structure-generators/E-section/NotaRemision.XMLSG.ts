@@ -7,12 +7,25 @@ class NotaRemisionXMLSG {
     if (!remision) return;
 
     return {
-      iMotEmiNR: remision.motivo, //E501
+      // E501
+      iMotEmiNR: remision.motivo,
+
+      // E502
       dDesMotEmiNR: remision.motivoDescripcion,
+
+      // E503
       iRespEmiNR: remision.tipoResponsable,
+
+      // E504
       dDesRespEmiNR: remision.descripcionTipoResponsable,
+
+      // E505
       dKmR: remision.kms,
+
+      // E506
       dFecEm: remision.fechaFactura,
+
+      // E507
       cPreFle: remision.costoFlete,
     };
   }
