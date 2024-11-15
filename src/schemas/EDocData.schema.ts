@@ -144,9 +144,7 @@ export const EDocDataSchema = z
     moneda: CommonValidators.currency().default(Currency.GUARANI),
 
     // D017
-    condicionTipoCambio: z
-      .union(enumToZodUnion(GlobalAndPerItem))
-      .optional(),
+    condicionTipoCambio: z.union(enumToZodUnion(GlobalAndPerItem)).optional(),
 
     // D018
     cambio: CommonValidators.currencyChange().optional(),
@@ -227,7 +225,9 @@ export const EDocDataSchema = z
     complementarios: ComplementariosSchema.optional(),
 
     // H. Campos que identifican al documento asociado (H001-H049)
-    documentoAsociado: DocumentoAsociadoSchema.optional(),
+    documentoAsociado: z
+      .union([DocumentoAsociadoSchema, DocumentoAsociadoSchema.array()])
+      .optional(),
   })
   .transform((data, ctx) => {
     type Data = typeof data;
@@ -1007,4 +1007,4 @@ export const EDocDataSchema = z
     };
   });
 
-  export type EDocDataInput = z.input<typeof EDocDataSchema>;
+export type EDocDataInput = z.input<typeof EDocDataSchema>;

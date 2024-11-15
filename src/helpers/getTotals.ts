@@ -617,7 +617,23 @@ export default function getTotals({
       ivaComision,
       ...valid
     } = totals;
-    return valid;
+
+    type OmittedKeys =
+      | 'subtotalExento'
+      | 'subtotalExonerado'
+      | 'subtotalIva5'
+      | 'subtotalIva10'
+      | 'liquidacionIva5'
+      | 'liquidacionIva10'
+      | 'liquidacionTotalIva'
+      | 'totalIvaGrabado5'
+      | 'totalIvaGrabado10'
+      | 'totalIvaGrabado'
+      | 'totalGuaranies'
+      | 'ivaComision';
+
+    type Result = SecureOmit<Totals, OmittedKeys> & Partial<Pick<Totals, OmittedKeys>>;
+    return valid as Result;
   } else {
     return totals;
   }
