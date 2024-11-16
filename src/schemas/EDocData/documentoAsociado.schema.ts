@@ -3,7 +3,7 @@ import { AssociatedDocumentType } from '../../constants/associatedDocumentTypes.
 import { ConstancyType } from '../../constants/constancyTypes.constants';
 import { PrintedDocumentType } from '../../constants/printedDocumentTypes.constants';
 import CommonValidators from '../../helpers/validation/CommonValidators';
-import { enumToZodUnion } from '../../helpers/validation/enumConverter';
+
 import NumberLength from '../../helpers/validation/NumberLenght';
 import ZodValidator from '../../helpers/validation/ZodValidator';
 import dbService from '../../services/db.service';
@@ -12,15 +12,15 @@ import dbService from '../../services/db.service';
 export const DocumentoAsociadoSchema = z
   .object({
     // H002
-    formato: z.union(enumToZodUnion(AssociatedDocumentType), {
+    formato: z.nativeEnum(AssociatedDocumentType, {
       required_error: 'El campo formato es requerido',
     }),
 
     // H004
-    cdc: z.string().length(44).optional(),
+    cdc: CommonValidators.cdc().optional(),
 
     // H005
-    timbrado: z.string().length(8).optional(),
+    timbrado: CommonValidators.timbardo().optional(),
 
     // H006
     establecimiento: CommonValidators.zeroPadToLength(3).optional(),
@@ -33,7 +33,7 @@ export const DocumentoAsociadoSchema = z
 
     // H009
     tipoDocumentoImpreso: z
-      .union(enumToZodUnion(PrintedDocumentType))
+      .nativeEnum(PrintedDocumentType)
       .optional(),
 
     // H011
@@ -46,7 +46,7 @@ export const DocumentoAsociadoSchema = z
     resolucionCreditoFiscal: z.string().length(15).optional(),
 
     // H014
-    constanciaTipo: z.union(enumToZodUnion(ConstancyType)).optional(),
+    constanciaTipo: z.nativeEnum(ConstancyType).optional(),
 
     // H016
     constanciaNumero: z

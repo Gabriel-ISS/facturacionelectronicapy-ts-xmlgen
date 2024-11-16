@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { Department } from '../../constants/departments.constants';
 import NumberLength from '../../helpers/validation/NumberLenght';
-import { enumToZodUnion } from '../../helpers/validation/enumConverter';
+
 import ZodValidator from '../../helpers/validation/ZodValidator';
 import dbService from '../../services/db.service';
 import CommonValidators from '../../helpers/validation/CommonValidators';
@@ -46,7 +46,7 @@ export const SalidaYEntregaSchema = z
     numeroCasa: CommonValidators.houseNumber().default(0),
     complementoDireccion1: CommonValidators.address().optional(),
     complementoDireccion2: CommonValidators.address().optional(),
-    departamento: z.union(enumToZodUnion(Department)),
+    departamento: z.nativeEnum(Department),
     distrito: CommonValidators.district().optional(),
     ciudad: CommonValidators.city(),
     telefonoContacto: z.string().min(6).max(15).optional(),

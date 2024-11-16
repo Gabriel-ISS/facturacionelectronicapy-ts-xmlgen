@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { Currency } from '../../constants/curencies.constants';
 import { PaymentType } from '../../constants/paymentTypes.constants';
 import CommonValidators from '../../helpers/validation/CommonValidators';
-import { enumToZodUnion } from '../../helpers/validation/enumConverter';
+
 import NumberLength from '../../helpers/validation/NumberLenght';
 import ZodValidator from '../../helpers/validation/ZodValidator';
 import constantsService from '../../services/constants.service';
@@ -14,7 +14,7 @@ import dbService from '../../services/db.service';
 export const EntregaSchema = z
   .object({
     // E606
-    tipo: z.union(enumToZodUnion(PaymentType), {
+    tipo: z.nativeEnum(PaymentType, {
       required_error: 'El tipo de pago es requerido',
     }),
 

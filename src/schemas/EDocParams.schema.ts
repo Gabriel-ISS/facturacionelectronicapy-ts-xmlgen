@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { ActividadEconomicaSchema } from './params/actividadEconomica.schema';
 import { EstablecimientoSchema } from './params/establecimiento.schema';
 import CommonValidators from '../helpers/validation/CommonValidators';
-import { enumToZodUnion } from '../helpers/validation/enumConverter';
+
 import { RegimeType } from '../constants/regimeTypes.constants';
 
 export const EDocParamsSchema = z.object({
@@ -20,7 +20,7 @@ export const EDocParamsSchema = z.object({
   tipoContribuyente: CommonValidators.taxpayer(),
 
   // D104
-  tipoRegimen: z.union(enumToZodUnion(RegimeType)).optional(),
+  tipoRegimen: z.nativeEnum(RegimeType).optional(),
 
   // D105
   razonSocial: CommonValidators.legalName(),

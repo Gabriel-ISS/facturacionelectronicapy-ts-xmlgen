@@ -1,14 +1,14 @@
 import { z } from 'zod';
 import { InfoCuotaSchema } from './infoCuota.schema';
 import { CreditType } from '../../constants/creditTypes.constants';
-import { enumToZodUnion } from '../../helpers/validation/enumConverter';
+
 import dbService from '../../services/db.service';
 import NumberLength from '../../helpers/validation/NumberLenght';
 
 /**E7.2. Campos que describen la operación a crédito (E640-E649) */
 export const CreditoSchema = z.object({
   // E641
-  tipo: z.union(enumToZodUnion(CreditType)),
+  tipo: z.nativeEnum(CreditType),
   
   // E643
   plazo: z.string().min(2).max(12).optional(),

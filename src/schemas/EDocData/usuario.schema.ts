@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { UserIdentityDocument } from '../../constants/userIdentityDocuments.constants';
 import CommonValidators from '../../helpers/validation/CommonValidators';
-import { enumToZodUnion } from '../../helpers/validation/enumConverter';
+
 import ZodValidator from '../../helpers/validation/ZodValidator';
 import dbService from '../../services/db.service';
 
@@ -9,7 +9,7 @@ import dbService from '../../services/db.service';
 export const UsuarioSchema = z
   .object({
     // D141
-    documentoTipo: z.union(enumToZodUnion(UserIdentityDocument)),
+    documentoTipo: z.nativeEnum(UserIdentityDocument),
 
     // D142
     documentoTipoDescripcion: z.string().min(9).max(41).optional(),

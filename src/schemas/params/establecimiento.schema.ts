@@ -38,24 +38,12 @@ export const EstablecimientoSchema = z
     denominacion: z.string().min(1).max(30).optional(),
   })
   .transform((data, ctx) => {
-
-    let errors: string[] = [];
-
-    if (data.distrito) {
-      constantsService.validateLocation(
-        'params.establecimientos',
-        data.departamento,
-        data.distrito,
-        data.ciudad,
-        errors,
-      );
-      errors.forEach((error) => {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: error,
-        });
-      });
-    }
+    CommonValidators.location(
+      ctx,
+      data.departamento,
+      data.distrito,
+      data.ciudad,
+    );
 
     return {
       ...data,

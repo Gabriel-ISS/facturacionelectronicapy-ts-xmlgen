@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { PresenceIndicator } from '../../constants/presenceIndicators.constants';
 import CommonValidators from '../../helpers/validation/CommonValidators';
-import { enumToZodUnion } from '../../helpers/validation/enumConverter';
+
 import dbService from '../../services/db.service';
 import ZodValidator from '../../helpers/validation/ZodValidator';
 
@@ -9,7 +9,7 @@ import ZodValidator from '../../helpers/validation/ZodValidator';
 export const FacturaSchema = z
   .object({
     // E011
-    presencia: z.union(enumToZodUnion(PresenceIndicator)),
+    presencia: z.nativeEnum(PresenceIndicator),
 
     // E012
     descripcionPresencia: z.string().min(10).max(30).optional(),

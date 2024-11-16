@@ -12,7 +12,7 @@ import { TransactionType } from '../constants/transactionTypes.constants';
 import getTotals from '../helpers/getTotals';
 import { Path } from '../helpers/Path';
 import CommonValidators from '../helpers/validation/CommonValidators';
-import { enumToZodUnion } from '../helpers/validation/enumConverter';
+
 import NumberLength from '../helpers/validation/NumberLenght';
 import ZodValidator from '../helpers/validation/ZodValidator';
 import dbService from '../services/db.service';
@@ -48,7 +48,7 @@ export const EDocDataSchema = z
     // A. Campos firmados del Documento Electrónico (A001-A099)
 
     // para calcular A002
-    cdc: z.string().length(44).optional(),
+    cdc: CommonValidators.cdc().optional(),
 
     // A004
     fechaFirmaDigital: z.coerce
@@ -63,8 +63,7 @@ export const EDocDataSchema = z
     // B. Campos inherentes a la operación de Documentos Electrónicos (B001-B099)
 
     // B002
-    tipoEmision: z
-      .union(enumToZodUnion(EmissionType))
+    tipoEmision: z.nativeEnum(EmissionType)
       .default(EmissionType.NORMAL),
 
     // B004
@@ -99,7 +98,7 @@ export const EDocDataSchema = z
     // C. Campos de datos del Timbrado (C001-C099)
 
     // C002
-    tipoDocumento: z.union(enumToZodUnion(ValidDocumentType)),
+    tipoDocumento: z.nativeEnum(ValidDocumentType),
 
     // C005: Debe coincidir con la estructura de timbrado
     establecimiento: CommonValidators.zeroPadToLength(3),
@@ -112,20 +111,7 @@ export const EDocDataSchema = z
 
     // C010: obligatorio cuando se consumió la numeración permitida
     // VER: "10.5. Manejo del timbrado y Numeración"
-    serie: z
-      .string()
-      .optional()
-      .refine(
-        (value) => {
-          if (value == undefined) return true;
-
-          // Solo 2 letras mayúsculas
-          return /^[A-Z]{2}$/.test(value);
-        },
-        {
-          message: 'El valor debe ser exactamente 2 letras mayúsculas',
-        },
-      ),
+    serie: CommonValidators.serie().optional(),
 
     // D. Campos Generales del Documento Electrónico DE (D001-D299)
 
@@ -133,24 +119,23 @@ export const EDocDataSchema = z
     fecha: CommonValidators.isoDateTime(),
 
     // D011: En este repo se agrega el tipo por defecto
-    tipoTransaccion: z
-      .union(enumToZodUnion(TransactionType))
+    tipoTransaccion: z.nativeEnum(TransactionType)
       .default(TransactionType.VENTA_DE_MERCADERIA),
 
     // D013
-    tipoImpuesto: z.union(enumToZodUnion(TaxType)),
+    tipoImpuesto: z.nativeEnum(TaxType),
 
     // D015
     moneda: CommonValidators.currency().default(Currency.GUARANI),
 
     // D017
-    condicionTipoCambio: z.union(enumToZodUnion(GlobalAndPerItem)).optional(),
+    condicionTipoCambio: z.nativeEnum(GlobalAndPerItem).optional(),
 
     // D018
     cambio: CommonValidators.currencyChange().optional(),
 
     // D019
-    condicionAnticipo: z.union(enumToZodUnion(GlobalAndPerItem)).optional(),
+    condicionAnticipo: z.nativeEnum(GlobalAndPerItem).optional(),
 
     // https://www.dnit.gov.py/documents/20123/420595/NT_E_KUATIA_018_MT_V150-+Junio.pdf/2ace18c4-5c03-c339-7f5c-bed6d5b5eb5e?t=1717699899642
     // D1.1. Campos que identifican las obligaciones afectadas (D030-D040)

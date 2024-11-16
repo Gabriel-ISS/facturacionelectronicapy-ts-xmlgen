@@ -4,15 +4,12 @@ import { MerchandiseRelevance } from '../../constants/merchandiseRelevances.cons
 import { TaxTreatment } from '../../constants/taxTreatments.constants';
 import DateHelper from '../../helpers/DateHelper';
 import NumberLength from '../../helpers/validation/NumberLenght';
-import {
-  enumToZodEnum,
-  enumToZodUnion,
-} from '../../helpers/validation/enumConverter';
 import dbService from '../../services/db.service';
 import { ItemDncpSchema } from './itemDncp.schema';
 import { SectorAutomotorSchema } from './sectorAutomotor.schema';
 import { TaxRate } from '../../constants/taxRate.constants';
 import ZodValidator from '../../helpers/validation/ZodValidator';
+import CommonValidators from '../../helpers/validation/CommonValidators';
 
 /**E8. Campos que describen los ítems de la operación (E700-E899) */
 export const ItemSchema = z
@@ -71,13 +68,13 @@ export const ItemSchema = z
       }),
 
     // E712
-    pais: z.enum(enumToZodEnum<typeof Country, Country>(Country)).optional(),
+    pais: CommonValidators.country().optional(),
 
     // E714
     observacion: z.string().min(1).max(500).optional(),
 
     // E715
-    tolerancia: z.union(enumToZodUnion(MerchandiseRelevance)).optional(),
+    tolerancia: z.nativeEnum(MerchandiseRelevance).optional(),
 
     // E717
     toleranciaCantidad: z
@@ -139,7 +136,7 @@ export const ItemSchema = z
     // E8.2. Campos que describen el IVA de la operación por ítem (E730-E739)
 
     // E731
-    ivaTipo: z.union(enumToZodUnion(TaxTreatment), {
+    ivaTipo: z.nativeEnum(TaxTreatment, {
       required_error: 'El tipo de IVA es requerido',
     }),
 
@@ -147,7 +144,7 @@ export const ItemSchema = z
     proporcionGravada: z.number().min(0).max(100).optional(),
 
     // E734
-    iva: z.union(enumToZodUnion(TaxRate), {
+    iva: z.nativeEnum(TaxRate, {
       required_error: 'La tasa del IVA es requerida',
     }),
 

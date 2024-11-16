@@ -2,9 +2,6 @@ import { z } from 'zod';
 import { CargoCharacteristic } from '../../constants/cargoCharacteristics.constants';
 import { MeasurementUnit } from '../../constants/measurementUnits.constants';
 import NumberLength from '../../helpers/validation/NumberLenght';
-import {
-  enumToZodUnion
-} from '../../helpers/validation/enumConverter';
 import dbService from '../../services/db.service';
 import ZodValidator from '../../helpers/validation/ZodValidator';
 
@@ -13,7 +10,7 @@ export const CargaSchema = z
   .object({
     // G051
     unidadMedidaVolumenTotal: z
-      .union(enumToZodUnion(MeasurementUnit))
+      .nativeEnum(MeasurementUnit)
       .optional(),
 
     // G053
@@ -26,7 +23,7 @@ export const CargaSchema = z
       }),
 
     // G054
-    unidadMedidaPesoTotal: z.union(enumToZodUnion(MeasurementUnit)).optional(),
+    unidadMedidaPesoTotal: z.nativeEnum(MeasurementUnit).optional(),
 
     // G056
     pesoTotal: z
@@ -39,7 +36,7 @@ export const CargaSchema = z
 
     // G057
     caracteristicaCarga: z
-      .union(enumToZodUnion(CargoCharacteristic))
+      .nativeEnum(CargoCharacteristic)
       .optional(),
 
     // G058: OBS: OBLIGATORIO PARA KUDE

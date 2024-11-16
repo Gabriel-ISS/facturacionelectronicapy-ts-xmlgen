@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { FreightResponsible } from '../../constants/freightResponsibles.constants';
 import { RemissionReason } from '../../constants/remissionReasons.constants';
 import DateHelper from '../../helpers/DateHelper';
-import { enumToZodUnion } from '../../helpers/validation/enumConverter';
+
 import constantsService from '../../services/constants.service';
 import NumberLength from '../../helpers/validation/NumberLenght';
 import CommonValidators from '../../helpers/validation/CommonValidators';
@@ -21,7 +21,7 @@ export const RemisionSchema = z
      * relacionadas)
      */
     // E501
-    motivo: z.union(enumToZodUnion(RemissionReason), {
+    motivo: z.nativeEnum(RemissionReason, {
       required_error: 'El motivo de la emisión es requerido',
     }),
 
@@ -29,7 +29,7 @@ export const RemisionSchema = z
     motivoDescripcion: z.string().min(5).max(60).optional(),
 
     // E503,
-    tipoResponsable: z.union(enumToZodUnion(FreightResponsible), {
+    tipoResponsable: z.nativeEnum(FreightResponsible, {
       required_error: 'El tipo de responsable es requerido',
     }),
 

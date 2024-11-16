@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { IdentityDocumentCarriers } from '../../constants/identityDocumentsCarriers.constants';
 import CommonValidators from '../../helpers/validation/CommonValidators';
-import { enumToZodUnion } from '../../helpers/validation/enumConverter';
+
 import ZodValidator from '../../helpers/validation/ZodValidator';
 import { AgenteSchema } from './agente.schema';
 import { ChoferSchema } from './chofer.schema';
@@ -21,7 +21,7 @@ export const TransportistaSchema = z
     ruc: CommonValidators.ruc(),
 
     // E985
-    documentoTipo: z.union(enumToZodUnion(IdentityDocumentCarriers)).optional(),
+    documentoTipo: z.nativeEnum(IdentityDocumentCarriers).optional(),
 
     // E987
     documentoNumero: CommonValidators.identityDocNumber().optional(),

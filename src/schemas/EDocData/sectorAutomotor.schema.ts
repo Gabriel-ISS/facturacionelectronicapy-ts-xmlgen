@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { FuelType } from '../../constants/fuelTypes.constants';
 import { VehicleOperationType } from '../../constants/vehicleOperationTypes.constants';
 import NumberLength from '../../helpers/validation/NumberLenght';
-import { enumToZodUnion } from '../../helpers/validation/enumConverter';
+
 import dbService from '../../services/db.service';
 import ZodValidator from '../../helpers/validation/ZodValidator';
 
@@ -10,7 +10,7 @@ import ZodValidator from '../../helpers/validation/ZodValidator';
 export const SectorAutomotorSchema = z
   .object({
     // E771
-    tipo: z.union(enumToZodUnion(VehicleOperationType)).optional(),
+    tipo: z.nativeEnum(VehicleOperationType).optional(),
 
     // E773
     chasis: z.string().length(17).optional(),
@@ -55,7 +55,7 @@ export const SectorAutomotorSchema = z
       }),
 
     // E779
-    tipoCombustible: z.union(enumToZodUnion(FuelType)).optional(),
+    tipoCombustible: z.nativeEnum(FuelType).optional(),
 
     // E780
     tipoCombustibleDescripcion: z.string().min(3).max(20).optional(),

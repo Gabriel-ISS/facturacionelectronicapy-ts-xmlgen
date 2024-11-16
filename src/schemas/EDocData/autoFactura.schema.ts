@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { Department } from '../../constants/departments.constants';
 import { IdentityDocumentCarriers } from '../../constants/identityDocumentsCarriers.constants';
 import { SellerNatureSelfInvoicing } from '../../constants/sellerNatureSelfInvoicingCases.constants';
-import { enumToZodUnion } from '../../helpers/validation/enumConverter';
+
 import { UbicacionSchema } from './ubicacion.schema';
 import constantsService from '../../services/constants.service';
 import CommonValidators from '../../helpers/validation/CommonValidators';
@@ -13,12 +13,12 @@ import dbService from '../../services/db.service';
 export const AutoFacturaSchema = z
   .object({
     // E301
-    tipoVendedor: z.union(enumToZodUnion(SellerNatureSelfInvoicing), {
+    tipoVendedor: z.nativeEnum(SellerNatureSelfInvoicing, {
       required_error: 'El tipo de vendedor es requerido',
     }),
 
     // E304
-    documentoTipo: z.union(enumToZodUnion(IdentityDocumentCarriers), {
+    documentoTipo: z.nativeEnum(IdentityDocumentCarriers, {
       required_error: 'El tipo de documento es requerido',
     }),
 

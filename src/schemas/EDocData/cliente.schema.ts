@@ -5,7 +5,7 @@ import { DEFAULT_NAME } from '../../constants/other.constants';
 import { Taxpayer } from '../../constants/taxpayer.constants';
 import { TaxpayerNotTaxpayer } from '../../constants/taxpayerNotTaxpayer.constants';
 import CommonValidators from '../../helpers/validation/CommonValidators';
-import { enumToZodUnion } from '../../helpers/validation/enumConverter';
+
 import ZodValidator from '../../helpers/validation/ZodValidator';
 import dbService from '../../services/db.service';
 
@@ -16,19 +16,19 @@ export const ClienteSchema = z
     contribuyente: CommonValidators.taxpayer(),
 
     // D202
-    tipoOperacion: z.union(enumToZodUnion(OperationType)),
+    tipoOperacion: z.nativeEnum(OperationType),
 
     // D203
     pais: CommonValidators.country(),
 
     // D205
-    tipoContribuyente: z.union(enumToZodUnion(Taxpayer)).optional(),
+    tipoContribuyente: z.nativeEnum(Taxpayer).optional(),
 
     // para obtener D206 y D207
     ruc: CommonValidators.ruc().optional(),
 
     // D208
-    documentoTipo: z.union(enumToZodUnion(IdentityDocumentReceptor)).optional(),
+    documentoTipo: z.nativeEnum(IdentityDocumentReceptor).optional(),
 
     // D210
     documentoNumero: CommonValidators.identityDocNumber().optional(),

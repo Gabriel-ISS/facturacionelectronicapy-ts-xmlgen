@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { enumToZodUnion } from '../../helpers/validation/enumConverter';
+
 import { Obligation } from '../../constants/obligations.constants';
 import dbService from '../../services/db.service';
 
@@ -9,7 +9,7 @@ import dbService from '../../services/db.service';
 export const ObligacionSchema = z
   .object({
     // D031
-    codigo: z.union(enumToZodUnion(Obligation)),
+    codigo: z.nativeEnum(Obligation),
   })
   .transform((data, ctx) => {
     return {

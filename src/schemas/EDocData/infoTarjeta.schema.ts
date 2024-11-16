@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { CreditCardProcessingMethod } from '../../constants/creditCardProcessingMethods.constants';
 import { CreditCard } from '../../constants/creditCards.constants';
-import { enumToZodUnion } from '../../helpers/validation/enumConverter';
+
 import constantsService from '../../services/constants.service';
 import CommonValidators from '../../helpers/validation/CommonValidators';
 import NumberLength from '../../helpers/validation/NumberLenght';
@@ -12,7 +12,7 @@ import dbService from '../../services/db.service';
 export const InfoTarjetaSchema = z
   .object({
     // E621
-    tipo: z.union(enumToZodUnion(CreditCard), {
+    tipo: z.nativeEnum(CreditCard, {
       required_error: 'El tipo de tarjeta es requerido',
     }),
 
@@ -26,7 +26,7 @@ export const InfoTarjetaSchema = z
     ruc: CommonValidators.ruc().optional(),
 
     // E626
-    medioPago: z.union(enumToZodUnion(CreditCardProcessingMethod), {
+    medioPago: z.nativeEnum(CreditCardProcessingMethod, {
       required_error: 'El medio de pago es requerido',
     }),
 

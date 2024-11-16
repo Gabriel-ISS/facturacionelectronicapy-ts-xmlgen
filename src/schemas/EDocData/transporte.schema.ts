@@ -1,15 +1,10 @@
 import { z } from 'zod';
-import { Country } from '../../constants/countries.constants';
 import { FreightResponsible } from '../../constants/freightResponsibles.constants';
 import { TradingCondition } from '../../constants/tradingConditions.constants';
 import { TransportModality } from '../../constants/transportModalities.constants';
 import { TransportType } from '../../constants/transportTypes.constants';
 import { Path } from '../../helpers/Path';
 import CommonValidators from '../../helpers/validation/CommonValidators';
-import {
-  enumToZodEnum,
-  enumToZodUnion,
-} from '../../helpers/validation/enumConverter';
 import ZodValidator from '../../helpers/validation/ZodValidator';
 import dbService from '../../services/db.service';
 import { SalidaYEntregaSchema } from './salidaYEntrega.schema';
@@ -19,22 +14,16 @@ import { VehiculoSchema } from './vehiculo.schema';
 export const TransporteSchema = z
   .object({
     // E901
-    tipo: z.union(enumToZodUnion(TransportType)).optional(),
+    tipo: z.nativeEnum(TransportType).optional(),
 
     // E903
-    modalidad: z.union(enumToZodUnion(TransportModality)),
+    modalidad: z.nativeEnum(TransportModality),
 
     // E905
-    tipoResponsable: z.union(enumToZodUnion(FreightResponsible)),
+    tipoResponsable: z.nativeEnum(FreightResponsible),
 
     // E906
-    condicionNegociacion: z
-      .enum(
-        enumToZodEnum<typeof TradingCondition, TradingCondition>(
-          TradingCondition,
-        ),
-      )
-      .optional(),
+    condicionNegociacion: z.nativeEnum(TradingCondition).optional(),
 
     // E907
     numeroManifiesto: z.string().min(1).max(15).optional(),
@@ -49,9 +38,7 @@ export const TransporteSchema = z
     finEstimadoTranslado: CommonValidators.isoDate().optional(),
 
     // E911
-    paisDestino: z
-      .enum(enumToZodEnum<typeof Country, Country>(Country))
-      .optional(),
+    paisDestino: CommonValidators.country().optional(),
 
     // (E920) E10.1. Campos que identifican el local de salida de las mercaderías (E920-E939)
     salida: SalidaYEntregaSchema.optional(),

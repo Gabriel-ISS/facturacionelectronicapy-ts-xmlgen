@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { PaymentCondition } from '../../constants/paymentCondition.constants';
-import { enumToZodUnion } from '../../helpers/validation/enumConverter';
+
 import { EntregaSchema } from './entregas.schema';
 import dbService from '../../services/db.service';
 import ZodValidator from '../../helpers/validation/ZodValidator';
@@ -9,7 +9,7 @@ import { Credito, CreditoSchema } from './credito.schema';
 export const CondicionSchema = z
   .object({
     // E601
-    tipo: z.union(enumToZodUnion(PaymentCondition), {
+    tipo: z.nativeEnum(PaymentCondition, {
       required_error: 'La condición de la operación es requerida',
     }),
 
