@@ -12,7 +12,6 @@ import { TransactionType } from '../constants/transactionTypes.constants';
 import getTotals from '../helpers/getTotals';
 import { Path } from '../helpers/Path';
 import CommonValidators from '../helpers/validation/CommonValidators';
-
 import NumberLength from '../helpers/validation/NumberLenght';
 import ZodValidator from '../helpers/validation/ZodValidator';
 import dbService from '../services/db.service';
@@ -180,7 +179,6 @@ export const EDocDataSchema = z
 
     // E9. Campos complementarios comerciales de uso específico (E790-E899)
 
-    // TODO: ahora puede aparecer hasta 9 veces, como es eso?
     // VER: https://www.dnit.gov.py/documents/20123/420595/NT_E_KUATIA_023_MT_V150.pdf/9580922b-5dd5-60f9-4857-ae66a757898f?t=1724956850006
     // E9.2. Sector Energía Eléctrica (E791-E799)
     sectorEnergiaElectrica: SectorEnergiaElectricaSchema.optional(),
@@ -211,7 +209,7 @@ export const EDocDataSchema = z
 
     // H. Campos que identifican al documento asociado (H001-H049)
     documentoAsociado: z
-      .union([DocumentoAsociadoSchema, DocumentoAsociadoSchema.array()])
+      .union([DocumentoAsociadoSchema, DocumentoAsociadoSchema.array().max(99)])
       .optional(),
   })
   .transform((data, ctx) => {
@@ -457,7 +455,7 @@ export const EDocDataSchema = z
     {
       /*
       Obligatorio si D202 = 3
-      TODO: Informar se existe el código de la DNCP (cual de todos?)
+      OBS: Informar se existe el código de la DNCP
       */
       if (operationIsB2G) {
         data.items.forEach((_item, i) => {
@@ -488,8 +486,7 @@ export const EDocDataSchema = z
       /*
       Obligatorio si C002 ≠ 7
       No informar si C002 = 7
-      TODO: de momento voy a asumir que es un error explicado
-      en las notas de desarrollador
+      DELETE: eliminar cuando se resuelva
       */
       /* if (isElectronicRemissionNote) {
       
@@ -521,7 +518,7 @@ export const EDocDataSchema = z
       Obligatorio si D013=1, 3, 4 o 5 y
       C002 ≠ 4 o 7
       No informar si D013=2 y C002= 4
-      o 7. TODO: TODO, ASUMIRÉ QUE ES UN ERROR HASTA LEER LAS DEV-NOTES
+      DELETE: eliminar cuando se resuelva
       */
     }
 
@@ -700,9 +697,6 @@ export const EDocDataSchema = z
       }
     }
 
-    // TODO: VALIDAR CDC
-
-    // TODO: VER CALCULO
     const totalItemsPrice = data.items.reduce(
       (acc, item) => acc + item.precioUnitario * item.cantidad,
       0,
@@ -722,12 +716,6 @@ export const EDocDataSchema = z
         (data.descuentoGlobal * itemPercentageOfAllItems) / 100;
       const globalDiscountItemUnit = globalDiscountItem / item.cantidad;
 
-      /*TODO: (por que lo dejo comentado?)
-      if (data.moneda === 'PYG') {
-        //jsonResult['dDescGloItem'] = parseFloat(jsonResult['dDescGloItem']).toFixed(config.pygDecimals);
-      }
-      */
-
       return globalDiscountItemUnit;
     };
 
@@ -743,12 +731,6 @@ export const EDocDataSchema = z
         (data.anticipoGlobal * itemPercentageOfAllItems) / 100;
       const globalDiscountItemUnit = globalDiscountItem / item.cantidad;
 
-      /* TODO:
-      if (data.moneda === 'PYG') {
-        jsonResult['dAntGloPreUniIt'] = parseFloat(jsonResult['dAntGloPreUniIt']).toFixed(config.pygDecimals);
-      }
-      */
-
       return globalDiscountItemUnit;
     };
 
@@ -758,21 +740,29 @@ export const EDocDataSchema = z
       Si D013 = 1, 3, 4 o 5 (afectado al
       IVA, Renta, ninguno, IVA - Renta),
       entonces EA008 corresponde al
-      cálculo aritmético: (E721 (Precio
-      unitario) – EA002 (Descuento
-      particular) – EA004 (Descuento
-      global) – EA006 (Anticipo
-      particular) – EA007 (Anticipo
-      global)) * E711(cantidad)
-      Cálculo para Autofactura
-      (C002=4):
+      cálculo aritmético: 
+      (
+        E721 (Precio unitario) – 
+        EA002 (Descuento particular) – 
+        EA004 (Descuento global) – 
+        EA006 (Anticipo particular) – 
+        EA007 (Anticipo global)
+      ) * E711(cantidad)
+      Cálculo para Autofactura (C002=4):
       E721*E711
       */
 
-      // TODO: que pasa si es ISC y no es auto-factura? ahora retorna 0, pero no se como se debería de tratar
+      const itemPrice = isAutoInvoice ? item.precioUnitario : (
+        item.precioUnitario -
+        data.descuentoGlobal -
+        data.anticipoGlobal -
+        (item.descuento || 0) -
+        (item.anticipo || 0)
+      )
 
-      if (data.tipoDocumento == ValidDocumentType.AUTOFACTURA_ELECTRONICA) {
-        return item.precioUnitario * item.cantidad;
+      // TODO_TEST: que pasa si es ISC y no es auto-factura? ahora retorna 0, pero no se como se debería de tratar
+      if (isAutoInvoice) {
+        return itemPrice * item.cantidad;
       }
       if (
         [
@@ -782,13 +772,7 @@ export const EDocDataSchema = z
           TaxType.IVA___RENTA,
         ].includes(data.tipoImpuesto)
       ) {
-        return (
-          item.precioUnitario -
-          data.descuentoGlobal -
-          data.anticipoGlobal -
-          (item.descuento || 0) -
-          (item.anticipo || 0)
-        );
+        return itemPrice * item.cantidad;
       }
 
       return 0;

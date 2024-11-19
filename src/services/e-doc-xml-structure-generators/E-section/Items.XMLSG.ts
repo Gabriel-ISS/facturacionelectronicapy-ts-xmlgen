@@ -85,7 +85,7 @@ class ItemsXMLSG {
       // E725
       dTiCamIt: item.cambio,
 
-      // E727: TODO: aplicar config.pygDecimals si la moneda es PYG
+      // E727
       dTotBruOpeItem: item.precioTotal,
 
       // E8.1.1 Campos que describen los descuentos, anticipos y valor total por ítem (EA001-EA050)
@@ -105,13 +105,13 @@ class ItemsXMLSG {
       // EA004
       dDescGloItem: item.descuentoGlobalItem,
 
-      // EA006: TODO: aplicar config.pygDecimals si la moneda es PYG
+      // EA006
       dAntPreUniIt: item.anticipo,
 
-      // EA007: TODO: aplicar config.pygDecimals si la moneda es PYG
+      // EA007
       dAntGloPreUniIt: item.anticipoGlobalItem,
 
-      // EA008: TODO: aplicar config.pygDecimals si la moneda es PYG
+      // EA008
       dTotOpeItem: item.totalOperacion,
 
       // EA009

@@ -31,7 +31,7 @@ export const EntregaSchema = z
         new NumberLength(value, ctx).max(15).maxDecimals(4);
       }),
 
-    // E609: TODO: "Se requiere la misma moneda para todos los ítems del DE"
+    // E609
     moneda: CommonValidators.currency(),
 
     // E611

@@ -72,7 +72,6 @@ export enum MeasurementUnit {
 
 type Data = BasicData<MeasurementUnit> & { representation: string };
 
-// TODO: TRIM PARA TODO ESO
 export const measurementUnits: Data[] = [
   {
     _id: MeasurementUnit.UNIDAD,

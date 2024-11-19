@@ -61,7 +61,7 @@ export const DocumentoAsociadoSchema = z
     constanciaControl: z.string().length(8).optional(),
 
     /*
-    TODO: Obligatorio cuando el CDC del DTE referenciado
+    OBS: Obligatorio cuando el CDC del DTE referenciado
     corresponda a un RUC fusionado
     */
     // H018

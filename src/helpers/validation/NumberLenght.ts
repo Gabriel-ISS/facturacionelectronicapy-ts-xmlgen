@@ -38,7 +38,7 @@ export default class NumberLength {
   min(min: number, message?: string) {
     if (this.intPart.length < min) {
       this.addError(
-        message ?? `El valor debe tener al menos ${min} caracteres`,
+        message ?? `El valor debe tener al menos ${min} dígitos enteros`,
       );
     }
     return this;
@@ -47,7 +47,7 @@ export default class NumberLength {
   max(max: number, message?: string) {
     if (this.intPart.length > max) {
       this.addError(
-        message ?? `El valor no puede tener más de ${max} caracteres`,
+        message ?? `El valor no puede tener más de ${max} dígitos enteros`,
       );
     }
     return this;
@@ -55,7 +55,7 @@ export default class NumberLength {
 
   length(len: number, message?: string) {
     if (this.intPart.length != len) {
-      this.addError(message ?? `El valor debe tener ${len} caracteres`);
+      this.addError(message ?? `El valor debe tener ${len} dígitos enteros`);
     }
     return this;
   }

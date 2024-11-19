@@ -14,7 +14,7 @@ export const CondicionSchema = z
     }),
 
     // E7.1. Campos que describen la forma de pago de la operación al contado o del monto de la entrega inicial (E605-E619)
-    entregas: z.array(EntregaSchema).optional(),
+    entregas: z.array(EntregaSchema).max(999).optional(),
 
     // E7.2. Campos que describen la operación a crédito (E640-E649)
     credito: CreditoSchema.optional(),

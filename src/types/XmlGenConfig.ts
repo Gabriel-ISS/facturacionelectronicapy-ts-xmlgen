@@ -24,5 +24,4 @@ export type XmlGenConfig = {
    * a partir del 21/04/2023
    * */
   test: boolean;
-  //debug?: boolean
 };

@@ -1,25 +1,14 @@
 import { z } from 'zod';
 import { FreightResponsible } from '../../constants/freightResponsibles.constants';
 import { RemissionReason } from '../../constants/remissionReasons.constants';
-import DateHelper from '../../helpers/DateHelper';
-
-import constantsService from '../../services/constants.service';
-import NumberLength from '../../helpers/validation/NumberLenght';
 import CommonValidators from '../../helpers/validation/CommonValidators';
-import dbService from '../../services/db.service';
+import NumberLength from '../../helpers/validation/NumberLenght';
 import ZodValidator from '../../helpers/validation/ZodValidator';
+import dbService from '../../services/db.service';
 
 /**E6. Campos que componen la Nota de Remisión Electrónica (E500-E599) */
 export const RemisionSchema = z
   .object({
-    /**TODO:
-     * Cuando el motivo sea por
-     * operaciones internas de la empresa,
-     * el RUC del receptor debe ser igual al
-     * RUC del emisor. (si se hace la validacion se
-     * tiene que procesar como otro por las validaciones
-     * relacionadas)
-     */
     // E501
     motivo: z.nativeEnum(RemissionReason, {
       required_error: 'El motivo de la emisión es requerido',

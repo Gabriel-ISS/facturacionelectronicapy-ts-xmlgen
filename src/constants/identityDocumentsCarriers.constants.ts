@@ -2,6 +2,7 @@ import { BasicData } from '../services/constants.service';
 import { IdentityDocument, identityDocuments } from './identityDocuments.contants';
 
 // VER DONDE SE USA ANTES DE ACTUALIZAR
+// ⚠️ también se usa en GED009 y E304 a pesar de no ser un transportista
 export enum IdentityDocumentCarriers {
   CEDULA_PARAGUAYA = IdentityDocument.CEDULA_PARAGUAYA,
   PASAPORTE = IdentityDocument.PASAPORTE,

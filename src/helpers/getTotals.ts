@@ -448,7 +448,6 @@ export default function getTotals({
     anticipo = totals.anticipo;
   }
 
-  // TODO: el usuario debe elegir si aplicar o no un redondeo a traves de config
   // F013 redondeo
   {
     /*

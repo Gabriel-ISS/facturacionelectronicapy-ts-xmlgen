@@ -10,13 +10,24 @@ Este paquete pretende servir de **modelo de transferencia estandarizado** para l
 
 El mismo es utilizado y mantenido por el autor y otorgado a la comunidad de desarrolladores de forma gratuita bajo licencia **MIT**
 
-El módulo está preparado de forma a proveer una fácil integración dentro de su entorno **NodeJS** y con cualquier otro lenguaje, sistema o librería que lo requiera, por ejemplo publicando el médoto desde un REST.
+El módulo está preparado de forma a proveer una fácil integración dentro de su entorno **NodeJS** y con cualquier otro lenguaje, sistema o librería que lo requiera, por ejemplo publicando el método desde un REST.
+
+## Migrar de facturanelectronicacionparaguay-xmlgen a facturacionelectronicaparaguay-ts-xmlgen
+- generateXMLDocument pasa a ser asíncrono
+- se removió el soporte para snakeCase
+- data.detalleTransporte -> data.transporte
+- data.ivaBase -> data.proporcionGravada
+- ya no se establece una unidad de medida por defecto para los items
+- config.defaultValues se elimino, se usa el guarani como moneda por defecto
+- config.userObjectRemove se elimino, simplemente no agregue el objeto usuario si no lo desea
+- config.separatorError se elimino, ahora se lanza un error de [zod](https://www.npmjs.com/package/zod#error-handling)
+- eventos data.tipoReceptor -> data.contribuyente
 
 ## Características
 - Genera el CDC automáticamente de acuerdo a los datos del documento electrónico
 - Implementa el Algoritmo del dígito verificador del CDC
 - Permite sobreescribir el valor del código de seguridad, de acuerdo a las necesidades del implementador
-- Realiza la validación de los datos de entrada conforme el menual técnico de la SET
+- Realiza la validación de los datos de entrada conforme el manual técnico de la SET
 
 ## Instalación
 
@@ -309,7 +320,7 @@ El campo Email, si bien puede informarse mas de 1 (uno), en el Sifen solamente s
         "numeroContrato" : "AF-2541",
         "saldoAnterior" : 1550000
     },
-    "detalleTransporte" : {
+    "transporte" : {
         "tipo" : 1,
         "modalidad" : 1,
         "tipoResponsable" : 1,

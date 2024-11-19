@@ -3,22 +3,21 @@ import xml2js from 'xml2js';
 import { EDocData, EDocParams } from '../schemas/EDoc.schema';
 import { XmlGenConfig } from '../types/XmlGenConfig';
 import constantService from './constants.service';
-import ComplementariosEspXMLSG from './xml-structure-generators/E-section/ComplementariosEsp.XMLSG';
-import ComplementariosGenXMLSG from './xml-structure-generators/ComplementariosGen.XMLSG';
-import CondicionXMLSG from './xml-structure-generators/E-section/Condicion.XMLSG';
-import { default as DocAsociadoXMLSG, default as jsonDteDocumentIdentify } from './xml-structure-generators/DocAsociado.XMLSG';
-import FacturaXMLSG from './xml-structure-generators/E-section/Factura.XMLSG';
-import GeneralXMLSG from './xml-structure-generators/General.XMLSG';
-import ItemsXMLSG from './xml-structure-generators/E-section/Items.XMLSG';
-import TotalesXMLSG from './xml-structure-generators/Totales.XMLSG';
-import TransporteXMLSG from './xml-structure-generators/E-section/Transporte.XMLSG';
-import AutoFacturaXMLSG from './xml-structure-generators/E-section/AutoFactura.XMLSG';
-import NotaRemisionXMLSG from './xml-structure-generators/E-section/NotaRemision.XMLSG';
-import NotaCreditoDebitoXMLSG from './xml-structure-generators/E-section/NotaCreditoDebito.XMLSG';
+import ComplementariosEspXMLSG from './e-doc-xml-structure-generators/E-section/ComplementariosEsp.XMLSG';
+import ComplementariosGenXMLSG from './e-doc-xml-structure-generators/ComplementariosGen.XMLSG';
+import CondicionXMLSG from './e-doc-xml-structure-generators/E-section/Condicion.XMLSG';
+import { default as DocAsociadoXMLSG, default as jsonDteDocumentIdentify } from './e-doc-xml-structure-generators/DocAsociado.XMLSG';
+import FacturaXMLSG from './e-doc-xml-structure-generators/E-section/Factura.XMLSG';
+import GeneralXMLSG from './e-doc-xml-structure-generators/General.XMLSG';
+import ItemsXMLSG from './e-doc-xml-structure-generators/E-section/Items.XMLSG';
+import TotalesXMLSG from './e-doc-xml-structure-generators/Totales.XMLSG';
+import TransporteXMLSG from './e-doc-xml-structure-generators/E-section/Transporte.XMLSG';
+import AutoFacturaXMLSG from './e-doc-xml-structure-generators/E-section/AutoFactura.XMLSG';
+import NotaRemisionXMLSG from './e-doc-xml-structure-generators/E-section/NotaRemision.XMLSG';
+import NotaCreditoDebitoXMLSG from './e-doc-xml-structure-generators/E-section/NotaCreditoDebito.XMLSG';
 
-// TODO: Nada de any
-class XMLGenerator {
-  private defaultConfig: XmlGenConfig = {
+class EDocXMLGenerator {
+  private readonly defaultConfig: XmlGenConfig = {
     errorSeparator: '; ',
     errorLimit: 10,
     redondeoSedeco: true,
@@ -31,7 +30,7 @@ class XMLGenerator {
     test: false, //Para ambiente de test se debe informar true por "config" exterior..
   };
 
-  private xmlBuilder = new xml2js.Builder({
+  private readonly xmlBuilder = new xml2js.Builder({
     xmldec: {
       version: '1.0',
       encoding: 'UTF-8',
@@ -50,7 +49,7 @@ class XMLGenerator {
   ): Promise<any> {
     return new Promise((resolve, reject) => {
       try {
-        // TODO: empezar a usar
+        // DELETE: si ya no se usa
         config = { ...this.defaultConfig, ...config };
 
         const xmlStructure = this.transformToXMLStructure(params, data);
@@ -214,4 +213,4 @@ class XMLGenerator {
   }
 }
 
-export default new XMLGenerator();
+export default new EDocXMLGenerator();

@@ -42,7 +42,7 @@ export const ClienteSchema = z
     // D213
     direccion: CommonValidators.address().optional(),
 
-    // D214: TODO: Debe incluir el prefijo de la ciudad si D203 = PRY
+    // D214
     telefono: CommonValidators.tel(),
 
     // D215
@@ -51,8 +51,8 @@ export const ClienteSchema = z
     // D216
     email: CommonValidators.email().optional(),
 
-    // D217 TODO: INVESTIGAR, PORQUE  NO SE ESPECIFICA QUE ES
-    codigo: z.string().min(3).max(15).optional(),
+    // D217
+    codigo: CommonValidators.clientCode().optional(),
 
     // D218
     numeroCasa: CommonValidators.houseNumber().optional(),
@@ -161,7 +161,6 @@ export const ClienteSchema = z
     {
       /*
       Campo obligatorio si se informa el campo D213
-      TODO: Cuando D201 = 1, debe corresponder a lo declarado en el RUC
       */
       if (data.direccion) {
         validator.requiredField('numeroCasa');

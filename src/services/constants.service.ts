@@ -37,14 +37,16 @@ import { tradingConditions } from '../constants/tradingConditions.constants';
 import { transactionTypes } from '../constants/transactionTypes.constants';
 import { transportModalities } from '../constants/transportModalities.constants';
 import { transportTypes } from '../constants/transportTypes.constants';
-import { identityDocumentsInnominateReceptors } from '../constants/typesOfDocumentsInnominateReceptors.constants';
-import { identityDocumentsReceptors } from '../constants/identityDocumentsReceptors.constants';
-import { userIdentityDocuments } from '../constants/userIdentityDocuments.constants';
-import { identityDocumentsCarriers } from '../constants/identityDocumentsCarriers.constants';
 import { vehicleIdentifications } from '../constants/vehicleIdentifications.constants';
 import { vehicleOperationTypes } from '../constants/vehicleOperationTypes.constants';
 import { exchangeRateConditions } from '../constants/exchangeRateConditions.constants';
 import { paymentConditions } from '../constants/paymentCondition.constants';
+
+import { identityDocumentsInnominateReceptors } from '../constants/typesOfDocumentsInnominateReceptors.constants';
+import { identityDocumentsReceptors } from '../constants/identityDocumentsReceptors.constants';
+import { userIdentityDocuments } from '../constants/userIdentityDocuments.constants';
+import { identityDocumentsCarriers } from '../constants/identityDocumentsCarriers.constants';
+import { identityDocsForNominationEvent } from '../constants/IdDocForNominationEvent.constants';
 
 export type BasicData<Code = number> = {
   _id: Code;
@@ -59,46 +61,6 @@ export type DataWithState<Code = number> = BasicData<Code> & {
 /** Data reference:
  * @link https://www.dnit.gov.py/documents/20123/420592/Manual+T%C3%A9cnico+Versi%C3%B3n+150.pdf/e706f7c7-6d93-21d4-b45b-5d22d07b2d22?t=1687351495907 */
 export default Object.freeze({
-  /*  tiposEventos: [
-      {
-        codigo: 1,
-        descripcion: 'Cancelación',
-        situacion: 0,
-      },
-      {
-        codigo: 2,
-        descripcion: 'Inutilización',
-        situacion: 1, //A futuro
-      },
-      {
-        codigo: 3,
-        descripcion: 'Endoso',
-        situacion: 1, //A futuro
-      },
-      {
-        codigo: 10,
-        descripcion: 'Acuse del DE',
-        situacion: 0,
-      },
-      {
-        codigo: 11,
-        descripcion: 'Conformidad del DE',
-        situacion: 0,
-      },
-      {
-        codigo: 12,
-        descripcion: 'Disconformidad del DE',
-        situacion: 0,
-      },
-      {
-        codigo: 13,
-        descripcion: 'Desconocimiento del DE',
-        situacion: 0,
-      },
-    ];
-  */
-
-
   //global and per item
   exchangeRateConditions,
   advancePaymentConditions,
@@ -115,10 +77,11 @@ export default Object.freeze({
   identityDocumentsCarriers,
   identityDocumentsReceptors,
   identityDocumentsInnominateReceptors,
+  identityDocsForNominationEvent,
 
   operationTypes,
   presenceIndicators,
-  receptorTypes: taxpayerNotTaxpayer,
+  taxpayerNotTaxpayer,
   sellerNatureSelfInvoicingCases,
   creditNoteReasons,
   remissionReasons,
@@ -150,41 +113,4 @@ export default Object.freeze({
   departments,
   districts,
   cities,
-  
-  validateLocation(
-    /**@deprecated no se para que esta esto aqui */
-    field: string,
-    departmentId: number,
-    districtId: number,
-    cityId: number,
-    errors: string[],
-  ) {
-    if (cityId) {
-      let foundCity = this.cities.find((c) => c._id === cityId);
-
-      if (!foundCity) {
-        errors.push(`No se encontro la ciudad con el Id "${cityId}"`);
-      } else if (foundCity.distrito != districtId) {
-        errors.push(
-          `El distrito con _id "${districtId}" no pertenece a la ciudad con _id "${cityId}"`,
-        );
-      }
-    } else {
-      errors.push(`El _id de ciudad "${cityId}" no es valido`);
-    }
-
-    if (districtId) {
-      let districtFound = this.districts.find((d) => d._id === districtId);
-
-      if (!districtFound) {
-        errors.push(`No se encontro el distrito con el Id "${districtId}"`);
-      } else if (districtFound.department != departmentId) {
-        errors.push(
-          `El departamento con _id "${departmentId}" no pertenece al distrito con _id "${districtId}"`,
-        );
-      }
-    } else {
-      errors.push(`El _id del distrito "${districtId}" no es valido`);
-    }
-  },
 });

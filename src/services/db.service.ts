@@ -5,7 +5,7 @@ type Tables = typeof constantsService;
 
 class DbService {
   select<
-    K extends Exclude<keyof Tables, 'validateLocation'>,
+    K extends keyof Tables,
     T extends Tables[K],
   >(tableName: K) {
     const table = constantsService[tableName] as T;
@@ -43,6 +43,9 @@ class DbService {
         manageNotFoundError(foundData, notFoundErrorData);
         return foundData ?? null;
       },
+      getAll() {
+        return table;
+      }
     };
   }
 }

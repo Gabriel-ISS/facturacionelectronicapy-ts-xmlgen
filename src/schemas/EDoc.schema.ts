@@ -6,23 +6,6 @@ import { Path } from '../helpers/Path';
 import { RemissionReason } from '../constants/remissionReasons.constants';
 import CDCHelper from '../helpers/CDCHelper';
 
-/*TODOS:
-COMPLETAR VALORES FALTANTES (aun faltan algunos)
-
-ASEGURARSE DE QUE LAS DESCRIPCIONES ESTEN BIEN VALIDADAS, CONSIDERAR undefined Y "OTRO"
-
-para todos los findByIdIfExist agregar ctx si ese necesario bajo alguna condición
-
-UTILIDAD DE REDONDEO (como aplicarlo en zod de manera opcional?)
-
-VALIDAR FECHAS DE INICIO Y FIN (creo que ya esta)
-
-VALIDAR DATOS RELACIONADOS A TIMBRADO
-
-CREAR OBJETO CON TODOS LOS MENSAJES POR DEFECTO
-CREAR FUNCION PARA SOBREESCRIBIR TODOS LOS MENSAJES
-*/
-
 export const EDocSchema = z
   .object({
     data: EDocDataSchema,
@@ -43,18 +26,25 @@ export const EDocSchema = z
       'Debe utilizar un establecimiento de params.establecimientos',
     );
 
-    // TODO: esto resuelve uno de mis todo
-    // TODO: acaso params.ruc = data.usuario.ruc ?
-    if (
-      data.remision &&
-      data.remision.motivo ==
-        RemissionReason.TRASLADO_ENTRE_LOCALES_DE_LA_EMPRESA
-    ) {
-      validator.validate(
-        dataPath.concat('cliente').concat('ruc'),
-        data.cliente.ruc != params.ruc,
-        'RUC del receptor debe coincidir con el RUC del emisor',
-      );
+    // E501
+    {
+      /*
+      OBS: Cuando el motivo sea por
+      operaciones internas de la empresa,
+      el RUC del receptor debe ser igual al
+      RUC del emisor.
+      */
+      if (
+        data.remision &&
+        data.remision.motivo ==
+          RemissionReason.TRASLADO_ENTRE_LOCALES_DE_LA_EMPRESA
+      ) {
+        validator.validate(
+          dataPath.concat('cliente').concat('ruc'),
+          data.cliente.ruc != params.ruc,
+          'RUC del receptor debe coincidir con el RUC del emisor',
+        );
+      }
     }
 
     // ⚠️ según el repo original

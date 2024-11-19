@@ -22,7 +22,7 @@ export const CreditoSchema = z.object({
   // E645: lo calculamos en CondicionSchema
 
   // E7.2.1.Campos que describen las cuotas (E650-E659)
-  infoCuotas: z.array(InfoCuotaSchema),
+  infoCuotas: z.array(InfoCuotaSchema).max(999),
 }).transform((data, ctx) => { 
   return {
     ...data,

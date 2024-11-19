@@ -139,15 +139,7 @@ class CommonValidators {
             code: z.ZodIssueCode.custom,
             message: messages?.min,
           });
-        } else if (Number.isNaN(Number(id))) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: 'El numero de identificación del RUC debe ser un número',
-          });
         }
-
-        /*TODO: en el numero de identificación del RUC, si es ruc de emisor 
-        no es necesario que use solo digitos numericos */
 
         if (!dv) {
           ctx.addIssue({
@@ -180,6 +172,10 @@ class CommonValidators {
 
   tel() {
     return z.string().min(6).max(15);
+  }
+
+  cel() {
+    return z.string().min(10).max(20);
   }
 
   email() {
@@ -274,6 +270,10 @@ class CommonValidators {
         message: 'El valor debe ser exactamente 2 letras mayúsculas',
       },
     );
+  }
+
+  clientCode() {
+    return z.string().min(3).max(15);
   }
 }
 

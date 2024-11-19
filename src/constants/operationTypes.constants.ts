@@ -11,6 +11,12 @@ export enum OperationType {
   B2F = 4,
 }
 
+export enum OperationTypeNoB2G {
+  B2B = OperationType.B2B,
+  B2C = OperationType.B2C,
+  B2F = OperationType.B2F,
+}
+
 export const operationTypes: BasicData<OperationType>[] = [
   {
     _id: OperationType.B2B,

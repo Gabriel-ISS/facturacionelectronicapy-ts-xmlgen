@@ -14,7 +14,7 @@ export const SectorAdicionalSchema = z.object({
   // E823
   finCiclo: CommonValidators.isoDate().optional(),
   
-  // E824: TODO: TIENE HASTA 3 OCURRENCIAS, COMO SE MANEJA ESO?
+  // E824
   vencimientoPago: CommonValidators.isoDate().optional(),
   
   // E825

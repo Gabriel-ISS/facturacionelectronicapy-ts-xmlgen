@@ -7,7 +7,6 @@ import { EDocData, EDocParams } from '../schemas/EDoc.schema';
 import calcDV from './calcDV';
 
 // VER: 10.1. Estructura del código de control (CDC) de los DE
-// TODO: ver "10.3. Generación del código de seguridad"
 class CDCHelper {
   validateCDC(EDoc: EDocData & { cdc?: string }, ctx: z.RefinementCtx) {
     if (!EDoc.cdc) return;

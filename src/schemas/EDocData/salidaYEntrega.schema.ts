@@ -36,7 +36,6 @@ import CommonValidators from '../../helpers/validation/CommonValidators';
  * @field E950 = ciudadDescripcion
  * @field E951 = telefonoContacto
  *
- * TODO: SIN CÓDIGO
  * @field ???? = pais
  * @field ???? = paisDescripcion
  */
