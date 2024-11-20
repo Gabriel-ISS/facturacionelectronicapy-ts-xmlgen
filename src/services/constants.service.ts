@@ -47,6 +47,7 @@ import { identityDocumentsReceptors } from '../constants/identityDocumentsRecept
 import { userIdentityDocuments } from '../constants/userIdentityDocuments.constants';
 import { identityDocumentsCarriers } from '../constants/identityDocumentsCarriers.constants';
 import { identityDocsForNominationEvent } from '../constants/IdDocForNominationEvent.constants';
+import { taxpayerTypes } from '../constants/taxpayer.constants';
 
 export type BasicData<Code = number> = {
   _id: Code;
@@ -68,6 +69,7 @@ export default Object.freeze({
   documentTypes,
   emissionTypes,
   transactionTypes,
+  taxpayerTypes,
   taxTypes,
   obligations,
   currencies,

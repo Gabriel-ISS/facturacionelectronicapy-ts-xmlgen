@@ -10,7 +10,7 @@
 # TAREAS:
 
 ## Rapidos
-- taxpayer y otros enums deben estar disponibles en constants service
+- ...
 
 ## Investigar
 - RUC: cuando el numero de identificación es numérico y cuando no? según el repo origina, cuando en el emisor no es necesario que sea numérico. y el formato?
@@ -28,7 +28,6 @@
 - SIN CÓDIGO: salidaYEntregaSchema => pais, paisDescripcion
 
 ### General
-- ver donde se valida el cdc en el repo original
 - ASEGURARSE DE QUE LAS DESCRIPCIONES ESTÉN BIEN VALIDADAS, CONSIDERAR undefined Y "OTRO"
     - para todos los findByIdIfExist agregar ctx si ese necesario bajo alguna condición
 - VALIDAR FECHAS DE INICIO Y FIN (creo que ya esta)
