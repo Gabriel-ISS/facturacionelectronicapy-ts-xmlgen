@@ -51,24 +51,12 @@ export const SalidaYEntregaSchema = z
     telefonoContacto: z.string().min(6).max(15).optional(),
   })
   .transform((data, ctx) => {
-    const validator = new ZodValidator(ctx, data);
-
-    // E928 - E948
-    let distritoDescripcion;
-    {
-      /*
-      Obligatorio si existe el campo E927/E947
-      */
-      if (data.distrito) {
-        distritoDescripcion = dbService
-          .select('districts')
-          .findById(data.distrito, {
-            ctx,
-            fieldName: 'distrito',
-            message: `No existe el distrito con id ${data.distrito}`,
-          }).description;
-      }
-    }
+    CommonValidators.location(
+      ctx,
+      data.departamento,
+      data.distrito,
+      data.ciudad,
+    );
 
     return {
       ...data,
@@ -76,7 +64,14 @@ export const SalidaYEntregaSchema = z
         .select('departments')
         .findById(data.departamento).description,
 
-      distritoDescripcion,
+      // E928 - E948
+      distritoDescripcion: dbService
+        .select('districts')
+        .findByIdIfExist(data.distrito, {
+          ctx,
+          fieldName: 'distrito',
+          message: `No existe el distrito con id ${data.distrito}`,
+        })?.description,
 
       ciudadDescripcion: dbService.select('cities').findById(data.ciudad, {
         ctx,

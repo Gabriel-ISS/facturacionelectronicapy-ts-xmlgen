@@ -19,6 +19,13 @@ export const UbicacionSchema = z
     ciudad: CommonValidators.city(),
   })
   .transform((data, ctx) => {
+    CommonValidators.location(
+      ctx,
+      data.departamento,
+      data.distrito,
+      data.ciudad,
+    );
+    
     return {
       ...data,
 

@@ -69,16 +69,23 @@ export const ClienteSchema = z
   .transform((data, ctx) => {
     const validator = new ZodValidator(ctx, data);
 
+    CommonValidators.location(
+      ctx,
+      data.departamento,
+      data.distrito,
+      data.ciudad,
+    );
+
     /**D201 = 1 */
-    const isTaxpayer =
-      data.contribuyente == TaxpayerNotTaxpayer.CONTRIBUYENTE;
+    const isTaxpayer = data.contribuyente == TaxpayerNotTaxpayer.CONTRIBUYENTE;
     /**D201 = 2 */
     const isNotTaxpayer =
       data.contribuyente == TaxpayerNotTaxpayer.NO_CONTRIBUYENTE;
     /**D202 = 4 */
     const isB2F = data.tipoOperacion == OperationType.B2F;
     /**D208 = 5 */
-    const isNameless = data.documentoTipo == IdentityDocumentReceptor.INNOMINADO;
+    const isNameless =
+      data.documentoTipo == IdentityDocumentReceptor.INNOMINADO;
 
     // D205 - tipoContribuyente
     {
@@ -189,7 +196,7 @@ export const ClienteSchema = z
       }
     }
 
-    const [rucID, rucDV] = data.ruc?.split('-') ?? []
+    const [rucID, rucDV] = data.ruc?.split('-') ?? [];
 
     return {
       ...data,
@@ -220,9 +227,8 @@ export const ClienteSchema = z
         .findByIdIfExist(data.distrito)?.description,
 
       // D224
-      descripcionCiudad: dbService
-        .select('cities')
-        .findByIdIfExist(data.ciudad)?.description,
+      descripcionCiudad: dbService.select('cities').findByIdIfExist(data.ciudad)
+        ?.description,
     };
   });
 

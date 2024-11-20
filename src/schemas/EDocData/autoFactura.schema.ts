@@ -47,6 +47,13 @@ export const AutoFacturaSchema = z
     ubicacion: UbicacionSchema,
   })
   .transform((data, ctx) => {
+    CommonValidators.location(
+      ctx,
+      data.departamento,
+      data.distrito,
+      data.ciudad,
+    );
+
     return {
       ...data,
 

@@ -138,7 +138,7 @@ export const EDocDataSchema = z
 
     // https://www.dnit.gov.py/documents/20123/420595/NT_E_KUATIA_018_MT_V150-+Junio.pdf/2ace18c4-5c03-c339-7f5c-bed6d5b5eb5e?t=1717699899642
     // D1.1. Campos que identifican las obligaciones afectadas (D030-D040)
-    obligaciones: z.array(ObligacionSchema).optional(),
+    obligaciones: z.array(ObligacionSchema).max(11).optional(),
 
     // ⚠️ No es del manual, pero si del repo original
     // Es el valor monetario total a descontar de la suma de los items

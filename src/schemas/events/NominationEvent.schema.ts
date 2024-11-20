@@ -74,6 +74,13 @@ export const NominationEventSchema = z
   .transform((data, ctx) => {
     const validator = new ZodValidator(ctx, data);
 
+    CommonValidators.location(
+      ctx,
+      data.departamento,
+      data.distrito,
+      data.ciudad,
+    );
+
     /**GENFE004 = 1 */
     const isTaxpayer = data.contribuyente == TaxpayerNotTaxpayer.CONTRIBUYENTE;
     /**GENFE004 = 2 */

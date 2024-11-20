@@ -53,33 +53,36 @@ class CommonValidators {
 
   location(
     ctx: z.RefinementCtx,
-    departmentId: Department,
+    departmentId: Department | undefined,
     districtId: number | undefined,
-    cityId: number,
+    cityId: number | undefined,
   ) {
+
     let foundDistrict = dbService
       .select('districts')
       .findByIdIfExist(districtId);
-    let foundCity = dbService.select('cities').findByIdIfExist(cityId);
 
     if (!foundDistrict) {
       this.addFieldError(
         ctx,
-        `No se encontro el distrito con el Id "${districtId}"`,
+        `No se encontró el distrito con el Id "${districtId}"`,
       );
-    } else if (foundDistrict.department != departmentId) {
+    } else if (departmentId && foundDistrict.department != departmentId) {
       this.addFieldError(
         ctx,
-        `El departamento con _id "${departmentId}" no pertenece al distrito con _id "${districtId}"`,
+        `El departamento con _id "${departmentId}" no coincide con el distrito con _id "${districtId}"`,
       );
     }
 
+    if (!cityId) return;
+    let foundCity = dbService.select('cities').findByIdIfExist(cityId);
+
     if (!foundCity) {
-      this.addFieldError(ctx, `No se encontro la ciudad con el Id "${cityId}"`);
+      this.addFieldError(ctx, `No se encontró la ciudad con el Id "${cityId}"`);
     } else if (districtId && foundCity.distrito != districtId) {
       this.addFieldError(
         ctx,
-        `El distrito con _id "${districtId}" no pertenece a la ciudad con _id "${cityId}"`,
+        `El distrito con _id "${districtId}" no coincide con la ciudad con _id "${cityId}"`,
       );
     }
   }

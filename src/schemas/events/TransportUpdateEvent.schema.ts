@@ -66,6 +66,13 @@ export const TransportUpdateEventSchema = z
         // GET030
         numeroMatricula: z.string().length(6).optional(),
       }),
+    }).superRefine((data, ctx) => {
+      CommonValidators.location(
+        ctx,
+        data.departamento,
+        data.distrito,
+        data.ciudad,
+      );
     }),
 
     transportista: z.object({
