@@ -28,7 +28,6 @@
 - SIN CÓDIGO: salidaYEntregaSchema => pais, paisDescripcion
 
 ### General
-- donde se incluya departamento, distrito y ciudad, verificar coherencia
 - ver donde se valida el cdc en el repo original
 - ASEGURARSE DE QUE LAS DESCRIPCIONES ESTÉN BIEN VALIDADAS, CONSIDERAR undefined Y "OTRO"
     - para todos los findByIdIfExist agregar ctx si ese necesario bajo alguna condición

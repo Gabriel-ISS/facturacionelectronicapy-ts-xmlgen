@@ -64,6 +64,8 @@ export const EDocSchema = z
           'Debe proveer el valor del código de seguridad aleatorio',
         );
       }
+    } else {
+      CDCHelper.validateCDC(params, data, ctx);
     }
 
     return {

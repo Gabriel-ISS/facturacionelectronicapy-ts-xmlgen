@@ -33,6 +33,7 @@ import { SectorSupermercadosSchema } from './EDocData/sectorSupermercados.schema
 import { TransporteSchema } from './EDocData/transporte.schema';
 import { UsuarioSchema } from './EDocData/usuario.schema';
 import DateHelper from '../helpers/DateHelper';
+import CDCHelper from '../helpers/CDCHelper';
 
 /** El esquema no incluye...
  *
@@ -937,7 +938,7 @@ export const EDocDataSchema = z
         .select('documentTypes')
         .findById(data.tipoDocumento).description,
 
-      // C004 y C008 se define en EDocParams
+      // C004 se define en EDocSchema y C008 en EDocParamsSchema
 
       // VER: https://www.dnit.gov.py/documents/20123/420595/NT_E_KUATIA_010_MT_V150.pdf/d64a693b-6c63-86e1-ec6a-d4fe5ec4eeea?t=1687353747196
       // D012
