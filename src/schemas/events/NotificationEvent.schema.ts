@@ -40,6 +40,17 @@ export const NotificationEventSchema = z
   .transform((data, ctx) => {
     const validator = new ZodValidator(ctx, data);
 
+    // ⚠️ esto no esta en el manual
+    {
+      const emission = new Date(data.fechaEmision);
+      const reception = new Date(data.fechaRecepcion);
+      validator.validate(
+        'fechaEmision',
+        emission > reception,
+        'Le fecha de emisión no puede ser después de la fecha de recepción',
+      )
+    }
+
     /**GEN005 = 1 */
     const isTaxpayer = data.contribuyente == TaxpayerNotTaxpayer.CONTRIBUYENTE;
     /**GEN005 = 2 */

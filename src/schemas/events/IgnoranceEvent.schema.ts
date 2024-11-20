@@ -43,6 +43,17 @@ export const IgnoranceEventSchema = z
     const isNotTaxpayer =
       data.contribuyente == TaxpayerNotTaxpayer.NO_CONTRIBUYENTE;
 
+    // ⚠️ esto no esta en el manual
+    {
+      const emission = new Date(data.fechaEmision);
+      const reception = new Date(data.fechaRecepcion);
+      validator.validate(
+        'fechaEmision',
+        emission > reception,
+        'Le fecha de emisión no puede ser después de la fecha de recepción',
+      )
+    }
+
     // GED007 y GED008 - ruc
     {
       /*

@@ -30,7 +30,6 @@
 ### General
 - ASEGURARSE DE QUE LAS DESCRIPCIONES ESTÉN BIEN VALIDADAS, CONSIDERAR undefined Y "OTRO"
     - para todos los findByIdIfExist agregar ctx si ese necesario bajo alguna condición
-- VALIDAR FECHAS DE INICIO Y FIN (creo que ya esta)
 - CREAR FUNCIÓN PARA SOBRESCRIBIR TODOS LOS MENSAJES
 - en el manual y las notas hay validaciones especiales que no tuve en cuenta.
 - validaciones de timbrado?

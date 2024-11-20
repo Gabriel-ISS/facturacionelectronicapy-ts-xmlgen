@@ -433,7 +433,7 @@ export const EDocDataSchema = z
 
         validator.validate(
           remisionPath.concat('fechaFactura'),
-          fechaFactura.getTime() > fechaEmision.getTime(),
+          fechaFactura > fechaEmision,
           'remission.fechaFactura debe ser antes de la fecha de emisión',
         );
       }
