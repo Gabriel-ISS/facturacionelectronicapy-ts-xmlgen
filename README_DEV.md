@@ -22,7 +22,6 @@
 - E940: hasta 99 ocurrencias, en el repo original no es array
 - E960: hasta 4 ocurrencias, en el repo original no es array
 - E791: desde NT023 hasta 9 ocurrencias, en el repo original no es array
-- E720, E730: averiguar como se maneja en el repo original, porque el campo no esta en su propio objeto y es requerido de manera condicional.
 - GENFE023, D214: debe incluir el prefijo de la ciudad si el país es paraguay
 - E609: "Se requiere la misma moneda para todos los ítems del DE" a que se refiere? por que no lo pusieron en un solo campo y ya? necesito saber a que items se refiere exactamente.
 - SIN CÓDIGO: salidaYEntregaSchema => pais, paisDescripcion

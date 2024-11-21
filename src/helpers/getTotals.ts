@@ -47,7 +47,27 @@ export default function getTotals({
   F023, F025 y F026
   */
 
-  if (!isElectronicRemissionNote) return undefined;
+  if (isElectronicRemissionNote) return;
+
+  /*
+  La condición para que se calcules los totales (F001) es:
+  Obligatorio si C002 ≠ 7
+
+  La condición para que se calcule el impuesto (E730) es:
+  Obligatorio si D013=1, 3, 4 o 5 y C002 ≠ 4 o 7
+
+  Que ocurre si D013=2 y C002 != 4?
+  Es decir D013 {
+    ISC = 2,
+  } y C002 {
+    FACTURA_ELECTRONICA = 1,
+    NOTA_DE_CREDITO_ELECTRONICA = 5,
+    NOTA_DE_DEBITO_ELECTRONICA = 6,
+  }
+
+  todos los campos relacionados al impuesto requieren que D013 = 1 0 5
+  por lo tanto no debería haber problema
+  */
 
   type Totals = {
     /**F002*/
@@ -139,8 +159,6 @@ export default function getTotals({
     totalAnticipoGlobalItem: 0,
   };
 
-  // calcular los que estan presentes en ambos casos
-
   /**D013=1 */
   const isIvaTax = tipoImpuesto == TaxType.IVA;
   /**D013=3 */
@@ -153,20 +171,26 @@ export default function getTotals({
   let totalWithoutDiscount = 0;
 
   items.forEach((item) => {
+    const taxData = item.impuesto;
+    const amountData = item.monto;
+
+    // si C002 != 7 se calculan los totales (F001) y existe el monto (E720)
+    if (!amountData) return;
+
     /**E731 = 1 */
-    const isGravado = item.ivaTipo == TaxTreatment.GRAVADO_IVA;
+    const isGravado = taxData?.ivaTipo == TaxTreatment.GRAVADO_IVA;
     /**E731 = 2 */
     const isExonerado =
-      item.ivaTipo == TaxTreatment.EXONERADO__ART__100___LEY_6380_2019_;
+      taxData?.ivaTipo == TaxTreatment.EXONERADO__ART__100___LEY_6380_2019_;
     /**E731 = 3 */
-    const isExento = item.ivaTipo == TaxTreatment.EXENTO;
+    const isExento = taxData?.ivaTipo == TaxTreatment.EXENTO;
     /**E731 = 4 */
     const isGravadoParcial =
-      item.ivaTipo == TaxTreatment.GRAVADO_PARCIAL__GRAV__EXENTO_;
+      taxData?.ivaTipo == TaxTreatment.GRAVADO_PARCIAL__GRAV__EXENTO_;
     /**E734 = 5 */
-    const isAt5Percent = item.iva == TaxRate.CINCO;
+    const isAt5Percent = taxData?.iva == TaxRate.CINCO;
     /**E734 = 10 */
-    const isAt10Percent = item.iva == TaxRate.DIEZ;
+    const isAt10Percent = taxData?.iva == TaxRate.DIEZ;
 
     /** Comentario del repo original:
      * Ahora mismo solo es el precio por la cantidad y se usa para calcular
@@ -174,7 +198,7 @@ export default function getTotals({
      * entonces a E721 (precioUnitario) hay que restarle EA002 (descuento)
      * antes de multiplicar por la cantidad)
      */
-    totalWithoutDiscount += item.precioUnitario * item.cantidad;
+    totalWithoutDiscount += amountData.precioUnitario * item.cantidad;
 
     // F002 subtotalExento
     {
@@ -188,11 +212,11 @@ export default function getTotals({
       VER: https://www.dnit.gov.py/documents/20123/420595/NT_E_KUATIA_013_MT_V150.pdf/ba73ec3b-5901-ae28-5d8c-9bed5632ab89?t=1687353747529
       */
       if (isExento) {
-        totals.subtotalExento += item.totalOperacion;
+        totals.subtotalExento += amountData.totalOperacion;
       }
 
-      if (isGravadoParcial) {
-        totals.subtotalExento += item.baseExentaIva;
+      if (isGravadoParcial && taxData) {
+        totals.subtotalExento += taxData.baseExentaIva;
       }
     }
 
@@ -206,7 +230,7 @@ export default function getTotals({
       exonerada
       */
       if (isExonerado) {
-        totals.subtotalExonerado += item.totalOperacion;
+        totals.subtotalExonerado += amountData.totalOperacion;
       }
     }
 
@@ -222,15 +246,14 @@ export default function getTotals({
 
       VER: https://www.dnit.gov.py/documents/20123/420595/NT_E_KUATIA_013_MT_V150.pdf/ba73ec3b-5901-ae28-5d8c-9bed5632ab89?t=1687353747529
       */
-      if (isIvaTax || isIvaRentTax) {
-        if (isAt5Percent) {
-          if (isGravado) {
-            if (!totals.subtotalIva5) totals.subtotalIva5 = 0;
-            totals.subtotalIva5 += item.totalOperacion;
-          } else if (isGravadoParcial) {
-            if (!totals.subtotalIva5) totals.subtotalIva5 = 0;
-            totals.subtotalIva5 += item.ivaBase + item.liquidacionIvaPorItem;
-          }
+      if ((isIvaTax || isIvaRentTax) && isAt5Percent) {
+        if (isGravado) {
+          if (!totals.subtotalIva5) totals.subtotalIva5 = 0;
+          totals.subtotalIva5 += amountData.totalOperacion;
+        } else if (isGravadoParcial && taxData) {
+          if (!totals.subtotalIva5) totals.subtotalIva5 = 0;
+          totals.subtotalIva5 +=
+            taxData.ivaBase + taxData.liquidacionIvaPorItem;
         }
       }
     }
@@ -252,10 +275,13 @@ export default function getTotals({
         if (isAt10Percent) {
           if (isGravado) {
             if (!totals.subtotalIva10) totals.subtotalIva10 = 0;
-            totals.subtotalIva10 += item.totalOperacion;
+            totals.subtotalIva10 += amountData.totalOperacion;
           } else if (isGravadoParcial) {
-            if (!totals.subtotalIva10) totals.subtotalIva10 = 0;
-            totals.subtotalIva10 += item.ivaBase + item.liquidacionIvaPorItem;
+            if (taxData) {
+              if (!totals.subtotalIva10) totals.subtotalIva10 = 0;
+              totals.subtotalIva10 +=
+                taxData.ivaBase + taxData.liquidacionIvaPorItem;
+            }
           }
         }
       }
@@ -271,7 +297,7 @@ export default function getTotals({
 
       VER: https://www.dnit.gov.py/documents/20123/420595/NT_E_KUATIA_001_MT_V150.pdf/c4d2ab8e-632b-dc8f-d3f6-6a144a3a3d9c?t=1687353745680
       */
-      totals.totalDescuento += (item.descuento || 0) * item.cantidad;
+      totals.totalDescuento += (amountData.descuento || 0) * item.cantidad;
     }
 
     // F015 liquidacionIva5
@@ -283,11 +309,9 @@ export default function getTotals({
       la tasa del 5% (E734=5)
       No debe existir el campo si D013≠1 o D013≠5
       */
-      if (isIvaTax || isIvaRentTax) {
+      if ((isIvaTax || isIvaRentTax) && isAt5Percent && taxData) {
         if (!totals.liquidacionIva5) totals.liquidacionIva5 = 0;
-        if (isAt5Percent) {
-          totals.liquidacionIva5 += item.liquidacionIvaPorItem;
-        }
+        totals.liquidacionIva5 += taxData.liquidacionIvaPorItem;
       }
     }
 
@@ -301,9 +325,11 @@ export default function getTotals({
       No debe existir el campo si D013≠1 o D013≠5
       */
       if (isIvaTax || isIvaRentTax) {
-        if (!totals.liquidacionIva10) totals.liquidacionIva10 = 0;
         if (isAt10Percent) {
-          totals.liquidacionIva10 += item.liquidacionIvaPorItem;
+          if (taxData) {
+            if (!totals.liquidacionIva10) totals.liquidacionIva10 = 0;
+            totals.liquidacionIva10 += taxData.liquidacionIvaPorItem;
+          }
         }
       }
     }
@@ -318,9 +344,11 @@ export default function getTotals({
       No debe existir el campo si D013≠1 o D013≠5
       */
       if (isIvaTax || isIvaRentTax) {
-        if (!totals.totalIvaGrabado5) totals.totalIvaGrabado5 = 0;
         if (isAt5Percent) {
-          totals.totalIvaGrabado5 += item.ivaBase;
+          if (taxData) {
+            if (!totals.totalIvaGrabado5) totals.totalIvaGrabado5 = 0;
+            totals.totalIvaGrabado5 += taxData.ivaBase;
+          }
         }
       }
     }
@@ -335,9 +363,11 @@ export default function getTotals({
       No debe existir el campo si D013≠1 o D013≠5
       */
       if (isIvaTax || isIvaRentTax) {
-        if (!totals.totalIvaGrabado10) totals.totalIvaGrabado10 = 0;
         if (isAt10Percent) {
-          totals.totalIvaGrabado10 += item.ivaBase;
+          if (taxData) {
+            if (!totals.totalIvaGrabado10) totals.totalIvaGrabado10 = 0;
+            totals.totalIvaGrabado10 += taxData.ivaBase;
+          }
         }
       }
     }
@@ -353,7 +383,7 @@ export default function getTotals({
       VER: https://www.dnit.gov.py/documents/20123/420595/NT_E_KUATIA_001_MT_V150.pdf/c4d2ab8e-632b-dc8f-d3f6-6a144a3a3d9c?t=1687353745680
       */
       totals.totalDescuentoGlobalItem +=
-        (item.descuentoGlobalItem || 0) * item.cantidad;
+        (amountData.descuentoGlobalItem || 0) * item.cantidad;
     }
 
     // F034 totalAnticipoItem
@@ -366,7 +396,7 @@ export default function getTotals({
       VER: https://www.dnit.gov.py/documents/20123/420595/NT_E_KUATIA_001_MT_V150.pdf/c4d2ab8e-632b-dc8f-d3f6-6a144a3a3d9c?t=1687353745680
       */
       if (!totals.totalAnticipoItem) totals.totalAnticipoItem = 0;
-      totals.totalAnticipoItem += (item.anticipo || 0) * item.cantidad;
+      totals.totalAnticipoItem += (amountData.anticipo || 0) * item.cantidad;
     }
 
     // F035 totalAnticipoGlobalItem
@@ -379,7 +409,7 @@ export default function getTotals({
       VER: https://www.dnit.gov.py/documents/20123/420595/NT_E_KUATIA_001_MT_V150.pdf/c4d2ab8e-632b-dc8f-d3f6-6a144a3a3d9c?t=1687353745680
       */
       totals.totalAnticipoGlobalItem +=
-        (item.anticipoGlobalItem || 0) * item.cantidad;
+        (amountData.anticipoGlobalItem || 0) * item.cantidad;
     }
   });
 
@@ -569,7 +599,7 @@ export default function getTotals({
       } else if (currencyChangeConditionIsPerItem) {
         let total = 0;
         items.forEach((item) => {
-          total += item.totalOperacionGuaranies;
+          total += item.monto?.totalOperacionGuaranies || 0;
         });
         totals.totalGuaranies = total;
       }
@@ -631,7 +661,8 @@ export default function getTotals({
       | 'totalGuaranies'
       | 'ivaComision';
 
-    type Result = SecureOmit<Totals, OmittedKeys> & Partial<Pick<Totals, OmittedKeys>>;
+    type Result = SecureOmit<Totals, OmittedKeys> &
+      Partial<Pick<Totals, OmittedKeys>>;
     return valid as Result;
   } else {
     return totals;

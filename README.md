@@ -15,12 +15,13 @@ El módulo está preparado de forma a proveer una fácil integración dentro de 
 ## Migrar de facturanelectronicacionparaguay-xmlgen a facturacionelectronicaparaguay-ts-xmlgen
 - generateXMLDocument pasa a ser asíncrono
 - se removió el soporte para snakeCase
-- data.detalleTransporte -> data.transporte
-- data.ivaBase -> data.proporcionGravada
+- `data.detalleTransporte` -> `data.transporte`
+- `data.ivaBase` -> `data.proporcionGravada`
+- los campos E720 y E730, ahora se engloban en su propio objeto en data.item (`item.monto` e `item.impuesto`)
 - ya no se establece una unidad de medida por defecto para los items
-- config.defaultValues se elimino, se usa el guarani como moneda por defecto
-- config.userObjectRemove se elimino, simplemente no agregue el objeto usuario si no lo desea
-- config.separatorError se elimino, ahora se lanza un error de [zod](https://www.npmjs.com/package/zod#error-handling)
+- `config.defaultValues` se elimino, se usa el guarani como moneda por defecto
+- `config.userObjectRemove` se elimino, simplemente no agregue el objeto usuario si no lo desea
+- `config.separatorError` se elimino, ahora se lanza un error de [zod](https://www.npmjs.com/package/zod#error-handling)
 - eventos data.tipoReceptor -> data.contribuyente
 
 ## Características

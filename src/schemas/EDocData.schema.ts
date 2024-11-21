@@ -9,6 +9,7 @@ import { RemissionReason } from '../constants/remissionReasons.constants';
 import { TaxTreatment } from '../constants/taxTreatments.constants';
 import { TaxType } from '../constants/taxTypes.constants';
 import { TransactionType } from '../constants/transactionTypes.constants';
+import DateHelper from '../helpers/DateHelper';
 import getTotals from '../helpers/getTotals';
 import { Path } from '../helpers/Path';
 import CommonValidators from '../helpers/validation/CommonValidators';
@@ -22,7 +23,9 @@ import { CondicionSchema } from './EDocData/condicion.schema';
 import { DncpSchema } from './EDocData/dncp.schema';
 import { DocumentoAsociadoSchema } from './EDocData/documentoAsociado.schema';
 import { FacturaSchema } from './EDocData/factura.schema';
+import { Impuesto } from './EDocData/impuesto.schema';
 import { CompleteItem, Item, ItemSchema } from './EDocData/item.schema';
+import { Monto } from './EDocData/monto.schema';
 import { NotaCreditoDebitoSchema } from './EDocData/notaCheditoDebito.schema';
 import { ObligacionSchema } from './EDocData/obligacion.schema';
 import { RemisionSchema } from './EDocData/remision.schema';
@@ -32,8 +35,6 @@ import { SectorSegurosSchema } from './EDocData/sectorSeguros.schema';
 import { SectorSupermercadosSchema } from './EDocData/sectorSupermercados.schema';
 import { TransporteSchema } from './EDocData/transporte.schema';
 import { UsuarioSchema } from './EDocData/usuario.schema';
-import DateHelper from '../helpers/DateHelper';
-import CDCHelper from '../helpers/CDCHelper';
 
 /** El esquema no incluye...
  *
@@ -63,8 +64,7 @@ export const EDocDataSchema = z
     // B. Campos inherentes a la operación de Documentos Electrónicos (B001-B099)
 
     // B002
-    tipoEmision: z.nativeEnum(EmissionType)
-      .default(EmissionType.NORMAL),
+    tipoEmision: z.nativeEnum(EmissionType).default(EmissionType.NORMAL),
 
     // B004
     // VER: 10.3. Generación del código de seguridad
@@ -119,7 +119,8 @@ export const EDocDataSchema = z
     fecha: CommonValidators.isoDateTime(),
 
     // D011: En este repo se agrega el tipo por defecto
-    tipoTransaccion: z.nativeEnum(TransactionType)
+    tipoTransaccion: z
+      .nativeEnum(TransactionType)
       .default(TransactionType.VENTA_DE_MERCADERIA),
 
     // D013
@@ -256,6 +257,16 @@ export const EDocDataSchema = z
     /**D011 = 12 */
     const transactionTypeIsTaxCreditSale =
       data.tipoTransaccion == TransactionType.VENTA_DE_CREDITO_FISCAL;
+    /**D013 = 1 */
+    const taxIsIVA = data.tipoImpuesto == TaxType.IVA;
+    /**D013 = 2 */
+    const taxIsISC = data.tipoImpuesto == TaxType.ISC;
+    /**D013 = 3 */
+    const taxIsRent = data.tipoImpuesto == TaxType.RENTA;
+    /**D013 = 4 */
+    const taxIsNone = data.tipoImpuesto == TaxType.NINGUNO;
+    /**D013 = 5 */
+    const taxIsIvaRent = data.tipoImpuesto == TaxType.IVA___RENTA;
     /**E501 = 5 */
     const remissionReasonIsImport =
       data.remision?.motivo == RemissionReason.IMPORTACION;
@@ -452,7 +463,7 @@ export const EDocDataSchema = z
       }
     }
 
-    // E704 - item.dncp.codigoNivelGeneral
+    // E704 - data.items.dncp.codigoNivelGeneral
     {
       /*
       Obligatorio si D202 = 3
@@ -467,7 +478,7 @@ export const EDocDataSchema = z
       }
     }
 
-    // E719 - item.cdcAnticipo
+    // E719 - data.items.cdcAnticipo
     {
       /*
         Obligatorio cuando se utilice una
@@ -482,21 +493,24 @@ export const EDocDataSchema = z
       }
     }
 
-    // E720 - (E720-E729)
+    // E720 - data.items.monto
     {
       /*
       Obligatorio si C002 ≠ 7
       No informar si C002 = 7
-      DELETE: eliminar cuando se resuelva
       */
-      /* if (isElectronicRemissionNote) {
-      
+      if (isElectronicRemissionNote) {
+        data.items.forEach((_item, i) => {
+          validator.requiredField(itemsPath.concat(i).concat('monto'));
+        });
       } else {
-
-      } */
+        data.items.forEach((_item, i) => {
+          validator.undesiredField(itemsPath.concat(i).concat('monto'));
+        });
+      }
     }
 
-    // E725 - item.cambio
+    // E725 - data.items.cambio
     {
       /*
       Obligatorio si D017 = 2
@@ -504,23 +518,38 @@ export const EDocDataSchema = z
       */
       if (currencyChangeConditionIsPerItem) {
         data.items.forEach((_item, i) => {
-          validator.requiredField(itemsPath.concat(i).concat('cambio'));
+          validator.requiredField(
+            itemsPath.concat(i).concat('monto').concat('cambio'),
+          );
         });
       } else if (currencyChangeConditionIsGlobal) {
         data.items.forEach((_item, i) => {
-          validator.undesiredField(itemsPath.concat(i).concat('cambio'));
+          validator.undesiredField(
+            itemsPath.concat(i).concat('monto').concat('cambio'),
+          );
         });
       }
     }
 
-    // E730 - Campos que describen el IVA de la operación por ítem
+    // E730 - data.items.impuesto
     {
       /*
-      Obligatorio si D013=1, 3, 4 o 5 y
-      C002 ≠ 4 o 7
+      Obligatorio si D013=1, 3, 4 o 5 y C002 ≠ 4 o 7
       No informar si D013=2 y C002= 4
-      DELETE: eliminar cuando se resuelva
       */
+      if (
+        (taxIsIVA || taxIsRent || taxIsNone || taxIsIvaRent) &&
+        !isAutoInvoice &&
+        !isElectronicRemissionNote
+      ) {
+        data.items.forEach((_item, i) => {
+          validator.requiredField(itemsPath.concat(i).concat('impuesto'));
+        });
+      } else if (taxIsISC && isAutoInvoice) {
+        data.items.forEach((_item, i) => {
+          validator.undesiredField(itemsPath.concat(i).concat('impuesto'));
+        });
+      }
     }
 
     // E900 - transporte
@@ -699,7 +728,7 @@ export const EDocDataSchema = z
     }
 
     const totalItemsPrice = data.items.reduce(
-      (acc, item) => acc + item.precioUnitario * item.cantidad,
+      (acc, item) => acc + (item.monto?.precioUnitario || 0) * item.cantidad,
       0,
     );
 
@@ -736,7 +765,10 @@ export const EDocDataSchema = z
     };
 
     // EA008 - totalOperacion
-    const calcTotalOperacion = (item: Item) => {
+    const calcTotalOperacion = (
+      itemQuantity_E711: number,
+      itemAmmountData: Monto | undefined,
+    ) => {
       /*
       Si D013 = 1, 3, 4 o 5 (afectado al
       IVA, Renta, ninguno, IVA - Renta),
@@ -753,18 +785,18 @@ export const EDocDataSchema = z
       E721*E711
       */
 
-      const itemPrice = isAutoInvoice ? item.precioUnitario : (
-        item.precioUnitario -
-        data.descuentoGlobal -
-        data.anticipoGlobal -
-        (item.descuento || 0) -
-        (item.anticipo || 0)
-      )
+      if (!itemAmmountData) return 0;
+
+      const itemPrice = isAutoInvoice
+        ? itemAmmountData.precioUnitario
+        : itemAmmountData.precioUnitario -
+          data.descuentoGlobal -
+          data.anticipoGlobal -
+          (itemAmmountData.descuento || 0) -
+          (itemAmmountData.anticipo || 0);
 
       // TODO_TEST: que pasa si es ISC y no es auto-factura? ahora retorna 0, pero no se como se debería de tratar
-      if (isAutoInvoice) {
-        return itemPrice * item.cantidad;
-      }
+
       if (
         [
           TaxType.IVA,
@@ -773,7 +805,10 @@ export const EDocDataSchema = z
           TaxType.IVA___RENTA,
         ].includes(data.tipoImpuesto)
       ) {
-        return itemPrice * item.cantidad;
+        return itemPrice * itemQuantity_E711;
+      }
+      if (isAutoInvoice) {
+        return itemPrice * itemQuantity_E711;
       }
 
       return 0;
@@ -781,16 +816,19 @@ export const EDocDataSchema = z
 
     // EA009 - totalOperacionGuaranies
     const calcTotalOperacionGuaranies = (
-      item: Item,
       totalOperacion_EA008: number,
+      currencyChange_E725: number | undefined,
     ) => {
-      if (item.cambio == undefined) return 0;
+      if (!currencyChange_E725) return 0;
 
-      return totalOperacion_EA008 * item.cambio;
+      return totalOperacion_EA008 * currencyChange_E725;
     };
 
     // E735 - ivaBase
-    const calcIvaBase = (item: Item, totalOperacion_EA008: number) => {
+    const calcIvaBase = (
+      itemTaxData: Impuesto,
+      totalOperacion_EA008: number,
+    ) => {
       /*
       Si E731 = 1 o 4 este campo es igual al resultado del cálculo:
       [100 * EA008 * E733] / [10000 + (E734 * E733)]
@@ -801,20 +839,21 @@ export const EDocDataSchema = z
       */
 
       /**E731 = 1 */
-      const isGravado = item.ivaTipo == TaxTreatment.GRAVADO_IVA;
+      const isGravado = itemTaxData.ivaTipo == TaxTreatment.GRAVADO_IVA;
       /**E731 = 2 */
       const isExonerado =
-        item.ivaTipo == TaxTreatment.EXONERADO__ART__100___LEY_6380_2019_;
+        itemTaxData.ivaTipo ==
+        TaxTreatment.EXONERADO__ART__100___LEY_6380_2019_;
       /**E731 = 3 */
-      const isExento = item.ivaTipo == TaxTreatment.EXENTO;
+      const isExento = itemTaxData.ivaTipo == TaxTreatment.EXENTO;
       /**E731 = 4 */
       const isGravadoParcial =
-        item.ivaTipo == TaxTreatment.GRAVADO_PARCIAL__GRAV__EXENTO_;
+        itemTaxData.ivaTipo == TaxTreatment.GRAVADO_PARCIAL__GRAV__EXENTO_;
 
       if (isGravado || isGravadoParcial) {
         return (
-          (100 * totalOperacion_EA008 * item.proporcionGravada) /
-          (10000 + item.iva * item.proporcionGravada)
+          (100 * totalOperacion_EA008 * itemTaxData.proporcionGravada) /
+          (10000 + itemTaxData.iva * itemTaxData.proporcionGravada)
         );
       } else if (isExonerado || isExento) {
         return 0;
@@ -826,7 +865,10 @@ export const EDocDataSchema = z
     };
 
     // E736 - liquidacionIvaPorItem
-    const calcLiquidacionIvaPorItem = (item: Item, ivaBase: number) => {
+    const calcLiquidacionIvaPorItem = (
+      iva_E734: number,
+      ivaBase_E735: number,
+    ) => {
       /*
       Corresponde al cálculo aritmético:
       E735 * (E734/100)
@@ -835,12 +877,15 @@ export const EDocDataSchema = z
       */
       // esto resume el calculo
       // si es exonerado o exento (E731 = 2 o 3) iva cera 0 y el resto son matemáticas
-      return ivaBase * (item.iva / 100);
+      return ivaBase_E735 * (iva_E734 / 100);
     };
 
     // E737 - baseExentaIva
     // VER: https://www.dnit.gov.py/documents/20123/420595/NT_E_KUATIA_013_MT_V150.pdf/ba73ec3b-5901-ae28-5d8c-9bed5632ab89?t=1687353747529
-    const calcBaseExentaIva = (item: Item, totalOperacion_EA008: number) => {
+    const calcBaseExentaIva = (
+      itemTaxData: Impuesto,
+      totalOperacion_EA008: number,
+    ) => {
       /*
       Si E731 = 4 este campo es igual al resultado del cálculo:
       [100 * EA008 * (100 – E733)] / [10000 + (E734 * E733)]
@@ -849,20 +894,21 @@ export const EDocDataSchema = z
       */
 
       /**E731 = 1 */
-      const isGravado = item.ivaTipo == TaxTreatment.GRAVADO_IVA;
+      const isGravado = itemTaxData.ivaTipo == TaxTreatment.GRAVADO_IVA;
       /**E731 = 2 */
       const isExonerado =
-        item.ivaTipo == TaxTreatment.EXONERADO__ART__100___LEY_6380_2019_;
+        itemTaxData.ivaTipo ==
+        TaxTreatment.EXONERADO__ART__100___LEY_6380_2019_;
       /**E731 = 3 */
-      const isExento = item.ivaTipo == TaxTreatment.EXENTO;
+      const isExento = itemTaxData.ivaTipo == TaxTreatment.EXENTO;
       /**E731 = 4 */
       const isGravadoParcial =
-        item.ivaTipo == TaxTreatment.GRAVADO_PARCIAL__GRAV__EXENTO_;
+        itemTaxData.ivaTipo == TaxTreatment.GRAVADO_PARCIAL__GRAV__EXENTO_;
 
       if (isGravadoParcial) {
         return (
-          (100 * totalOperacion_EA008 * (100 - item.proporcionGravada)) /
-          (10000 + item.iva * item.proporcionGravada)
+          (100 * totalOperacion_EA008 * (100 - itemTaxData.proporcionGravada)) /
+          (10000 + itemTaxData.iva * itemTaxData.proporcionGravada)
         );
       } else if (isGravado || isExonerado || isExento) {
         return 0;
@@ -874,7 +920,7 @@ export const EDocDataSchema = z
     };
 
     const items = data.items.map((item) => {
-      const totalItemPrice = item.precioUnitario * item.cantidad;
+      const totalItemPrice = (item.monto?.precioUnitario || 0) * item.cantidad;
       const percentageInAllItems = (totalItemPrice * 100) / totalItemsPrice;
 
       const descuentoGlobalItem = calcDescuentoGlobalItem(
@@ -886,37 +932,60 @@ export const EDocDataSchema = z
         percentageInAllItems,
       );
 
-      const totalOperacion = calcTotalOperacion(item);
-      const totalOperacionGuaranies = calcTotalOperacionGuaranies(
-        item,
-        totalOperacion,
-      );
-      const ivaBase = calcIvaBase(item, totalOperacion);
-      const baseExentaIva = calcBaseExentaIva(item, totalOperacion);
+      const totalOperacion = calcTotalOperacion(item.cantidad, item.monto);
+
+      // E720
+      let monto;
+      if (item.monto) {
+        const totalOperacionGuaranies = calcTotalOperacionGuaranies(
+          totalOperacion,
+          item.monto.cambio,
+        );
+
+        monto = {
+          ...item.monto,
+
+          /**EA004 */
+          descuentoGlobalItem,
+
+          /**EA007 */
+          anticipoGlobalItem,
+
+          /**EA008 */
+          totalOperacion,
+
+          /**EA009 */
+          totalOperacionGuaranies,
+        };
+      }
+
+      // E730
+      let impuesto;
+      if (item.impuesto) {
+        const ivaBase = calcIvaBase(item.impuesto, totalOperacion);
+        const baseExentaIva = calcBaseExentaIva(item.impuesto, totalOperacion);
+
+        impuesto = {
+          ...item.impuesto,
+
+          /**E735 */
+          ivaBase,
+
+          /**E736 */
+          liquidacionIvaPorItem: calcLiquidacionIvaPorItem(
+            item.impuesto.iva,
+            ivaBase,
+          ),
+
+          /**E737 */
+          baseExentaIva,
+        };
+      }
 
       return {
         ...item,
-
-        /**EA004 */
-        descuentoGlobalItem,
-
-        /**EA007 */
-        anticipoGlobalItem,
-
-        /**EA008 */
-        totalOperacion,
-
-        /**EA009 */
-        totalOperacionGuaranies,
-
-        /**E735 */
-        ivaBase,
-
-        /**E736 */
-        liquidacionIvaPorItem: calcLiquidacionIvaPorItem(item, ivaBase),
-
-        /**E737 */
-        baseExentaIva,
+        monto,
+        impuesto,
       } satisfies CompleteItem;
     });
 

@@ -14,18 +14,14 @@ import dbService from '../../services/db.service';
 export const EntregaSchema = z
   .object({
     // E606
-    tipo: z.nativeEnum(PaymentType, {
-      required_error: 'El tipo de pago es requerido',
-    }),
+    tipo: z.nativeEnum(PaymentType),
 
     // E607
     tipoDescripcion: z.string().min(4).max(30).optional(),
 
     // E608
     monto: z
-      .number({
-        required_error: 'El monto por tipo de pago es requerido',
-      })
+      .number()
       .superRefine((value, ctx) => {
         if (value == undefined) return;
         new NumberLength(value, ctx).max(15).maxDecimals(4);

@@ -12,9 +12,7 @@ import dbService from '../../services/db.service';
 export const DocumentoAsociadoSchema = z
   .object({
     // H002
-    formato: z.nativeEnum(AssociatedDocumentType, {
-      required_error: 'El campo formato es requerido',
-    }),
+    formato: z.nativeEnum(AssociatedDocumentType),
 
     // H004
     cdc: CommonValidators.cdc().optional(),

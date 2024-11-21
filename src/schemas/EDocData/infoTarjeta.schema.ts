@@ -12,9 +12,7 @@ import dbService from '../../services/db.service';
 export const InfoTarjetaSchema = z
   .object({
     // E621
-    tipo: z.nativeEnum(CreditCard, {
-      required_error: 'El tipo de tarjeta es requerido',
-    }),
+    tipo: z.nativeEnum(CreditCard),
 
     // E622
     tipoDescripcion: z.string().optional(),
@@ -26,9 +24,7 @@ export const InfoTarjetaSchema = z
     ruc: CommonValidators.ruc().optional(),
 
     // E626
-    medioPago: z.nativeEnum(CreditCardProcessingMethod, {
-      required_error: 'El medio de pago es requerido',
-    }),
+    medioPago: z.nativeEnum(CreditCardProcessingMethod),
 
     // E627
     codigoAutorizacion: z

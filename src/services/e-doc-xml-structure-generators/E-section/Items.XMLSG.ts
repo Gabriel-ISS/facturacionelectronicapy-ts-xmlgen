@@ -1,5 +1,6 @@
 import { EDocData } from '../../../schemas/EDoc.schema';
 import { CompleteItem } from '../../../schemas/EDocData/item.schema';
+import { CompleteMonto } from '../../../schemas/EDocData/monto.schema';
 
 class ItemsXMLSG {
   /**E8. Campos que describen los ítems de la operación (E700-E899)*/
@@ -78,67 +79,73 @@ class ItemsXMLSG {
 
   /**E8.1. Campos que describen el precio, tipo de cambio y valor total de la operación por ítem (E720-E729)*/
   private get_gValorItem(item: CompleteItem) {
+    const monto = item.monto;
+    if (!monto) return;
+
     return {
       // E721: del repo original: "Mejor no tocar como el usuario envia desde el JSON"
-      dPUniProSer: item.precioUnitario,
+      dPUniProSer: monto.precioUnitario,
 
       // E725
-      dTiCamIt: item.cambio,
+      dTiCamIt: monto.cambio,
 
       // E727
-      dTotBruOpeItem: item.precioTotal,
+      dTotBruOpeItem: monto.precioTotal,
 
       // E8.1.1 Campos que describen los descuentos, anticipos y valor total por ítem (EA001-EA050)
-      gValorRestaItem: this.get_gValorRestaItem(item),
+      gValorRestaItem: this.get_gValorRestaItem(monto),
     };
   }
 
   /**E8.1.1 Campos que describen los descuentos, anticipos y valor total por ítem (EA001-EA050)*/
-  private get_gValorRestaItem(item: CompleteItem) {
+  private get_gValorRestaItem(monto: CompleteMonto) {
     return {
       // EA002
-      dDescItem: item.descuento,
+      dDescItem: monto.descuento,
 
       // EA003
-      dPorcDesIt: item.procentajeDescuentoPorItem,
+      dPorcDesIt: monto.procentajeDescuentoPorItem,
 
       // EA004
-      dDescGloItem: item.descuentoGlobalItem,
+      dDescGloItem: monto.descuentoGlobalItem,
 
       // EA006
-      dAntPreUniIt: item.anticipo,
+      dAntPreUniIt: monto.anticipo,
 
       // EA007
-      dAntGloPreUniIt: item.anticipoGlobalItem,
+      dAntGloPreUniIt: monto.anticipoGlobalItem,
 
       // EA008
-      dTotOpeItem: item.totalOperacion,
+      dTotOpeItem: monto.totalOperacion,
 
       // EA009
-      dTotOpeGs: item.totalOperacionGuaranies,
+      dTotOpeGs: monto.totalOperacionGuaranies,
     };
   }
 
   /**E8.2. Campos que describen el IVA de la operación por ítem (E730-E739)*/
   private get_gCamIVA(item: CompleteItem) {
+    const impuesto = item.impuesto;
+    if (!impuesto) return;
+
     return {
       // E731
-      iAfecIVA: item.ivaTipo,
+      iAfecIVA: impuesto.ivaTipo,
 
       // E732
-      dDesAfecIVA: item.ivaTipoDescripcion,
+      dDesAfecIVA: impuesto.ivaTipoDescripcion,
 
       // E733
-      dPropIVA: item.proporcionGravada,
+      dPropIVA: impuesto.proporcionGravada,
 
       // E734
-      dTasaIVA: item.iva,
+      dTasaIVA: impuesto.iva,
 
       // E735
-      dBasGravIVA: item.ivaBase,
+      dBasGravIVA: impuesto.ivaBase,
 
       // E736
-      dLiqIVAItem: item.liquidacionIvaPorItem,
+      dLiqIVAItem: impuesto.liquidacionIvaPorItem,
     };
   }
 

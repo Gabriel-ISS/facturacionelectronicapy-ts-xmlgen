@@ -9,9 +9,7 @@ import { Credito, CreditoSchema } from './credito.schema';
 export const CondicionSchema = z
   .object({
     // E601
-    tipo: z.nativeEnum(PaymentCondition, {
-      required_error: 'La condición de la operación es requerida',
-    }),
+    tipo: z.nativeEnum(PaymentCondition),
 
     // E7.1. Campos que describen la forma de pago de la operación al contado o del monto de la entrega inicial (E605-E619)
     entregas: z.array(EntregaSchema).max(999).optional(),

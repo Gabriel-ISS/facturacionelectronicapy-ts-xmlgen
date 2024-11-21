@@ -10,23 +10,17 @@ import dbService from '../../services/db.service';
 export const RemisionSchema = z
   .object({
     // E501
-    motivo: z.nativeEnum(RemissionReason, {
-      required_error: 'El motivo de la emisión es requerido',
-    }),
+    motivo: z.nativeEnum(RemissionReason),
 
     // E502
     motivoDescripcion: z.string().min(5).max(60).optional(),
 
     // E503,
-    tipoResponsable: z.nativeEnum(FreightResponsible, {
-      required_error: 'El tipo de responsable es requerido',
-    }),
+    tipoResponsable: z.nativeEnum(FreightResponsible),
 
     // E505
     kms: z
-      .number({
-        required_error: 'Los kilómetros estimados de recorrido son requeridos',
-      })
+      .number()
       .superRefine((value, ctx) => {
         new NumberLength(value, ctx).int().max(5);
       }),

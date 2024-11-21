@@ -13,14 +13,10 @@ import dbService from '../../services/db.service';
 export const AutoFacturaSchema = z
   .object({
     // E301
-    tipoVendedor: z.nativeEnum(SellerNatureSelfInvoicing, {
-      required_error: 'El tipo de vendedor es requerido',
-    }),
+    tipoVendedor: z.nativeEnum(SellerNatureSelfInvoicing),
 
     // E304
-    documentoTipo: z.nativeEnum(IdentityDocumentCarriers, {
-      required_error: 'El tipo de documento es requerido',
-    }),
+    documentoTipo: z.nativeEnum(IdentityDocumentCarriers),
 
     // E306
     documentoNumero: CommonValidators.identityDocNumber(),
