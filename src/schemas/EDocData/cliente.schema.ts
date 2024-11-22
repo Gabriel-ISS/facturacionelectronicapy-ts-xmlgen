@@ -30,6 +30,9 @@ export const ClienteSchema = z
     // D208
     documentoTipo: z.nativeEnum(IdentityDocumentReceptor).optional(),
 
+    // D209
+    descripcionTipoDocumento: CommonValidators.identityDocDescription().optional(),
+
     // D210
     documentoNumero: CommonValidators.identityDocNumber().optional(),
 
@@ -86,6 +89,8 @@ export const ClienteSchema = z
     /**D208 = 5 */
     const isNameless =
       data.documentoTipo == IdentityDocumentReceptor.INNOMINADO;
+    /**D208 = 9 */
+    const isOther = data.documentoTipo == IdentityDocumentReceptor.OTRO;
 
     // D205 - tipoContribuyente
     {
@@ -124,6 +129,22 @@ export const ClienteSchema = z
         validator.requiredField('documentoTipo');
       } else if (isTaxpayer) {
         validator.undesiredField('documentoTipo');
+      }
+    }
+
+    // D209 - descripcionTipoDocumento
+    {
+      /*
+      Si D208 = 9 informar el tipo de
+      documento de identidad del
+      receptor
+      */
+      if (isOther) {
+        validator.requiredField('descripcionTipoDocumento');
+      } else {
+        data.descripcionTipoDocumento = dbService
+          .select('identityDocumentsReceptors')
+          .findByIdIfExist(data.documentoTipo)?.description;
       }
     }
 
@@ -210,11 +231,6 @@ export const ClienteSchema = z
 
       // D207
       rucDV: rucDV as string | undefined,
-
-      // D209
-      descripcionTipoDocumento: dbService
-        .select('identityDocumentsReceptors')
-        .findByIdIfExist(data.documentoTipo)?.description,
 
       // D220
       descripcionDepartamento: dbService

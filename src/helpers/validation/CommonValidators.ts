@@ -185,6 +185,10 @@ class CommonValidators {
     return z.string().email().min(3).max(80);
   }
 
+  identityDocDescription() {
+    return z.string().min(9).max(41);
+  }
+
   identityDocNumber() {
     return z.string().min(1).max(20);
   }

@@ -32,6 +32,9 @@ export const NominationEventSchema = z
     // GENFE010
     documentoTipo: z.nativeEnum(IdentityDocForNominationEvent).optional(),
 
+    // GENFE011
+    descripcionTipoDocumento: CommonValidators.identityDocDescription().optional(),
+
     // GENFE012
     documentoNumero: CommonValidators.identityDocNumber().optional(),
 
@@ -86,6 +89,8 @@ export const NominationEventSchema = z
     /**GENFE004 = 2 */
     const isNotTaxpayer =
       data.contribuyente == TaxpayerNotTaxpayer.NO_CONTRIBUYENTE;
+    /**GENFE010 = 9 */
+    const isOther = data.documentoTipo == IdentityDocForNominationEvent.OTRO;
 
     // GENFE007, GENFE008, GENFE009
     {
@@ -110,6 +115,22 @@ export const NominationEventSchema = z
       if (isNotTaxpayer) {
         validator.requiredField('documentoTipo');
         validator.requiredField('documentoNumero');
+      }
+    }
+
+    // GENFE011 - descripcionTipoDocumento
+    {
+      /*
+      Si GENFE010 = 9 informar el tipo de
+      documento de identidad del
+      receptor
+      */
+      if (isOther) {
+        validator.requiredField('descripcionTipoDocumento');
+      } else {
+        data.descripcionTipoDocumento = dbService
+          .select('identityDocsForNominationEvent')
+          .findByIdIfExist(data.documentoTipo)?.description;
       }
     }
 
@@ -144,11 +165,6 @@ export const NominationEventSchema = z
 
       // GENFE009
       rucDV: rucDV as string | undefined,
-
-      // GENFE011
-      descripcionTipoDocumento: dbService
-        .select('identityDocsForNominationEvent')
-        .findByIdIfExist(data.documentoTipo)?.description,
 
       // GENFE018
       descripcionDepartamento: dbService

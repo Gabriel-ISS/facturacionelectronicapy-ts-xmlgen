@@ -17,12 +17,13 @@ export const FacturaSchema = z
     // E013
     fechaEnvio: CommonValidators.isoDate(),
   })
-  .superRefine((data, ctx) => {
+  .transform((data, ctx) => {
     const validator = new ZodValidator(ctx, data);
 
     const presenceIsOther = data.presencia == PresenceIndicator.OTRO;
 
     // E012 - descripcionPresencia
+    let descripcionPresencia = data.descripcionPresencia;
     {
       /*
       Si E011 = 9 informar el indicador de
@@ -30,8 +31,19 @@ export const FacturaSchema = z
       */
       if (presenceIsOther) {
         validator.requiredField('descripcionPresencia');
+      } else {
+        descripcionPresencia = dbService
+          .select('presenceIndicators')
+          .findByIdIfExist(data.presencia)?.description;
       }
     }
+
+    return {
+      ...data,
+
+      // E012
+      descripcionPresencia,
+    };
   });
 
 export type Factura = z.infer<typeof FacturaSchema>;
