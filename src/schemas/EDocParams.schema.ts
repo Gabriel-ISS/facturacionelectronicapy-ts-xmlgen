@@ -36,7 +36,7 @@ export const EDocParamsSchema = z.object({
   actividadesEconomicas: z.array(ActividadEconomicaSchema).min(1).max(9),
 
   // C004
-  timbradoNumero: z.string().length(8),
+  timbradoNumero: CommonValidators.timbardo(),
 
   // C008
   timbradoFecha: CommonValidators.isoDate(),

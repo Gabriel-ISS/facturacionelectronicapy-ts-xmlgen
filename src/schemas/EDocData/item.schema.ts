@@ -1,17 +1,14 @@
 import { z } from 'zod';
-import { Country } from '../../constants/countries.constants';
 import { MerchandiseRelevance } from '../../constants/merchandiseRelevances.constants';
-import { TaxTreatment } from '../../constants/taxTreatments.constants';
 import DateHelper from '../../helpers/DateHelper';
-import NumberLength from '../../helpers/validation/NumberLenght';
-import dbService from '../../services/db.service';
-import { ItemDncpSchema } from './itemDncp.schema';
-import { SectorAutomotorSchema } from './sectorAutomotor.schema';
-import { TaxRate } from '../../constants/taxRate.constants';
-import ZodValidator from '../../helpers/validation/ZodValidator';
 import CommonValidators from '../../helpers/validation/CommonValidators';
-import { CompleteMonto, MontoSchema } from './monto.schema';
+import NumberLength from '../../helpers/validation/NumberLenght';
+import ZodValidator from '../../helpers/validation/ZodValidator';
+import dbService from '../../services/db.service';
 import { CompleteImpuesto, ImpuestoSchema } from './impuesto.schema';
+import { ItemDncpSchema } from './itemDncp.schema';
+import { CompleteMonto, MontoSchema } from './monto.schema';
+import { SectorAutomotorSchema } from './sectorAutomotor.schema';
 
 /**E8. Campos que describen los ítems de la operación (E700-E899) */
 export const ItemSchema = z

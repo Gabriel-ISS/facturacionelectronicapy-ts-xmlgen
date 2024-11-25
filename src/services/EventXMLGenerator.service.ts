@@ -106,6 +106,7 @@ class EventService {
    */
   private generateXMLEventoService(data: EventData) {
     const result = {
+      // GDE000
       gGroupGesEve: {
         $: {
           xmlns: 'http://ekuatia.set.gov.py/sifen/xsd',
@@ -113,13 +114,24 @@ class EventService {
           'xsi:schemaLocation':
             'http://ekuatia.set.gov.py/sifen/xsd/siRecepEvento_v150.xsd',
         },
+
+        // GDE001
         rGesEve: {
+
+          // GDE002
           rEve: {
             $: {
+              // GDE003
               Id: 1,
             },
+
+            // GDE004
             dFecFirma: DateHelper.getIsoDateTime(new Date()),
+
+            // GDE005
             dVerFor: 150,
+
+            // GDE007
             gGroupTiEvt: removeUndefinedValues(this.get_gGroupTiEvt(data)),
           },
         },
