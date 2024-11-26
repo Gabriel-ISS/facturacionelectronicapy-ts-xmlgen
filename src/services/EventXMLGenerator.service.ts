@@ -34,6 +34,7 @@ import {
   TransportUpdateEventInput,
   TransportUpdateEventSchema,
 } from '../schemas/events/TransportUpdateEvent.schema';
+import { removeUndefinedValues } from '../helpers/removeUndefinedValues';
 
 type Pair<E extends SIFENEvent, D> = { event: E } & D;
 

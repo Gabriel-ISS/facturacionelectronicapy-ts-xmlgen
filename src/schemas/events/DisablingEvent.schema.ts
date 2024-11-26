@@ -9,7 +9,7 @@ import CommonValidators from '../../helpers/validation/CommonValidators';
 export const DisablingEventSchema = z
   .object({
     // GEI002
-    timbrado: CommonValidators.timbardo(),
+    timbrado: CommonValidators.timbrado(),
 
     // GEI003
     establecimiento: CommonValidators.zeroPadToLength(3),

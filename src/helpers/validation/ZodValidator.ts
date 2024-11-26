@@ -8,16 +8,35 @@ export default class ZodValidator<T extends Record<string, any>> {
     readonly object: T,
   ) {}
 
+  private getPathString(fieldNameOrPath: keyof T | Path<any>) {
+    const pathStr = fieldNameOrPath.toString();
+    return this.ctx.path.join('.') + '.' + pathStr;
+  }
+
+  private getPath(fieldNameOrPath: keyof T | Path<any>) {
+    let pathStr: (string | number)[];
+    if (fieldNameOrPath instanceof String) {
+      pathStr = fieldNameOrPath.split('.');
+    } else if (fieldNameOrPath instanceof Path) {
+      pathStr = fieldNameOrPath.path;
+    } else {
+      pathStr = [fieldNameOrPath.toString()];
+    }
+
+    return this.ctx.path.concat(pathStr);
+  }
+
   validate(
     fieldNameOrPath: keyof T | Path<any>,
     errorCondition: boolean,
     message: string,
   ) {
     if (errorCondition) {
+
       this.ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message,
-        path: this.ctx.path.concat(fieldNameOrPath.toString()),
+        path: this.getPath(fieldNameOrPath),
       });
     }
   }
@@ -30,7 +49,7 @@ export default class ZodValidator<T extends Record<string, any>> {
     this.validate(
       fieldNameOrPath,
       value != undefined,
-      customMessage ?? `El campo ${fieldNameOrPath as string} no es requerido`,
+      customMessage ?? `El campo '${this.getPathString(fieldNameOrPath)}' no es requerido`,
     );
   }
 
@@ -41,8 +60,8 @@ export default class ZodValidator<T extends Record<string, any>> {
 
     this.validate(
       fieldNameOrPath,
-      value != undefined,
-      customMessage ?? `El campo ${fieldNameOrPath as string} no es requerido`,
+      value == undefined,
+      customMessage ?? `El campo '${this.getPathString(fieldNameOrPath)}' es requerido`,
     );
   }
 }

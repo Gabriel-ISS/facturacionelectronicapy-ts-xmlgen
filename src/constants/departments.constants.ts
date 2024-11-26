@@ -1,24 +1,24 @@
 import { BasicData } from '../services/constants.service';
 
 export enum Department {
-  ALTO_PARAGUAY = 17,
-  ALTO_PARANA = 11,
-  AMAMBAY = 14,
-  BOQUERON = 16,
-  CAAGUAZU = 6,
-  CAAZAPA = 7,
-  CANINDEYU = 18,
   CAPITAL = 1,
-  CENTRAL = 12,
   CONCEPCION = 2,
+  SAN_PEDRO = 3,
   CORDILLERA = 4,
   GUAIRA = 5,
+  CAAGUAZU = 6,
+  CAAZAPA = 7,
   ITAPUA = 8,
   MISIONES = 9,
-  NEEMBUCU = 13,
   PARAGUARI = 10,
+  ALTO_PARANA = 11,
+  CENTRAL = 12,
+  NEEMBUCU = 13,
+  AMAMBAY = 14,
   PTE__HAYES = 15,
-  SAN_PEDRO = 3,
+  BOQUERON = 16,
+  ALTO_PARAGUAY = 17,
+  CANINDEYU = 18,
 }
 
 export const departments: BasicData<Department>[] = [

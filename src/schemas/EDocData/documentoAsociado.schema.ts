@@ -18,7 +18,7 @@ export const DocumentoAsociadoSchema = z
     cdc: CommonValidators.cdc().optional(),
 
     // H005
-    timbrado: CommonValidators.timbardo().optional(),
+    timbrado: CommonValidators.timbrado().optional(),
 
     // H006
     establecimiento: CommonValidators.zeroPadToLength(3).optional(),

@@ -20,36 +20,38 @@ class CommonValidators {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       message,
+      path: ctx.path,
     });
   }
 
-  oneNumberOf(tableName: keyof typeof constantsService) {
-    return z.number().refine(
-      (value) => {
-        if (!value) return true;
-        const foundData = dbService.select(tableName).findByIdIfExist(value);
-        return foundData != null;
-      },
-      {
-        message: `El valor del campo no es válido`,
-      },
-    );
+  oneNumberOf(tableName: keyof typeof constantsService, message?: string) {
+    return z.number().superRefine((value, ctx) => {
+      if (!value) return;
+      const foundData = dbService.select(tableName).findByIdIfExist(value);
+      if (foundData) return;
+      this.addFieldError(
+        ctx,
+        message ?? `El valor del campo '${ctx.path.join('.')}' no es válido`,
+      );
+    });
   }
 
-  oneStringOf(tableName: 'countries' | 'currencies' | 'tradingConditions') {
-    return z.string().refine(
-      (value) => {
-        if (!value) return true;
-        const foundData = dbService
-          .select(tableName)
-          .findByIdIfExist(value as Country | Currency | TradingCondition);
-        return foundData != null;
-      },
-      {
-        message: `El valor del campo no es válido`,
-      },
-    );
-  }
+  // DELETE: de momento no se usa, pero se puede usar para mejorar la eficiencia de algunas validaciones
+  /* oneStringOf(tableName: 'countries' | 'currencies' | 'tradingConditions', message?: string) {
+    return z.string().superRefine((value, ctx) => {
+      if (!value) return;
+      const foundData = dbService
+        .select(tableName)
+        .findByIdIfExist(value as Country | Currency | TradingCondition);
+      if (foundData) return;
+
+      const path = `'${ctx.path.join('.')}'`;
+      this.addFieldError(
+        ctx,
+        message ?? `El valor del campo ${path} no es válido`,
+      );
+    });
+  } */
 
   location(
     ctx: z.RefinementCtx,
@@ -57,7 +59,6 @@ class CommonValidators {
     districtId: number | undefined,
     cityId: number | undefined,
   ) {
-
     let foundDistrict = dbService
       .select('districts')
       .findByIdIfExist(districtId);
@@ -127,34 +128,37 @@ class CommonValidators {
   ruc(messages?: Min & Max) {
     return z
       .string()
-      .min(3)
-      .max(8)
       .superRefine((value, ctx) => {
         const [id, dv] = value.split('-');
+        const path = `'${ctx.path.join('.')}'`;
 
         if (id.length > 8) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: messages?.max,
+            message:
+              messages?.max ??
+              `El numero de identificación en ${path} debe tener como máximo 8 caracteres`,
           });
         } else if (id.length < 3) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: messages?.min,
+            message:
+              messages?.min ??
+              `El numero de identificación en ${path} debe tener al menos 3 caracteres`,
           });
         }
 
         if (!dv) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: 'El ruc debe contener el dígito verificador',
+            message: `El ruc en ${path} debe contener el dígito verificador`,
           });
         } else {
           const dvNumber = Number(dv);
           if (Number.isNaN(dvNumber) || dvNumber < 1 || dvNumber > 9) {
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
-              message: 'El dígito verificador debe ser un número entre 1 y 9',
+              message: `El dígito verificador de ${path} debe ser un número entre 1 y 9`,
             });
           }
         }
@@ -235,22 +239,19 @@ class CommonValidators {
   }
 
   gtinCode(messages?: Lengths) {
-    return z.number().refine(
-      (value) => {
-        if (value == undefined) return;
-        const nStr = value.toString();
-        const validLenghts = [8, 12, 13, 14];
-        if (!validLenghts.includes(nStr.length)) {
-          return false;
-        }
-        return true;
-      },
-      {
-        message:
-          messages?.length ??
-          `El valor debe ser del tipo de código GTIN de 8 o 12 o 13 o 14 caracteres`,
-      },
-    );
+    return z.number().superRefine((value, ctx) => {
+      if (value == undefined) return;
+      const nStr = value.toString();
+      const validLenghts = [8, 12, 13, 14];
+      if (validLenghts.includes(nStr.length)) return;
+
+      const path = `'${ctx.path.join('.')}'`;
+      this.addFieldError(
+        ctx,
+        messages?.length ??
+          `El valor del campo ${path} debe ser del tipo de código GTIN de 8 o 12 o 13 o 14 caracteres`,
+      );
+    });
   }
 
   cdc() {
@@ -261,22 +262,23 @@ class CommonValidators {
     return z.string().min(5).max(500);
   }
 
-  timbardo() {
+  timbrado() {
     return z.string().length(8);
   }
 
   serie() {
-    return z.string().refine(
-      (value) => {
-        if (value == undefined) return true;
+    return z.string().superRefine((value, ctx) => {
+      if (value == undefined) return true;
 
-        // Solo 2 letras mayúsculas
-        return /^[A-Z]{2}$/.test(value);
-      },
-      {
-        message: 'El valor debe ser exactamente 2 letras mayúsculas',
-      },
-    );
+      // Solo 2 letras mayúsculas
+      if (/^[A-Z]{2}$/.test(value)) return;
+
+      const path = `'${ctx.path.join('.')}'`;
+      this.addFieldError(
+        ctx,
+        `El valor del campo ${path} debe ser exactamente 2 letras mayúsculas`,
+      );
+    });
   }
 
   clientCode() {

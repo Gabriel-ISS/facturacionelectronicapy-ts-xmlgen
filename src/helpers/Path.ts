@@ -18,7 +18,14 @@ export class Path<T, K extends Key<T> = Key<T>> {
   getValueFromPath(object: any) {
     let currentValue = object;
     for (const key of this.path) {
-      currentValue = currentValue[key];
+      try {
+        currentValue = currentValue[key];
+      } catch (error) {
+        console.info(JSON.stringify(object, null, 2));
+        throw new Error(
+          `Error al intentar ingresar al campo '${this.path.join('.')}' en la clave '${key}', por favor reporte el error en la seccion de errores del repositorio`,
+        )
+      }
     }
     return currentValue;
   }

@@ -1,4 +1,4 @@
-function removeUndefinedValues(obj: any): any {
+export function removeUndefinedValues(obj: any): any {
   if (typeof obj !== 'object' || obj === null) return obj;
 
   // Iterar sobre todas las propiedades del objeto

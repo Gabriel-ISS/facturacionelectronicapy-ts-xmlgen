@@ -41,3 +41,7 @@ class EDocument {
 }
 
 export default new EDocument();
+
+export { EDocDataInput, EDocParamsInput };
+export { XmlGenConfig };
+export { SIFENEvent } from './types/Events';

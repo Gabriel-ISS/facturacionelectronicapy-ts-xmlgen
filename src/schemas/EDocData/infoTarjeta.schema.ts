@@ -39,7 +39,10 @@ export const InfoTarjetaSchema = z
     titular: z.string().min(4).max(30).optional(),
 
     // E629
-    numero: z.string().length(4).optional(),
+    numero: z.number().optional().superRefine((value, ctx) => {
+      if (value == undefined) return;
+      new NumberLength(value, ctx).int().length(4);
+    }),
   })
   .transform((data, ctx) => {
     const validator = new ZodValidator(ctx, data);

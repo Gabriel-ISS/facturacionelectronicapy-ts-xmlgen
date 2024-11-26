@@ -9,6 +9,7 @@ import { CompleteImpuesto, ImpuestoSchema } from './impuesto.schema';
 import { ItemDncpSchema } from './itemDncp.schema';
 import { CompleteMonto, MontoSchema } from './monto.schema';
 import { SectorAutomotorSchema } from './sectorAutomotor.schema';
+import { MeasurementUnit } from '../../constants/measurementUnits.constants';
 
 /**E8. Campos que describen los ítems de la operación (E700-E899) */
 export const ItemSchema = z
@@ -46,7 +47,7 @@ export const ItemSchema = z
     descripcion: z.string().min(1).max(2000),
 
     // E709
-    unidadMedida: z.number(),
+    unidadMedida: z.nativeEnum(MeasurementUnit),
 
     // E711: VER: https://www.dnit.gov.py/documents/20123/420595/NT_E_KUATIA_023_MT_V150.pdf/9580922b-5dd5-60f9-4857-ae66a757898f?t=1724956850006
     cantidad: z.number().superRefine((value, ctx) => {

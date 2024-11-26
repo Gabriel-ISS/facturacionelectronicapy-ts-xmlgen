@@ -15,6 +15,7 @@ import TransporteXMLSG from './e-doc-xml-structure-generators/E-section/Transpor
 import AutoFacturaXMLSG from './e-doc-xml-structure-generators/E-section/AutoFactura.XMLSG';
 import NotaRemisionXMLSG from './e-doc-xml-structure-generators/E-section/NotaRemision.XMLSG';
 import NotaCreditoDebitoXMLSG from './e-doc-xml-structure-generators/E-section/NotaCreditoDebito.XMLSG';
+import { removeUndefinedValues } from '../helpers/removeUndefinedValues';
 
 class EDocXMLGenerator {
   private readonly defaultConfig: XmlGenConfig = {
@@ -46,8 +47,8 @@ class EDocXMLGenerator {
     params: EDocParams,
     data: EDocData,
     config?: XmlGenConfig,
-  ): Promise<any> {
-    return new Promise((resolve, reject) => {
+  ) {
+    return new Promise<string>((resolve, reject) => {
       try {
         // DELETE: si ya no se usa
         config = { ...this.defaultConfig, ...config };

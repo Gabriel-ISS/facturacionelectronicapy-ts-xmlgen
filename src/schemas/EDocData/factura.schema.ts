@@ -15,7 +15,7 @@ export const FacturaSchema = z
     descripcionPresencia: z.string().min(10).max(30).optional(),
 
     // E013
-    fechaEnvio: CommonValidators.isoDate(),
+    fechaEnvio: CommonValidators.isoDate().optional(),
   })
   .transform((data, ctx) => {
     const validator = new ZodValidator(ctx, data);

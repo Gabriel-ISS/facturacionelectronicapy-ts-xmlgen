@@ -3,6 +3,18 @@ import { z, ZodErrorMap, ZodIssueCode } from 'zod';
 export default function translateZodErrors(errorMapOverride?: ZodErrorMap) {
   const customErrorMap: ZodErrorMap = (issue, _ctx) => {
     const pathStr = `'${issue.path.join('.')}'`;
+
+    const dataType = typeof _ctx.data
+
+    const elements = {
+      'string': 'caracteres',
+      'number': 'dígitos',
+      'bigint': 'dígitos',
+      'object': 'elementos',
+    }
+
+    const element = (elements as any)[dataType] ?? 'partes';
+
     switch (issue.code) {
       case ZodIssueCode.invalid_type:
         return {
@@ -48,18 +60,18 @@ export default function translateZodErrors(errorMapOverride?: ZodErrorMap) {
         };
       case ZodIssueCode.too_small:
         return {
-          message: `El campo ${pathStr} debe tener una longitud de ${issue.minimum} caracteres`,
+          message: `El campo ${pathStr} debe tener al menos ${issue.minimum} ${element}`,
         };
       case ZodIssueCode.too_big:
         return {
-          message: `El campo ${pathStr} debe tener una longitud de ${issue.maximum} caracteres`,
+          message: `El campo ${pathStr} debe tener como máximo ${issue.maximum} ${element}`,
         };
       case ZodIssueCode.invalid_intersection_types:
         // Al parecer esto solo aplica en las intersecciones de zod.
         return { message: `El campo ${pathStr} no es válido` };
       case ZodIssueCode.not_multiple_of:
         return {
-          message: `El campo ${pathStr} debe ser multiplo de ${issue.multipleOf}`,
+          message: `El campo ${pathStr} debe ser múltiplo de ${issue.multipleOf}`,
         };
       case ZodIssueCode.not_finite:
         return { message: `El campo ${pathStr} no puede ser infinito` };

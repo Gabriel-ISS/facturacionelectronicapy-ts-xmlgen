@@ -20,7 +20,9 @@ export const CondicionSchema = z
   .transform((data, ctx) => {
     const validator = new ZodValidator(ctx, data);
 
+    /**E601 = 1 */
     const isInCash = data.tipo == PaymentCondition.CONTADO;
+    /**E601 = 2 */
     const isInCredit = data.tipo == PaymentCondition.CREDITO;
 
     // E605 - entregas

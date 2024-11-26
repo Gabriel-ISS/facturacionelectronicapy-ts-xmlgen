@@ -1,0 +1,9 @@
+/dev
+/src
+/test
+/node_modules
+
+.eslintrc.js
+.prettierrc
+tsconfig.json
+tsup.config.ts
