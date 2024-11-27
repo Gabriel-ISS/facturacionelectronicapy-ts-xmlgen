@@ -6,8 +6,9 @@ export default class ZodValidator<T extends Record<string, any>> {
   constructor(readonly ctx: z.RefinementCtx, readonly object: T) {}
 
   private getPathString(fieldNameOrPath: keyof T | Path<any>) {
+    const startPath = this.ctx.path.length ? this.ctx.path.join('.') + '.' : '';
     const pathStr = fieldNameOrPath.toString();
-    return this.ctx.path.join('.') + '.' + pathStr;
+    return startPath + pathStr;
   }
 
   private getPath(fieldNameOrPath: keyof T | Path<any>) {
