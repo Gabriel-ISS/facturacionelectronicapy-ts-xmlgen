@@ -231,18 +231,6 @@ class GeneralXMLSG {
       // D213
       dDirRec: client.direccion,
 
-      // D214
-      dTelRec: client.telefono,
-
-      // D215
-      dCelRec: client.celular,
-
-      // D216
-      dEmailRec: client.email,
-
-      // D217
-      dCodCliente: client.codigo,
-
       // D218
       dNumCasRec: client.numeroCasa,
 
@@ -263,6 +251,18 @@ class GeneralXMLSG {
 
       // D224
       dDesCiuRec: client.descripcionCiudad,
+
+      // D214
+      dTelRec: client.telefono,
+
+      // D215
+      dCelRec: client.celular,
+
+      // D216
+      dEmailRec: client.email,
+
+      // D217
+      dCodCliente: client.codigo,
     };
   }
 }

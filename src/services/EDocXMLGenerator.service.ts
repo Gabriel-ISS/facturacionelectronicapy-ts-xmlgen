@@ -19,8 +19,6 @@ import { removeUndefinedValues } from '../helpers/removeUndefinedValues';
 
 class EDocXMLGenerator {
   private readonly defaultConfig: XmlGenConfig = {
-    errorSeparator: '; ',
-    errorLimit: 10,
     redondeoSedeco: true,
     decimals: 2,
     taxDecimals: 2,
@@ -81,14 +79,15 @@ class EDocXMLGenerator {
       $: {
         xmlns: 'http://ekuatia.set.gov.py/sifen/xsd',
         'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
+        // aunque parezca un error, ese espacio en el link es necesario
         'xsi:schemaLocation':
-          'http://ekuatia.set.gov.py/sifen/xsd/siRecepDE_v150.xsd',
+          'http://ekuatia.set.gov.py/sifen/xsd siRecepDE_v150.xsd',
       },
       dVerFor: params.version,
       DE: this.get_DE(params, data),
       
       // I. Información de la Firma Digital del DTE (I001-I049)
-      Signature: undefined,
+      Signature: {},
 
       // J. Campos fuera de la Firma Digital (J001-J049)
       gCamFuFD: undefined,
@@ -176,11 +175,11 @@ class EDocXMLGenerator {
       // C007
       dNumDoc: data.numero,
 
-      // C008
-      dFeIniT: params.timbradoFecha,
-
       // C010
       dSerieNum: data.serie,
+
+      // C008
+      dFeIniT: params.timbradoFecha,
     };
   }
 

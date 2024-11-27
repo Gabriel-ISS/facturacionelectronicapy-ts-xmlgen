@@ -69,24 +69,12 @@ export const EDocDataSchema = z
     // B004
     // VER: 10.3. Generación del código de seguridad
     codigoSeguridadAleatorio: z
-      .string()
+      .number()
       .optional()
-      .superRefine((value, ctx) => {
+      .transform((value, ctx) => {
         if (value == undefined) return;
-        if (value.length != 9) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: 'El valor debe tener 9 caracteres',
-          });
-        }
-
-        const isNumericOnly = value.match(/^\d+$/);
-        if (!isNumericOnly) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: 'El valor debe ser numérico',
-          });
-        }
+        new NumberLength(value, ctx).int().length(9);
+        return value.toString();
       }),
 
     // B005
@@ -396,7 +384,7 @@ export const EDocDataSchema = z
       Esta fecha debe ser anterior a la fecha
       de emisión de la FE
       */
-     const dncpDatePath = dncpPath.concat('fecha');
+      const dncpDatePath = dncpPath.concat('fecha');
       validator.validate(
         'fecha',
         Boolean(
@@ -443,7 +431,7 @@ export const EDocDataSchema = z
         const fechaFactura = new Date(data.remision.fechaFactura);
         const fechaEmision = new Date(data.fecha);
 
-        const datePath = new Path<Data>('fecha')
+        const datePath = new Path<Data>('fecha');
         validator.validate(
           remisionPath.concat('fechaFactura'),
           fechaFactura > fechaEmision,

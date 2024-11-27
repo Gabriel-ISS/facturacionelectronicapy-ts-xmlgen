@@ -21,7 +21,7 @@ El módulo está preparado de forma a proveer una fácil integración dentro de 
 - ya no se establece una unidad de medida por defecto para los items
 - `config.defaultValues` se elimino, se usa el guarani como moneda por defecto
 - `config.userObjectRemove` se elimino, simplemente no agregue el objeto usuario si no lo desea
-- `config.separatorError` se elimino, ahora se lanza un error de [zod](https://www.npmjs.com/package/zod#error-handling)
+- `config.separatorError` y `config.separatorLimit` se eliminaron, ahora se lanza un error de [zod](https://www.npmjs.com/package/zod#error-handling)
 - eventos data.tipoReceptor -> data.contribuyente
 
 ## Características

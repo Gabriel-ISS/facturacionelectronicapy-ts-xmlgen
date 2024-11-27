@@ -55,7 +55,7 @@ export default class ZodValidator<T extends Record<string, any>> {
       fieldNameOrPath,
       value != undefined,
       customMessage ??
-        `El campo '${this.getPathString(fieldNameOrPath)}' no es requerido`,
+        `El campo $path no es requerido`,
     );
   }
 
@@ -64,12 +64,13 @@ export default class ZodValidator<T extends Record<string, any>> {
       fieldNameOrPath instanceof Path
         ? fieldNameOrPath.getValueFromPath(this.object)
         : this.object[fieldNameOrPath];
+    
 
     this.validate(
       fieldNameOrPath,
       value == undefined,
       customMessage ??
-        `El campo '${this.getPathString(fieldNameOrPath)}' es requerido`,
+        `El campo $path es requerido`,
     );
   }
 }

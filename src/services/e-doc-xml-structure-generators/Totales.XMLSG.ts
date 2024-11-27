@@ -24,6 +24,15 @@ class TotalesXMLSG {
       
       // F009
       dTotDesc: totales.totalDescuento,
+      
+      // F033
+      dTotDescGlotem: totales.totalDescuentoGlobalItem,
+
+      // F034
+      dTotAntItem: totales.totalAnticipoItem,
+
+      // F035
+      dTotAnt: totales.totalAnticipoGlobalItem,
 
       // F010
       dPorcDescTotal: totales.porcentajeDescuentoTotal,
@@ -37,6 +46,9 @@ class TotalesXMLSG {
       // F013
       dRedon: totales.redondeo,
 
+      // F025
+      dComi: data.comision,
+
       // F014
       dTotGralOpe: totales.totalNeto,
 
@@ -45,6 +57,15 @@ class TotalesXMLSG {
 
       // F016
       dIVA10: totales.liquidacionIva10,
+
+      // F036
+      dLiqTotIVA5: totales.liquidacionTotalIva5,
+
+      // F037
+      dLiqTotIVA10: totales.liquidacionTotalIva10,
+
+      // F026
+      dIVAComi: totales.ivaComision,
 
       // F017
       dTotIVA: totales.liquidacionTotalIva,
@@ -60,27 +81,6 @@ class TotalesXMLSG {
 
       // F023
       dTotalGs: totales.totalGuaranies,
-
-      // F025
-      dComi: data.comision,
-
-      // F026
-      dIVAComi: totales.ivaComision,
-      
-      // F033
-      dTotDescGlotem: totales.totalDescuentoGlobalItem,
-
-      // F034
-      dTotAntItem: totales.totalAnticipoItem,
-
-      // F035
-      dTotAnt: totales.totalAnticipoGlobalItem,
-
-      // F036
-      dLiqTotIVA5: totales.liquidacionTotalIva5,
-
-      // F037
-      dLiqTotIVA10: totales.liquidacionTotalIva10,
     };
   }
 }

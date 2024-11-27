@@ -151,6 +151,9 @@ class TransporteXMLSG {
       // E962
       dMarVeh: vehiculo.marca,
 
+      // E967
+      dTipIdenVeh: vehiculo.documentoTipo,
+
       // E963
       dNroIDVeh: vehiculo.documentoNumero,
 
@@ -162,9 +165,6 @@ class TransporteXMLSG {
 
       // E966
       dNroVuelo: vehiculo.numeroVuelo,
-
-      // E967
-      dTipIdenVeh: vehiculo.documentoTipo,
     };
   }
 

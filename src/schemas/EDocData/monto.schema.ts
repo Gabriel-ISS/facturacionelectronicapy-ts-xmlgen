@@ -12,6 +12,7 @@ export const MontoSchema = z
     // E725
     cambio: z
       .number()
+      .positive()
       .optional()
       .superRefine((value, ctx) => {
         if (value == undefined) return;

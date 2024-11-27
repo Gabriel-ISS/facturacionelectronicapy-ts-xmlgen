@@ -8,9 +8,10 @@ export function removeUndefinedValues(obj: any): any {
     } else if (typeof obj[key] === 'object') {
       removeUndefinedValues(obj[key]);
       
+      /* esto produce error porque elimina signature que es un campo vació 
       if (Object.keys(obj[key]).length === 0) {
         delete obj[key];
-      }
+      } */
     }
   }
 

@@ -194,7 +194,7 @@ export const ItemSchema = z
         .findById(data.unidadMedida, {
           ctx,
           fieldName: 'unidadMedida',
-        }).description,
+        }).representation,
 
       // E716
       toleranciaDescripcion: dbService

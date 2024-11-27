@@ -15,61 +15,61 @@ class AutoFacturaXMLSG {
       // E302
       dDesNatVen: autoFactura.tipoVendedorDescripcion,
 
-      // E303
+      // E304
       iTipIDVen: autoFactura.documentoTipo,
 
-      // E304
+      // E305
       dDTipIDVen: autoFactura.documentoTipoDescripcion,
 
-      // E305
+      // E306
       dNumIDVen: autoFactura.documentoNumero,
 
-      // E306
+      // E307
       dNomVen: autoFactura.nombre,
 
-      // E307
+      // E308
       dDirVen: autoFactura.direccion,
 
-      // E308
+      // E309
       dNumCasVen: autoFactura.numeroCasa,
 
-      // E309
+      // E310
       cDepVen: autoFactura.departamento,
 
-      // E310
+      // E311
       dDesDepVen: autoFactura.departamentoDescripcion,
 
-      // E311
+      // E312
       cDisVen: autoFactura.distrito,
 
-      // E312
+      // E313
       dDesDisVen: autoFactura.distritoDescripcion,
 
-      // E313
+      // E314
       cCiuVen: autoFactura.ciudad,
 
-      // E314
+      // E315
       dDesCiuVen: autoFactura.ciudadDescripcion,
 
-      // E315
+      // E316
       dDirProv: ubicacion.lugar,
 
-      // E316
+      // E317
       cDepProv: ubicacion.departamento,
 
-      // E317
+      // E318
       dDesDepProv: ubicacion.departamentoDescripcion,
 
-      // E318
+      // E319
       cDisProv: ubicacion.distrito,
 
-      // E319
+      // E320
       dDesDisProv: ubicacion.distritoDescripcion,
 
-      // E320
+      // E321
       cCiuProv: ubicacion.ciudad,
 
-      // E321
+      // E322
       dDesCiuProv: ubicacion.ciudadDescripcion,
     };
   }

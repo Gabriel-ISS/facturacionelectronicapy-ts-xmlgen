@@ -26,7 +26,7 @@ const params: EDocParamsInput = {
       direccion: 'Avda Calle Segunda y Proyectada',
       departamento: Department.ALTO_PARANA,
       ciudad: 3344,
-      telefono: '000000',
+      telefono: '100000',
       email: 'generadorde@generadorde.com',
     },
   ],
@@ -36,11 +36,12 @@ const params: EDocParamsInput = {
       descripcion: 'COMERCIO AL POR MENOR EN MINI MERCADOS Y DESPENSAS',
     },
   ],
-  timbradoNumero: '00000000',
+  timbradoNumero: 10000000,
   timbradoFecha: new Date(),
 };
 
 const data: EDocDataInput = {
+  codigoSeguridadAleatorio: 123456789,
   tipoDocumento: ValidDocumentType.FACTURA_ELECTRONICA,
   establecimiento: 1,
   punto: 1,
@@ -67,7 +68,7 @@ const data: EDocDataInput = {
     tipoContribuyente: Taxpayer.PERSONA_FISICA,
     //documentoTipo: IdentityDocumentReceptor.CEDULA_PARAGUAYA,
     //documentoNumero: '2324234',
-    telefono: '000000',
+    telefono: '100000',
     //celular: '0986 000000',
     //email: 'cliente@cliente.com',
     //codigo: '1548',
@@ -93,7 +94,7 @@ const data: EDocDataInput = {
         tipo: 3,
         monto: 150000,
         moneda: Currency.GUARANI,
-        cambio: 0,
+        //cambio: 0,
         infoTarjeta: {
           numero: 1234,
           tipo: CreditCard.VISA,
@@ -108,7 +109,7 @@ const data: EDocDataInput = {
         tipo: PaymentType.CHEQUE,
         monto: 150000,
         moneda: Currency.GUARANI,
-        cambio: 0,
+        //cambio: 0,
         infoCheque: {
           numeroCheque: 32323232,
           banco: 'Sudameris',
@@ -143,7 +144,7 @@ const data: EDocDataInput = {
       cantidad: 10.5,
       monto: {
         precioUnitario: 10800,
-        cambio: 0,
+        //cambio: 0,
       },
       impuesto: {
         ivaTipo: 1,
@@ -159,16 +160,42 @@ const data: EDocDataInput = {
   ],
 };
 
-EDocument.generateXMLDocument(params, data)
-  .then((xml) => {
+/* const soap = require('soap'); */
+
+async function sendRequest(test = true) {
+  const baseURL = test
+    ? 'https://sifen-test.set.gov.py/de/ws/'
+    : 'https://sifen.set.gov.py/de/ws/';
+
+  const endpoints = {
+    enviar: `${baseURL}sync/recibe.wsdl`,
+    enviarLote: `${baseURL}async/recibe-lote.wsdl`,
+    evento: `${baseURL}eventos/evento.wsdl`,
+    consulta: `${baseURL}consultas/consulta.wsdl`,
+    consultaLote: `${baseURL}consultas/consulta-lote.wsdl`,
+    consultaRuc: `${baseURL}consultas/consulta-ruc.wsdl`,
+  };
+
+  try {
+    // Generar el XML que se enviará
+    const xml = await EDocument.generateXMLDocument(params, data);
     console.log(xml);
-  })
-  .catch((e) => {
-    if (e instanceof ZodError) {
-      e.issues.forEach((issue, i) => {
+
+    // Crear el cliente SOAP usando el WSDL
+    /* const client = await soap.createClientAsync(endpoints.enviar); */
+
+    // Llamar al método correspondiente con el XML generado
+    /* const result = await client.NombreDelMetodoAsync({ xml });
+    console.log('Respuesta del servicio:', result); */
+  } catch (error) {
+    if (error instanceof ZodError) {
+      error.issues.forEach((issue, i) => {
         console.log(`${i + 1} - ${issue.message}`);
       });
     } else {
-      throw e;
+      console.error('Error en la solicitud:', error);
     }
-  });
+  }
+}
+
+sendRequest();

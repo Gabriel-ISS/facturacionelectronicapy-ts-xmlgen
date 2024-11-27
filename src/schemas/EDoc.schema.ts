@@ -11,8 +11,9 @@ export const EDocSchema = z
     data: EDocDataSchema,
     params: EDocParamsSchema,
   })
-  .transform(({ data, params }, ctx) => {
-    const validator = new ZodValidator(ctx, data);
+  .transform((eDoc, ctx) => {
+    const { data, params } = eDoc
+    const validator = new ZodValidator(ctx, eDoc);
     const dataPath = new Path<EDoc>('data');
     const paramsPath = new Path<EDoc>('params');
 
@@ -77,7 +78,8 @@ export const EDocSchema = z
         dvId: data.cdc?.charAt(data.cdc.length - 1) as string,
 
         // B004
-        codigoSeguridadAleatorio: data.codigoSeguridadAleatorio as string,
+        codigoSeguridadAleatorio:
+          data.codigoSeguridadAleatorio?.toString() as string,
       },
 
       params,

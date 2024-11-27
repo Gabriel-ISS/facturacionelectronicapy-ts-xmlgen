@@ -1,4 +1,4 @@
-import { z, ZodErrorMap, ZodIssueCode } from 'zod';
+import { array, z, ZodErrorMap, ZodIssueCode } from 'zod';
 
 export default function translateZodErrors(errorMapOverride?: ZodErrorMap) {
   const customErrorMap: ZodErrorMap = (issue, _ctx) => {
@@ -8,8 +8,8 @@ export default function translateZodErrors(errorMapOverride?: ZodErrorMap) {
 
     const elements = {
       'string': 'caracteres',
-      'number': 'dígitos',
-      'bigint': 'dígitos',
+      'number': 'como valor',
+      'bigint': 'como valor',
       'object': 'elementos',
     }
 
@@ -59,13 +59,39 @@ export default function translateZodErrors(errorMapOverride?: ZodErrorMap) {
           message: `El campo ${pathStr} debe ser un texto de tipo ${issue.validation}`,
         };
       case ZodIssueCode.too_small:
-        return {
-          message: `El campo ${pathStr} debe tener al menos ${issue.minimum} ${element}`,
-        };
+        switch(typeof _ctx.data) {
+          case 'number':
+            return {
+              message: `El campo ${pathStr} debe ser mayor a ${issue.minimum}`,
+            };
+          case 'string':
+            return {
+              message: `El campo ${pathStr} debe tener al menos ${issue.minimum} caracteres`,
+            };
+          case 'object':
+            return {
+              message: `El campo ${pathStr} debe tener al menos ${issue.minimum} elementos`,
+            };
+          default:
+            return { message: `El campo ${pathStr} debe tener al menos ${issue.minimum} ${element}` };
+        }
       case ZodIssueCode.too_big:
-        return {
-          message: `El campo ${pathStr} debe tener como máximo ${issue.maximum} ${element}`,
-        };
+        switch(typeof _ctx.data) {
+          case 'number':
+            return {
+              message: `El campo ${pathStr} debe ser menor a ${issue.maximum}`,
+            };
+          case 'string':
+            return {
+              message: `El campo ${pathStr} debe tener como máximo ${issue.maximum} caracteres`,
+            };
+          case 'object':
+            return {
+              message: `El campo ${pathStr} debe tener como máximo ${issue.maximum} elementos`,
+            };
+          default:
+            return { message: `El campo ${pathStr} debe tener como máximo ${issue.maximum} ${element}` };
+        }
       case ZodIssueCode.invalid_intersection_types:
         // Al parecer esto solo aplica en las intersecciones de zod.
         return { message: `El campo ${pathStr} no es válido` };

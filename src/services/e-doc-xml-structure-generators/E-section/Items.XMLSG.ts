@@ -7,7 +7,7 @@ class ItemsXMLSG {
   public get_gCamItem(data: EDocData) {
     return data.items.map((item) => ({
       // E701
-      iCodInt: item.codigo,
+      dCodInt: item.codigo,
 
       // E702
       dParAranc: item.partidaArancelaria,
@@ -33,8 +33,8 @@ class ItemsXMLSG {
       // E709
       cUniMed: item.unidadMedida,
 
-      // E710
-      dDesUniMed: item.unidadMedidaDescripcion,
+      // E710: DELETE: el trim una vez se quiten los espacios de las unidades de medida
+      dDesUniMed: item.unidadMedidaDescripcion.trim(),
 
       // E711
       dCantProSer: item.cantidad,
@@ -146,6 +146,10 @@ class ItemsXMLSG {
 
       // E736
       dLiqIVAItem: impuesto.liquidacionIvaPorItem,
+
+      // E737
+      // VER: https://www.dnit.gov.py/documents/20123/420595/NT_E_KUATIA_013_MT_V150.pdf/ba73ec3b-5901-ae28-5d8c-9bed5632ab89?t=1687353747529
+      dBasExe: impuesto.baseExentaIva,
     };
   }
 

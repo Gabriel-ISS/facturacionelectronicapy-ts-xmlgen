@@ -133,17 +133,17 @@ class CondicionXMLSG {
     if (!infoCuotas) return;
 
     return infoCuotas.map((infoCuota) => ({
-      // E651
-      dMonCuota: infoCuota.monto,
-
-      //  E652
-      dVencCuo: infoCuota.vencimiento,
-
       // E653
       cMoneCuo: infoCuota.moneda,
 
       // E654
       dDMoneCuo: infoCuota.monedaDescripcion,
+
+      // E651
+      dMonCuota: infoCuota.monto,
+
+      //  E652
+      dVencCuo: infoCuota.vencimiento,
     }));
   }
 }

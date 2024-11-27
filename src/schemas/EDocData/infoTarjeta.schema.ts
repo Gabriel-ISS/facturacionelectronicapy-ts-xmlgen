@@ -67,7 +67,7 @@ export const InfoTarjetaSchema = z
       ...data,
       tipoDescripcion:
         data.tipoDescripcion ??
-        dbService.select('creditCards').findById(data.tipo),
+        dbService.select('creditCards').findById(data.tipo).description,
 
       // E624
       rucID,

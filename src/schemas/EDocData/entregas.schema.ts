@@ -78,6 +78,9 @@ export const EntregaSchema = z
       */
       if (!isGuarani) {
         validator.requiredField('cambio');
+      } else {
+        // ⚠️ esto parece necesario aunque no se especifica
+        validator.undesiredField('cambio');
       }
     }
 

@@ -41,7 +41,6 @@ class DbService {
       findByIdIfExist(_id: TD['_id'] | undefined, notFoundErrorData?: NotFoundErrorData): TD | null {
         if (_id == undefined) return null;
         const foundData = table.find((item) => item._id === _id);
-        if (!foundData) console.log(_id);
         manageNotFoundError(foundData, notFoundErrorData);
         return foundData ?? null;
       },

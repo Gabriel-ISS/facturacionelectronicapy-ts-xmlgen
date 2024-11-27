@@ -266,7 +266,9 @@ class CommonValidators {
   }
 
   timbrado() {
-    return z.string().length(8);
+    return z.number().superRefine((value, ctx) => {
+      new NumberLength(value, ctx).int().length(8)
+    });
   }
 
   serie() {
