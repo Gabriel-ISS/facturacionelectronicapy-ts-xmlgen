@@ -1,3 +1,4 @@
+import { ZodError } from 'zod';
 import translateZodErrors from './helpers/validation/translateZodErrors';
 import { EDocSchema } from './schemas/EDoc.schema';
 import { EDocDataInput } from './schemas/EDocData.schema';
@@ -17,16 +18,24 @@ class EDocument {
     data: EDocDataInput,
     config?: XmlGenConfig,
   ) {
-    const parsed = await EDocSchema.parseAsync({
-      data,
-      params,
-    });
+    try {
+      const parsed = await EDocSchema.parseAsync({
+        data,
+        params,
+      });
 
-    return EDocXMLGenerator.generateXMLDocument(
-      parsed.params,
-      parsed.data,
-      config,
-    );
+      return EDocXMLGenerator.generateXMLDocument(
+        parsed.params,
+        parsed.data,
+        config,
+      );
+    } catch (error) {
+      if (error instanceof Error && Object.getPrototypeOf(error) === Error.prototype) {
+        error.message +=
+          '. Por favor reporte el error en https://github.com/Gabriel-ISS/facturacionelectronicapy-ts-xmlgen/issues/new';
+      }
+      throw error;
+    }
   }
 
   async generateXMLEvent(

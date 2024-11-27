@@ -44,13 +44,13 @@ export const ImpuestoSchema = z
           validator.validate(
             'proporcionGravada',
             data.proporcionGravada != 100,
-            'La proporcion gravada deve ser de 100% para el tipo de IVA gravado',
+            '$path debe ser de 100% para el tipo de IVA gravado',
           );
         } else if (isIvaExonerado || isIvaExento) {
           validator.validate(
             'proporcionGravada',
             data.proporcionGravada != 0,
-            'La proporcion gravada debe ser de 0% para el tipo de IVA exonerado o exento',
+            '$path debe ser de 0% para el tipo de IVA exonerado o exento',
           );
         }
       } else {
@@ -78,13 +78,13 @@ export const ImpuestoSchema = z
       validator.validate(
         'iva',
         (isIvaGravado || isIvaGravadoParcial) && !(taxRateIs5 || taxRateIs10),
-        'El IVA debe ser cinco o diez',
+        '$path debe ser cinco o diez si es gravado o gravado parcial',
       );
 
       validator.validate(
         'iva',
         (isIvaExonerado || isIvaExento) && !taxRateIs0,
-        'El IVA debe ser cero',
+        '$path debe ser cero si es exonerado o exento',
       );
     }
 

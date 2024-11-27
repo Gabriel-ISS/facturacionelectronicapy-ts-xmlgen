@@ -396,12 +396,13 @@ export const EDocDataSchema = z
       Esta fecha debe ser anterior a la fecha
       de emisión de la FE
       */
+     const dncpDatePath = dncpPath.concat('fecha');
       validator.validate(
-        dncpPath.concat('fecha'),
+        'fecha',
         Boolean(
           isElectronicInvoice && data.dncp && data.dncp.fecha > data.fecha,
         ),
-        'La fecha de emisión de la FE debe ser anterior a la fecha de la DNCP',
+        `La fecha de emisión $path de la FE debe ser anterior a '${dncpDatePath}'`,
       );
     }
 
@@ -442,10 +443,11 @@ export const EDocDataSchema = z
         const fechaFactura = new Date(data.remision.fechaFactura);
         const fechaEmision = new Date(data.fecha);
 
+        const datePath = new Path<Data>('fecha')
         validator.validate(
           remisionPath.concat('fechaFactura'),
           fechaFactura > fechaEmision,
-          'remission.fechaFactura debe ser antes de la fecha de emisión',
+          `$path debe ser antes de la fecha de emisión '${datePath}'`,
         );
       }
     }
@@ -499,7 +501,7 @@ export const EDocDataSchema = z
       Obligatorio si C002 ≠ 7
       No informar si C002 = 7
       */
-      if (isElectronicRemissionNote) {
+      if (!isElectronicRemissionNote) {
         data.items.forEach((_item, i) => {
           validator.requiredField(itemsPath.concat(i).concat('monto'));
         });

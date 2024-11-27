@@ -3,10 +3,7 @@ import { Path } from '../Path';
 
 /** ZodValidator */
 export default class ZodValidator<T extends Record<string, any>> {
-  constructor(
-    readonly ctx: z.RefinementCtx,
-    readonly object: T,
-  ) {}
+  constructor(readonly ctx: z.RefinementCtx, readonly object: T) {}
 
   private getPathString(fieldNameOrPath: keyof T | Path<any>) {
     const pathStr = fieldNameOrPath.toString();
@@ -26,42 +23,52 @@ export default class ZodValidator<T extends Record<string, any>> {
     return this.ctx.path.concat(pathStr);
   }
 
+  private completeMessage(
+    message: string,
+    fieldNameOrPath: keyof T | Path<any>,
+  ) {
+    return message.replace('$path', `'${this.getPathString(fieldNameOrPath)}'`);
+  }
+
   validate(
     fieldNameOrPath: keyof T | Path<any>,
     errorCondition: boolean,
     message: string,
   ) {
     if (errorCondition) {
-
       this.ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message,
+        message: this.completeMessage(message, fieldNameOrPath),
         path: this.getPath(fieldNameOrPath),
       });
     }
   }
 
   undesiredField(fieldNameOrPath: keyof T | Path<any>, customMessage?: string) {
-    const value = fieldNameOrPath instanceof Path
-      ? fieldNameOrPath.getValueFromPath(this.object)
-      : this.object[fieldNameOrPath];
+    const value =
+      fieldNameOrPath instanceof Path
+        ? fieldNameOrPath.getValueFromPath(this.object)
+        : this.object[fieldNameOrPath];
 
     this.validate(
       fieldNameOrPath,
       value != undefined,
-      customMessage ?? `El campo '${this.getPathString(fieldNameOrPath)}' no es requerido`,
+      customMessage ??
+        `El campo '${this.getPathString(fieldNameOrPath)}' no es requerido`,
     );
   }
 
   requiredField(fieldNameOrPath: keyof T | Path<any>, customMessage?: string) {
-    const value = fieldNameOrPath instanceof Path
-      ? fieldNameOrPath.getValueFromPath(this.object)
-      : this.object[fieldNameOrPath];
+    const value =
+      fieldNameOrPath instanceof Path
+        ? fieldNameOrPath.getValueFromPath(this.object)
+        : this.object[fieldNameOrPath];
 
     this.validate(
       fieldNameOrPath,
       value == undefined,
-      customMessage ?? `El campo '${this.getPathString(fieldNameOrPath)}' es requerido`,
+      customMessage ??
+        `El campo '${this.getPathString(fieldNameOrPath)}' es requerido`,
     );
   }
 }

@@ -53,6 +53,7 @@ export const TransporteSchema = z
     transportista: TransportistaSchema.optional(),
   })
   .transform((data, ctx) => {
+    type Data = typeof data;
     const validator = new ZodValidator(ctx, data);
     const vehiclePath = new Path<typeof data>('vehiculo');
 
@@ -68,11 +69,12 @@ export const TransporteSchema = z
 
     // ⚠️ esto no esta en el manual
     {
+      const startPath = new Path<Data>('inicioEstimadoTranslado');
       if (data.inicioEstimadoTranslado && data.finEstimadoTranslado) {
         validator.validate(
           'finEstimadoTranslado',
           data.finEstimadoTranslado < data.inicioEstimadoTranslado,
-          'El valor de finEstimadoTranslado no puede ser menor que el valor de inicioEstimadoTranslado',
+          `$path no puede ser anterior a '${startPath}'`,
         );
       }
     }

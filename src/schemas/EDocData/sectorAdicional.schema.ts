@@ -2,6 +2,7 @@ import { z } from 'zod';
 import NumberLength from '../../helpers/validation/NumberLenght';
 import ZodValidator from '../../helpers/validation/ZodValidator';
 import CommonValidators from '../../helpers/validation/CommonValidators';
+import { Path } from '../../helpers/Path';
 
 /**E9.5. Grupo de datos adicionales de uso comercial (E820-E829) */
 export const SectorAdicionalSchema = z.object({
@@ -30,6 +31,7 @@ export const SectorAdicionalSchema = z.object({
   codigoContratacionDncp: z.string().min(1).max(30).optional(),
 
 }).superRefine((data, ctx) => {
+  type Data = typeof data;
   const validator = new ZodValidator(ctx, data)
   
   // E822 - inicioCiclo
@@ -63,10 +65,12 @@ export const SectorAdicionalSchema = z.object({
     const inicio = new Date(data.inicioCiclo);
     const fin = new Date(data.finCiclo);
 
+    const endPath = new Path<Data>('finCiclo');
+
     validator.validate(
       'inicioCiclo',
       inicio > fin,
-      'La fecha de inicio del ciclo no puede ser mayor que la fecha de fin del ciclo.',
+      `$path no puede ser mayor que '${endPath}'`,
     )
   }
 });

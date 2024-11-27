@@ -1,17 +1,17 @@
 import { z } from 'zod';
 import CommonValidators from '../../helpers/validation/CommonValidators';
-import constantsService from '../../services/constants.service';
 import dbService from '../../services/db.service';
 
 export const EstablecimientoSchema = z
   .object({
-    codigo: z.string(),
+    // relacionado con C005
+    codigo: CommonValidators.zeroPadToLength(3),
 
     // D107
     direccion: CommonValidators.address(),
 
     // D108
-    numeroCasa: CommonValidators.houseNumber(),
+    numeroCasa: CommonValidators.houseNumber().default(0),
 
     // D109
     complementoDireccion1: CommonValidators.address().optional(),
@@ -59,14 +59,12 @@ export const EstablecimientoSchema = z
         .findByIdIfExist(data.distrito, {
           ctx,
           fieldName: 'distrito',
-          message: 'El código del distrito no es válido',
         })?.description,
 
       // D116
-      ciudadDescripcion: dbService.select('districts').findById(data.ciudad, {
+      ciudadDescripcion: dbService.select('cities').findById(data.ciudad, {
         ctx,
-        fieldName: 'distrito',
-        message: 'El código de ciudad no es válido',
+        fieldName: 'ciudad',
       })?.description,
     };
   });

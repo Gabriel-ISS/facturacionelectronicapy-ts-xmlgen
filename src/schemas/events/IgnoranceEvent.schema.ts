@@ -3,6 +3,7 @@ import CommonValidators from '../../helpers/validation/CommonValidators';
 import { TaxpayerNotTaxpayer } from '../../constants/taxpayerNotTaxpayer.constants';
 import ZodValidator from '../../helpers/validation/ZodValidator';
 import { IdentityDocumentCarriers } from '../../constants/identityDocumentsCarriers.constants';
+import { Path } from '../../helpers/Path';
 
 // GED001
 export const IgnoranceEventSchema = z
@@ -35,6 +36,7 @@ export const IgnoranceEventSchema = z
     motivo: CommonValidators.motive().optional(),
   })
   .transform((data, ctx) => {
+    type Data = typeof data;
     const validator = new ZodValidator(ctx, data);
 
     /**GED005=1 */
@@ -47,10 +49,11 @@ export const IgnoranceEventSchema = z
     {
       const emission = new Date(data.fechaEmision);
       const reception = new Date(data.fechaRecepcion);
+      const receptionDatePath = new Path<Data>('fechaRecepcion')
       validator.validate(
         'fechaEmision',
         emission > reception,
-        'Le fecha de emisión no puede ser después de la fecha de recepción',
+        `$path no puede ser después de '${receptionDatePath}'`,
       )
     }
 

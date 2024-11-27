@@ -20,10 +20,11 @@ export const EDocSchema = z
       (d) => d.codigo == data.establecimiento,
     );
 
+    const paramsEstablishmentPath = paramsPath.concat('establecimiento');
     validator.validate(
       dataPath.concat('establecimiento'),
       !isValidEstablishment,
-      'Debe utilizar un establecimiento de params.establecimientos',
+      `Debe utilizar un establecimiento de '${paramsEstablishmentPath}'`,
     );
 
     // E501
@@ -39,30 +40,27 @@ export const EDocSchema = z
         data.remision.motivo ==
           RemissionReason.TRASLADO_ENTRE_LOCALES_DE_LA_EMPRESA
       ) {
+        const paramsRucPath = paramsPath.concat('ruc');
         validator.validate(
           dataPath.concat('cliente').concat('ruc'),
           data.cliente.ruc != params.ruc,
-          'RUC del receptor debe coincidir con el RUC del emisor',
+          `RUC del receptor en $path debe coincidir con el RUC del emisor en '${paramsRucPath}'`,
         );
       }
     }
 
     // ⚠️ según el repo original
     if (!data.cdc) {
+      validator.requiredField(dataPath.concat('codigoSeguridadAleatorio'));
+
       if (data.codigoSeguridadAleatorio) {
         validator.validate(
           paramsPath.concat('ruc'),
           !params.rucDV,
-          'RUC debe contener dígito verificador en params.ruc',
+          '$path debe contener dígito verificador',
         );
 
         data.cdc = CDCHelper.generateCDC(params, data as EDocData);
-      } else {
-        validator.validate(
-          dataPath.concat('codigoSeguridadAleatorio'),
-          true,
-          'Debe proveer el valor del código de seguridad aleatorio',
-        );
       }
     } else {
       CDCHelper.validateCDC(params, data, ctx);

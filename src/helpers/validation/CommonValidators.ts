@@ -29,9 +29,11 @@ class CommonValidators {
       if (!value) return;
       const foundData = dbService.select(tableName).findByIdIfExist(value);
       if (foundData) return;
+
+      const path = `'${ctx.path.join('.')}'`;
       this.addFieldError(
         ctx,
-        message ?? `El valor del campo '${ctx.path.join('.')}' no es válido`,
+        message ?? `El valor del campo ${path} no es válido`,
       );
     });
   }
@@ -59,19 +61,25 @@ class CommonValidators {
     districtId: number | undefined,
     cityId: number | undefined,
   ) {
+    const strPath = `'${ctx.path.join('.')}'`;
+
     let foundDistrict = dbService
       .select('districts')
       .findByIdIfExist(districtId);
 
-    if (!foundDistrict) {
+    if (districtId && !foundDistrict) {
       this.addFieldError(
         ctx,
-        `No se encontró el distrito con el Id "${districtId}"`,
+        `No se encontró el distrito con el Id '${districtId}' en ${strPath}`,
       );
-    } else if (departmentId && foundDistrict.department != departmentId) {
+    } else if (
+      foundDistrict &&
+      departmentId &&
+      foundDistrict.department != departmentId
+    ) {
       this.addFieldError(
         ctx,
-        `El departamento con _id "${departmentId}" no coincide con el distrito con _id "${districtId}"`,
+        `El departamento con _id '${departmentId}' no coincide con el distrito con _id '${districtId}' en ${strPath}`,
       );
     }
 
@@ -79,11 +87,11 @@ class CommonValidators {
     let foundCity = dbService.select('cities').findByIdIfExist(cityId);
 
     if (!foundCity) {
-      this.addFieldError(ctx, `No se encontró la ciudad con el Id "${cityId}"`);
+      this.addFieldError(ctx, `No se encontró la ciudad con el Id '${cityId}' en ${strPath}`);
     } else if (districtId && foundCity.distrito != districtId) {
       this.addFieldError(
         ctx,
-        `El distrito con _id "${districtId}" no coincide con la ciudad con _id "${cityId}"`,
+        `El distrito con _id '${districtId}' no coincide con la ciudad con _id '${cityId}' en ${strPath}`,
       );
     }
   }
@@ -126,43 +134,41 @@ class CommonValidators {
   }
 
   ruc(messages?: Min & Max) {
-    return z
-      .string()
-      .superRefine((value, ctx) => {
-        const [id, dv] = value.split('-');
-        const path = `'${ctx.path.join('.')}'`;
+    return z.string().superRefine((value, ctx) => {
+      const [id, dv] = value.split('-');
+      const path = `'${ctx.path.join('.')}'`;
 
-        if (id.length > 8) {
+      if (id.length > 8) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message:
+            messages?.max ??
+            `El numero de identificación en ${path} debe tener como máximo 8 caracteres`,
+        });
+      } else if (id.length < 3) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message:
+            messages?.min ??
+            `El numero de identificación en ${path} debe tener al menos 3 caracteres`,
+        });
+      }
+
+      if (!dv) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `El ruc en ${path} debe contener el dígito verificador`,
+        });
+      } else {
+        const dvNumber = Number(dv);
+        if (Number.isNaN(dvNumber) || dvNumber < 1 || dvNumber > 9) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message:
-              messages?.max ??
-              `El numero de identificación en ${path} debe tener como máximo 8 caracteres`,
-          });
-        } else if (id.length < 3) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message:
-              messages?.min ??
-              `El numero de identificación en ${path} debe tener al menos 3 caracteres`,
+            message: `El dígito verificador de ${path} debe ser un número entre 1 y 9`,
           });
         }
-
-        if (!dv) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: `El ruc en ${path} debe contener el dígito verificador`,
-          });
-        } else {
-          const dvNumber = Number(dv);
-          if (Number.isNaN(dvNumber) || dvNumber < 1 || dvNumber > 9) {
-            ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              message: `El dígito verificador de ${path} debe ser un número entre 1 y 9`,
-            });
-          }
-        }
-      });
+      }
+    });
   }
 
   name() {
@@ -229,13 +235,10 @@ class CommonValidators {
   }
 
   houseNumber() {
-    return z
-      .number()
-      .min(1)
-      .superRefine((value, ctx) => {
-        if (value == undefined) return;
-        new NumberLength(value, ctx).int().max(6);
-      });
+    return z.number().superRefine((value, ctx) => {
+      if (value == undefined) return;
+      new NumberLength(value, ctx).int().max(6);
+    });
   }
 
   gtinCode(messages?: Lengths) {

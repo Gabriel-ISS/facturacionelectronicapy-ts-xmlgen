@@ -20,11 +20,22 @@ const params: EDocParamsInput = {
   tipoContribuyente: Taxpayer.PERSONA_FISICA,
   razonSocial: 'Gabriel Sanabria',
   ruc: '5859019-9',
-  establecimientos: [],
-  actividadesEconomicas: [{
-    codigo: '47112',
-    descripcion: 'COMERCIO AL POR MENOR EN MINI MERCADOS Y DESPENSAS'
-  }],
+  establecimientos: [
+    {
+      codigo: 1,
+      direccion: 'Avda Calle Segunda y Proyectada',
+      departamento: Department.ALTO_PARANA,
+      ciudad: 3344,
+      telefono: '000000',
+      email: 'generadorde@generadorde.com',
+    },
+  ],
+  actividadesEconomicas: [
+    {
+      codigo: '47112',
+      descripcion: 'COMERCIO AL POR MENOR EN MINI MERCADOS Y DESPENSAS',
+    },
+  ],
   timbradoNumero: '00000000',
   timbradoFecha: new Date(),
 };
@@ -148,14 +159,16 @@ const data: EDocDataInput = {
   ],
 };
 
-EDocument.generateXMLDocument(params, data).then(xml => {
-  console.log(xml);
-}).catch(e => {
-  if (e instanceof ZodError) {
-    e.issues.forEach((issue, i) => {
-      console.log(`${i + 1} - ${issue.message}`);
-    });
-  } else {
-    throw e;
-  }
-});
+EDocument.generateXMLDocument(params, data)
+  .then((xml) => {
+    console.log(xml);
+  })
+  .catch((e) => {
+    if (e instanceof ZodError) {
+      e.issues.forEach((issue, i) => {
+        console.log(`${i + 1} - ${issue.message}`);
+      });
+    } else {
+      throw e;
+    }
+  });

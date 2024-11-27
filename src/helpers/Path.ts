@@ -7,8 +7,10 @@ type Value<T, K extends Key<T>> = T extends any[]
   : never;
 
 export class Path<T, K extends Key<T> = Key<T>> {
-  constructor(key: K, readonly path: string[] = []) {
-    this.path.push(key as string);
+  path: string[];
+
+  constructor(key: K, path: string[] = []) {
+    this.path = path.concat(key as string);
   }
 
   concat<NK extends Key<Value<T, K>>>(key: NK) {
@@ -21,10 +23,7 @@ export class Path<T, K extends Key<T> = Key<T>> {
       try {
         currentValue = currentValue[key];
       } catch (error) {
-        console.info(JSON.stringify(object, null, 2));
-        throw new Error(
-          `Error al intentar ingresar al campo '${this.path.join('.')}' en la clave '${key}', por favor reporte el error en la seccion de errores del repositorio`,
-        )
+        // es posible que el valor simplemente no este presente, por eso no se lanza error
       }
     }
     return currentValue;
@@ -33,4 +32,5 @@ export class Path<T, K extends Key<T> = Key<T>> {
   toString() {
     return this.path.join('.');
   }
+
 }

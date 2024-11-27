@@ -23,9 +23,10 @@ class DbService {
       notFoundErrorData?: NotFoundErrorData,
     ) => {
       if (!result && notFoundErrorData) {
+        const path = `'${notFoundErrorData.ctx.path.join('.')}.${notFoundErrorData.fieldName}'`;
         notFoundErrorData.ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: `El valor del campo ${notFoundErrorData.fieldName} no es válido`,
+          message: notFoundErrorData.message ?? `El valor del campo ${path} no es válido`,
           path: [notFoundErrorData.fieldName],
         });
       }
@@ -40,6 +41,7 @@ class DbService {
       findByIdIfExist(_id: TD['_id'] | undefined, notFoundErrorData?: NotFoundErrorData): TD | null {
         if (_id == undefined) return null;
         const foundData = table.find((item) => item._id === _id);
+        if (!foundData) console.log(_id);
         manageNotFoundError(foundData, notFoundErrorData);
         return foundData ?? null;
       },

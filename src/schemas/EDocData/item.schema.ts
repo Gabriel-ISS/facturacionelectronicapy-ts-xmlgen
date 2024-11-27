@@ -186,7 +186,6 @@ export const ItemSchema = z
         .findByIdIfExist(data.pais, {
           ctx,
           fieldName: 'pais',
-          message: 'El pais no es válido',
         })?.description,
 
       // E710
@@ -195,7 +194,6 @@ export const ItemSchema = z
         .findById(data.unidadMedida, {
           ctx,
           fieldName: 'unidadMedida',
-          message: 'Unidad de medida no encontrada',
         }).description,
 
       // E716

@@ -4,6 +4,7 @@ import { IdentityDocumentCarriers } from '../../constants/identityDocumentsCarri
 import NumberLength from '../../helpers/validation/NumberLenght';
 import { TaxpayerNotTaxpayer } from '../../constants/taxpayerNotTaxpayer.constants';
 import ZodValidator from '../../helpers/validation/ZodValidator';
+import { Path } from '../../helpers/Path';
 
 // GEN001
 export const NotificationEventSchema = z
@@ -38,16 +39,18 @@ export const NotificationEventSchema = z
     }),
   })
   .transform((data, ctx) => {
+    type Data = typeof data;
     const validator = new ZodValidator(ctx, data);
 
     // ⚠️ esto no esta en el manual
     {
       const emission = new Date(data.fechaEmision);
       const reception = new Date(data.fechaRecepcion);
+      const receptionDatePath = new Path<Data>('fechaRecepcion')
       validator.validate(
         'fechaEmision',
         emission > reception,
-        'Le fecha de emisión no puede ser después de la fecha de recepción',
+        `$path no puede ser después de '${receptionDatePath}'`,
       )
     }
 

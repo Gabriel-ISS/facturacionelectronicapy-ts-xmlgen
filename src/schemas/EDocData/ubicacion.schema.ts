@@ -40,7 +40,6 @@ export const UbicacionSchema = z
         .findByIdIfExist(data.distrito, {
           ctx,
           fieldName: 'distrito',
-          message: 'El código del distrito no es válido',
         })?.description,
 
       // E322
@@ -49,7 +48,6 @@ export const UbicacionSchema = z
         .findById(data.ciudad, {
           ctx,
           fieldName: 'distrito',
-          message: 'El código de ciudad no es válido',
         })?.description,
     };
   });

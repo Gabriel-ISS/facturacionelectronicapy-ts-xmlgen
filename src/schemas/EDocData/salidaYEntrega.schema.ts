@@ -70,13 +70,11 @@ export const SalidaYEntregaSchema = z
         .findByIdIfExist(data.distrito, {
           ctx,
           fieldName: 'distrito',
-          message: `No existe el distrito con id ${data.distrito}`,
         })?.description,
 
       ciudadDescripcion: dbService.select('cities').findById(data.ciudad, {
         ctx,
         fieldName: 'ciudad',
-        message: `No existe la ciudad con id ${data.ciudad}`,
       }).description,
     };
   });

@@ -30,7 +30,7 @@ export const EDocParamsSchema = z.object({
   nombreFantasia: CommonValidators.tradeName().optional(),
 
   // D107 - D119
-  establecimientos: z.array(EstablecimientoSchema),
+  establecimientos: z.array(EstablecimientoSchema).min(1),
 
   // D2.1 Campos que describen la actividad económica del emisor (D130-D139)
   actividadesEconomicas: z.array(ActividadEconomicaSchema).min(1).max(9),

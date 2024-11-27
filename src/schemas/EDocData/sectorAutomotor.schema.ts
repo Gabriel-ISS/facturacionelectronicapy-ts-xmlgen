@@ -5,6 +5,7 @@ import NumberLength from '../../helpers/validation/NumberLenght';
 
 import dbService from '../../services/db.service';
 import ZodValidator from '../../helpers/validation/ZodValidator';
+import { Path } from '../../helpers/Path';
 
 /**E8.5. Sector de automotores nuevos y usados (E770-E789) */
 export const SectorAutomotorSchema = z
@@ -98,6 +99,7 @@ export const SectorAutomotorSchema = z
     cilindradas: z.string().length(4).optional(),
   })
   .transform((data, ctx) => {
+    type Data = typeof data;
     const validator = new ZodValidator(ctx, data);
 
     /**E769 = 9 */
@@ -122,12 +124,13 @@ export const SectorAutomotorSchema = z
     }
 
     // ⚠️ esto no es del manual
+    const pesoBrutoPath = new Path<Data>('pesoBruto');
     validator.validate(
       'pesoNeto',
       Boolean(
         data.pesoNeto && data.pesoBruto && data.pesoNeto > data.pesoBruto,
       ),
-      'El peso neto no puede ser mayor que el peso bruto.',
+      `$path no puede ser mayor que '${pesoBrutoPath}'`,
     );
 
     return {
