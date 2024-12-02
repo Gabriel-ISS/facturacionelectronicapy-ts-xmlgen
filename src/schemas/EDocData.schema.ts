@@ -1,14 +1,14 @@
 import { z } from 'zod';
-import { Currency } from '../constants/curencies.constants';
-import { ValidDocumentType } from '../constants/documentTypes.constants';
-import { EmissionType } from '../constants/emissionTypes.constants';
-import { GlobalAndPerItem } from '../constants/globalAndPerItem.constants';
-import { OperationType } from '../constants/operationTypes.constants';
-import { PaymentType } from '../constants/paymentTypes.constants';
-import { RemissionReason } from '../constants/remissionReasons.constants';
-import { TaxTreatment } from '../constants/taxTreatments.constants';
-import { TaxType } from '../constants/taxTypes.constants';
-import { TransactionType } from '../constants/transactionTypes.constants';
+import { Currency } from '../data/currencies.table';
+import { ValidDocumentType } from '../data/documentTypes.table';
+import { EmissionType } from '../data/emissionTypes.table';
+import { GlobalAndPerItem } from '../data/shared/globalAndPerItem.table';
+import { OperationType } from '../data/operationTypes.table';
+import { PaymentType } from '../data/paymentTypes.table';
+import { RemissionReason } from '../data/remissionReasons.table';
+import { TaxTreatment } from '../data/taxTreatments.table';
+import { TaxType } from '../data/taxTypes.table';
+import { TransactionType } from '../data/transactionTypes.table';
 import DateHelper from '../helpers/DateHelper';
 import getTotals from '../helpers/getTotals';
 import { Path } from '../helpers/Path';
@@ -16,25 +16,26 @@ import CommonValidators from '../helpers/validation/CommonValidators';
 import NumberLength from '../helpers/validation/NumberLenght';
 import ZodValidator from '../helpers/validation/ZodValidator';
 import dbService from '../services/db.service';
-import { AutoFacturaSchema } from './EDocData/autoFactura.schema';
-import { ClienteSchema } from './EDocData/cliente.schema';
-import { ComplementariosSchema } from './EDocData/complementarios.schema';
-import { CondicionSchema } from './EDocData/condicion.schema';
-import { DncpSchema } from './EDocData/dncp.schema';
-import { DocumentoAsociadoSchema } from './EDocData/documentoAsociado.schema';
-import { FacturaSchema } from './EDocData/factura.schema';
-import { Impuesto } from './EDocData/impuesto.schema';
-import { CompleteItem, Item, ItemSchema } from './EDocData/item.schema';
-import { Monto } from './EDocData/monto.schema';
-import { NotaCreditoDebitoSchema } from './EDocData/notaCheditoDebito.schema';
-import { ObligacionSchema } from './EDocData/obligacion.schema';
-import { RemisionSchema } from './EDocData/remision.schema';
-import { SectorAdicionalSchema } from './EDocData/sectorAdicional.schema';
-import { SectorEnergiaElectricaSchema } from './EDocData/sectorEnergiaElectrica.schema';
-import { SectorSegurosSchema } from './EDocData/sectorSeguros.schema';
-import { SectorSupermercadosSchema } from './EDocData/sectorSupermercados.schema';
-import { TransporteSchema } from './EDocData/transporte.schema';
-import { UsuarioSchema } from './EDocData/usuario.schema';
+import { AutoFacturaSchema } from './data/autoFactura.schema';
+import { ClienteSchema } from './data/cliente.schema';
+import { ComplementariosSchema } from './data/complementarios.schema';
+import { CondicionSchema } from './data/condicion.schema';
+import { DncpSchema } from './data/dncp.schema';
+import { DocumentoAsociadoSchema } from './data/documentoAsociado.schema';
+import { FacturaSchema } from './data/factura.schema';
+import { Impuesto } from './data/impuesto.schema';
+import { CompleteItem, Item, ItemSchema } from './data/item.schema';
+import { Monto } from './data/monto.schema';
+import { NotaCreditoDebitoSchema } from './data/notaCheditoDebito.schema';
+import { ObligacionSchema } from './data/obligacion.schema';
+import { RemisionSchema } from './data/remision.schema';
+import { SectorAdicionalSchema } from './data/sectorAdicional.schema';
+import { SectorEnergiaElectricaSchema } from './data/sectorEnergiaElectrica.schema';
+import { SectorSegurosSchema } from './data/sectorSeguros.schema';
+import { SectorSupermercadosSchema } from './data/sectorSupermercados.schema';
+import { TransporteSchema } from './data/transporte.schema';
+import { UsuarioSchema } from './data/usuario.schema';
+import { AllDocumentTypes } from '../data/documentTypes.table';
 
 /** El esquema no incluye...
  *
@@ -86,7 +87,7 @@ export const EDocDataSchema = z
     // C. Campos de datos del Timbrado (C001-C099)
 
     // C002
-    tipoDocumento: z.nativeEnum(ValidDocumentType),
+    tipoDocumento: z.nativeEnum(AllDocumentTypes),
 
     // C005: Debe coincidir con la estructura de timbrado
     establecimiento: CommonValidators.zeroPadToLength(3),
@@ -216,19 +217,19 @@ export const EDocDataSchema = z
 
     /**C002 = 1 */
     const isElectronicInvoice =
-      data.tipoDocumento == ValidDocumentType.FACTURA_ELECTRONICA;
+      data.tipoDocumento == AllDocumentTypes.FACTURA_ELECTRONICA;
     /**C002 = 4 */
     const isAutoInvoice =
-      data.tipoDocumento == ValidDocumentType.AUTOFACTURA_ELECTRONICA;
+      data.tipoDocumento == AllDocumentTypes.AUTOFACTURA_ELECTRONICA;
     /**C002 = 5 */
     const isElectronicCreditNote =
-      data.tipoDocumento == ValidDocumentType.NOTA_DE_CREDITO_ELECTRONICA;
+      data.tipoDocumento == AllDocumentTypes.NOTA_DE_CREDITO_ELECTRONICA;
     /**C002 = 6 */
     const isElectronicDebitNote =
-      data.tipoDocumento == ValidDocumentType.NOTA_DE_DEBITO_ELECTRONICA;
+      data.tipoDocumento == AllDocumentTypes.NOTA_DE_DEBITO_ELECTRONICA;
     /**C002 = 7 */
     const isElectronicRemissionNote =
-      data.tipoDocumento == ValidDocumentType.NOTA_DE_REMISION_ELECTRONICA;
+      data.tipoDocumento == AllDocumentTypes.NOTA_DE_REMISION_ELECTRONICA;
     /**D015 = PYG */
     const currencyIsGuarani = data.moneda == Currency.GUARANI;
     /**D017 = 1 */
@@ -989,35 +990,35 @@ export const EDocDataSchema = z
 
       // B003
       descripcionEmision: dbService
-        .select('emissionTypes')
-        .findById(data.tipoEmision).description,
+        .emissionTypes
+        ._findById(data.tipoEmision).description,
 
       // C003
       descripcionDocumento: dbService
-        .select('documentTypes')
-        .findById(data.tipoDocumento).description,
+        .documentTypes
+        ._findById(data.tipoDocumento).description,
 
       // C004 se define en EDocSchema y C008 en EDocParamsSchema
 
       // VER: https://www.dnit.gov.py/documents/20123/420595/NT_E_KUATIA_010_MT_V150.pdf/d64a693b-6c63-86e1-ec6a-d4fe5ec4eeea?t=1687353747196
       // D012
       descripcionTipoTransaccion: dbService
-        .select('transactionTypes')
-        .findById(data.tipoTransaccion).description,
+        .transactionTypes
+        ._findById(data.tipoTransaccion).description,
 
       // D014
       descripcionTipoImpuesto: dbService
-        .select('taxTypes')
-        .findById(data.tipoImpuesto).description,
+        .taxTypes
+        ._findById(data.tipoImpuesto).description,
 
       // D016
-      descripcionMoneda: dbService.select('currencies').findById(data.moneda)
+      descripcionMoneda: dbService.currencies._findById(data.moneda)
         .description,
 
       // D020
       descripcionCondicionAnticipo: dbService
-        .select('advancePaymentConditions')
-        .findByIdIfExist(data.condicionAnticipo)?.description,
+        .advancePaymentConditions
+        ._findByIdIfExist(data.condicionAnticipo)?.description,
 
       items,
 

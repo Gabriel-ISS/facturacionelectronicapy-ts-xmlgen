@@ -1,8 +1,8 @@
 import { z } from 'zod';
 import CommonValidators from '../../helpers/validation/CommonValidators';
-import { IdentityDocumentCarriers } from '../../constants/identityDocumentsCarriers.constants';
+import { IdentityDocumentCarriers } from '../../data/idDocsCarriers.table';
 import NumberLength from '../../helpers/validation/NumberLenght';
-import { TaxpayerNotTaxpayer } from '../../constants/taxpayerNotTaxpayer.constants';
+import { TaxpayerNotTaxpayer } from '../../data/taxpayerNotTaxpayer.table';
 import ZodValidator from '../../helpers/validation/ZodValidator';
 import { Path } from '../../helpers/Path';
 

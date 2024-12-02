@@ -1,6 +1,6 @@
 import { EDocData } from '../../../schemas/EDoc.schema';
-import { Credito } from '../../../schemas/EDocData/credito.schema';
-import { Entrega } from '../../../schemas/EDocData/entregas.schema';
+import { Credito } from '../../../schemas/data/credito.schema';
+import { Entrega } from '../../../schemas/data/entregas.schema';
 
 class CondicionXMLSG {
   /**E7. Campos que describen la condición de la operación (E600-E699)*/

@@ -3,8 +3,8 @@ import { ActividadEconomicaSchema } from './params/actividadEconomica.schema';
 import { EstablecimientoSchema } from './params/establecimiento.schema';
 import CommonValidators from '../helpers/validation/CommonValidators';
 
-import { RegimeType } from '../constants/regimeTypes.constants';
-import { Taxpayer } from '../constants/taxpayer.constants';
+import { RegimeType } from '../data/regimeTypes.table';
+import { Taxpayer } from '../data/taxpayerTypes.table';
 
 export const EDocParamsSchema = z.object({
   // AA. Campos que identifican el formato electrónico XML (AA001-AA009)

@@ -2,12 +2,12 @@ import { z } from 'zod';
 import CommonValidators from '../../helpers/validation/CommonValidators';
 import ZodValidator from '../../helpers/validation/ZodValidator';
 import dbService from '../../services/db.service';
-import { IdentityDocumentCarriers } from '../../constants/identityDocumentsCarriers.constants';
-import { TransportType } from '../../constants/transportTypes.constants';
-import { TransportModality } from '../../constants/transportModalities.constants';
-import { VehicleIdentification } from '../../constants/vehicleIdentifications.constants';
+import { IdentityDocumentCarriers } from '../../data/idDocsCarriers.table';
+import { TransportType } from '../../data/transportTypes.table';
+import { TransportModality } from '../../data/transportModalities.table';
+import { VehicleIdentification } from '../../data/vehicleIdentifications.table';
 import { Path } from '../../helpers/Path';
-import { TaxpayerNotTaxpayer } from '../../constants/taxpayerNotTaxpayer.constants';
+import { TaxpayerNotTaxpayer } from '../../data/taxpayerNotTaxpayer.table';
 
 export enum TransportUpdateMotive {
   CAMBIO_LOCAL_ENTREGA = 1,
@@ -259,28 +259,28 @@ export const TransportUpdateEventSchema = z
 
         // GET005
         descripcionDepartamento: dbService
-          .select('departments')
-          .findByIdIfExist(entrega.departamento)?.description,
+          .departments
+          ._findByIdIfExist(entrega.departamento)?.description,
 
         // GET007
         descripcionDistrito: dbService
-          .select('districts')
-          .findByIdIfExist(entrega.distrito)?.description,
+          .districts
+          ._findByIdIfExist(entrega.distrito)?.description,
 
         // GET009
         descripcionCiudad: dbService
-          .select('cities')
-          .findByIdIfExist(entrega.ciudad)?.description,
+          .cities
+          ._findByIdIfExist(entrega.ciudad)?.description,
 
         // GET023
         descripcionTipoTransporte: dbService
-          .select('transportTypes')
-          .findByIdIfExist(data.entrega.tipoTransporte)?.description,
+          .transportTypes
+          ._findByIdIfExist(data.entrega.tipoTransporte)?.description,
 
         // GET025
         descripcionModalidadTransporte: dbService
-          .select('transportModalities')
-          .findByIdIfExist(data.entrega.modalidadTransporte)?.description,
+          .transportModalities
+          ._findByIdIfExist(data.entrega.modalidadTransporte)?.description,
 
         vehiculo: {
           ...vehiculo,
@@ -298,8 +298,8 @@ export const TransportUpdateEventSchema = z
 
         // GET020
         descripcionTipoDocumento: dbService
-          .select('identityDocumentsCarriers')
-          .findByIdIfExist(transportista.documentoTipo)?.description,
+          .idDocsCarriers
+          ._findByIdIfExist(transportista.documentoTipo)?.description,
 
         chofer: {
           ...chofer,

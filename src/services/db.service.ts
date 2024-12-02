@@ -1,54 +1,108 @@
-import { z } from 'zod';
-import constantsService from './constants.service';
+import associatedDocumentTypes from '../data/associatedDocumentTypes.table';
+import cargoCharacteristics from '../data/cargoCharacteristics.table';
+import cities from '../data/cities.table';
+import complianceEventTypes from '../data/complianceEventTypes.table';
+import constancyTypes from '../data/constancyTypes.table';
+import countries from '../data/countries.table';
+import creditCardProcessingMethods from '../data/creditCardProcessingMethods.table';
+import creditCards from '../data/creditCards.table';
+import creditNoteReasons from '../data/creditNoteReasons.table';
+import creditTypes from '../data/creditTypes.table';
+import currencies from '../data/currencies.table';
+import departments from '../data/departments.table';
+import districts from '../data/districts.table';
+import documentTypes from '../data/documentTypes.table';
+import emissionTypes from '../data/emissionTypes.table';
+import freightResponsibles from '../data/freightResponsibles.table';
+import fuelTypes from '../data/fuelTypes.table';
+import advancePaymentConditions from '../data/advancePaymentConditions.table';
+import iscCategories from '../data/iscCategories.table';
+import iscTaxes from '../data/iscTaxes.table';
+import measurementUnits from '../data/measurementUnits.table';
+import merchandiseRelevances from '../data/merchandiseRelevances.table';
+import obligations from '../data/obligations.table';
+import operatingConditions from '../data/operatingConditions.table';
+import operationTypes from '../data/operationTypes.table';
+import paymentTypes from '../data/paymentTypes.table';
+import presenceIndicators from '../data/presenceIndicators.table';
+import printedDocumentTypes from '../data/printedDocumentTypes.table';
+import taxpayerNotTaxpayer from '../data/taxpayerNotTaxpayer.table';
+import remissionReasons from '../data/remissionReasons.table';
+import remissionResponsibles from '../data/remissionResponsibles.table';
+import regimeTypes from '../data/regimeTypes.table';
+import sellerNatureSelfInvoicingCases from '../data/sellerNatureSelfInvoicingCases.table';
+import taxTreatments from '../data/taxTreatments.table';
+import taxTypes from '../data/taxTypes.table';
+import tradingConditions from '../data/tradingConditions.table';
+import transactionTypes from '../data/transactionTypes.table';
+import transportModalities from '../data/transportModalities.table';
+import transportTypes from '../data/transportTypes.table';
+import vehicleIdentifications from '../data/vehicleIdentifications.table';
+import vehicleOperationTypes from '../data/vehicleOperationTypes.table';
+import exchangeRateConditions from '../data/exchangeRateConditions.table';
+import paymentConditions from '../data/paymentConditions.table';
 
-type Tables = typeof constantsService;
+import idDocsInnominateReceptors from '../data/idDocsInnominateReceptors.table';
+import idDocsReceptors from '../data/idDocsReceptors.table';
+import idDocsUsers from '../data/idDocsUsers.table';
+import idDocsCarriers from '../data/idDocsCarriers.table';
+import identityDocsForNominationEvent from '../data/idDocsForNominationEvent.table';
+import taxpayerTypes from '../data/taxpayerTypes.table';
 
-class DbService {
-  select<
-    K extends keyof Tables,
-    T extends Tables[K],
-  >(tableName: K) {
-    const table = constantsService[tableName] as T;
+/** Data reference:
+ * @link https://www.dnit.gov.py/documents/20123/420592/Manual+T%C3%A9cnico+Versi%C3%B3n+150.pdf/e706f7c7-6d93-21d4-b45b-5d22d07b2d22?t=1687351495907 */
+export default Object.freeze({
+  //global and per item
+  exchangeRateConditions,
+  advancePaymentConditions,
 
-    type TD = T[number];
+  idDocsUsers,
+  idDocsCarriers,
+  idDocsReceptors,
+  idDocsInnominateReceptors,
+  identityDocsForNominationEvent,
 
-    type NotFoundErrorData = {
-      ctx: z.RefinementCtx;
-      fieldName: string;
-      message?: string;
-    };
+  documentTypes,
+  emissionTypes,
+  transactionTypes,
+  taxpayerTypes,
+  taxTypes,
+  obligations,
+  currencies,
+  regimeTypes,
+  operationTypes,
+  presenceIndicators,
+  taxpayerNotTaxpayer,
+  sellerNatureSelfInvoicingCases,
+  creditNoteReasons,
+  remissionReasons,
+  remissionResponsibles,
+  operatingConditions,
+  paymentTypes,
+  paymentConditions,
+  creditTypes,
+  creditCards,
+  creditCardProcessingMethods,
+  measurementUnits,
+  taxTreatments,
+  iscCategories,
+  iscTaxes,
+  tradingConditions,
+  merchandiseRelevances,
+  vehicleOperationTypes,
+  vehicleIdentifications,
+  fuelTypes,
+  transportTypes,
+  transportModalities,
+  freightResponsibles,
+  associatedDocumentTypes,
+  printedDocumentTypes,
+  constancyTypes,
+  cargoCharacteristics,
+  complianceEventTypes,
+  countries,
+  departments,
+  districts,
+  cities,
+});
 
-    const manageNotFoundError = (
-      result: TD | undefined,
-      notFoundErrorData?: NotFoundErrorData,
-    ) => {
-      if (!result && notFoundErrorData) {
-        const path = `'${notFoundErrorData.ctx.path.join('.')}.${notFoundErrorData.fieldName}'`;
-        notFoundErrorData.ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: notFoundErrorData.message ?? `El valor del campo ${path} no es válido`,
-          path: [notFoundErrorData.fieldName],
-        });
-      }
-    };
-
-    return {
-      findById(_id: TD['_id'], notFoundErrorData?: NotFoundErrorData): TD {
-        const foundData = table.find((item) => item._id === _id);
-        manageNotFoundError(foundData, notFoundErrorData);
-        return table.find((item) => item._id === _id) as TD;
-      },
-      findByIdIfExist(_id: TD['_id'] | undefined, notFoundErrorData?: NotFoundErrorData): TD | null {
-        if (_id == undefined) return null;
-        const foundData = table.find((item) => item._id === _id);
-        manageNotFoundError(foundData, notFoundErrorData);
-        return foundData ?? null;
-      },
-      getAll() {
-        return table;
-      }
-    };
-  }
-}
-
-export default new DbService();

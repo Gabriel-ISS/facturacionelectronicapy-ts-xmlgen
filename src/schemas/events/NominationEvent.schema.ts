@@ -1,11 +1,11 @@
 import { z } from 'zod';
-import { OperationTypeNoB2G } from '../../constants/operationTypes.constants';
+import { OperationTypeNoB2G } from '../../data/operationTypes.table';
 import CommonValidators from '../../helpers/validation/CommonValidators';
 import ZodValidator from '../../helpers/validation/ZodValidator';
 import dbService from '../../services/db.service';
-import { Taxpayer } from '../../constants/taxpayer.constants';
-import { TaxpayerNotTaxpayer } from '../../constants/taxpayerNotTaxpayer.constants';
-import { IdentityDocForNominationEvent } from '../../constants/IdDocForNominationEvent.constants';
+import { Taxpayer } from '../../data/taxpayerTypes.table';
+import { TaxpayerNotTaxpayer } from '../../data/taxpayerNotTaxpayer.table';
+import { IdentityDocForNominationEvent } from '../../data/idDocsForNominationEvent.table';
 
 // VER: https://www.dnit.gov.py/documents/20123/420595/NT_E_KUATIA_014_MT_V150X.pdf/dbbb0294-8678-357a-1657-bcd0318077f9?t=1706189857282
 // GENFE001
@@ -129,8 +129,8 @@ export const NominationEventSchema = z
         validator.requiredField('descripcionTipoDocumento');
       } else {
         data.descripcionTipoDocumento = dbService
-          .select('identityDocsForNominationEvent')
-          .findByIdIfExist(data.documentoTipo)?.description;
+          .identityDocsForNominationEvent
+          ._findByIdIfExist(data.documentoTipo)?.description;
       }
     }
 
@@ -157,7 +157,7 @@ export const NominationEventSchema = z
       ...data,
 
       // GENFE006
-      paisDescripcion: dbService.select('countries').findByIdIfExist(data.pais)
+      paisDescripcion: dbService.countries._findByIdIfExist(data.pais)
         ?.description,
 
       // GENFE008
@@ -168,16 +168,16 @@ export const NominationEventSchema = z
 
       // GENFE018
       descripcionDepartamento: dbService
-        .select('departments')
-        .findByIdIfExist(data.departamento)?.description,
+        .departments
+        ._findByIdIfExist(data.departamento)?.description,
 
       // GENFE020
       descripcionDistrito: dbService
-        .select('districts')
-        .findByIdIfExist(data.distrito)?.description,
+        .districts
+        ._findByIdIfExist(data.distrito)?.description,
 
       // GENFE022
-      descripcionCiudad: dbService.select('cities').findByIdIfExist(data.ciudad)
+      descripcionCiudad: dbService.cities._findByIdIfExist(data.ciudad)
         ?.description,
     };
   });

@@ -1,7 +1,9 @@
 import fs from 'fs';
 import { Parser } from 'json2csv';
 import * as readline from 'readline';
-import constantsService, { BasicData } from '../src/services/constants.service';
+import constantsService from '../src/services/constants.service';
+// @ts-ignore
+import * as prettier from 'prettier';
 
 /**
  * Para no tener que repetir los archivos si se deja el trabajo a la mitad
@@ -103,25 +105,25 @@ class ToTableTransformer<
    * debería ser relativo al archivo donde se guardara la tabla
    * ademas debería guardarse en la carpeta data
    */
-  getTableFileContent(
+  async getTableFileContent<D extends { _id: string | number }>(
     currentConstantFilePath: string,
-    tableName: string,
-    csvFilePath: string,
-  ): string {
-    let r = `import Table, { Schema } from '../src/helpers/Table';\n\n`;
-    r += this.getEnumContent(fs.readFileSync(currentConstantFilePath, 'utf8'));
-    r += this.getTypeStr();
-    r += this.getTableStr(tableName, csvFilePath);
+    currentValues: D[],
+  ): Promise<string> {
+    const fileContent = fs.readFileSync(currentConstantFilePath, 'utf8');
+    const { enumName, enumContent } = this.getEnumNameAndContent(fileContent);
+
+    let r = `import Table from '../helpers/Table';\n\n`;
+    r += enumContent;
+    r += await this.getTableStr(enumName, currentValues);
     return r;
   }
 
-  getCsvFileContent(): string {
-    return this.json2csvParser.parse(this.currentData);
-  }
+  private getEnumNameAndContent(fileContent: string) {
+    const nameRegex = /export enum (\w+)/g;
+    const nameMatch = nameRegex.exec(fileContent);
+    if (!nameMatch) return { enumName: undefined, enumContent: '' };
+    const enumName = nameMatch?.[1];
 
-  /** Busca el el contenido del archivo el enum y retorna el contenido del enum */
-  private getEnumContent(fileContent: string): string {
-    // 'export enum' index
     let startIndex = fileContent.indexOf('export enum');
     let endIndex = 0;
 
@@ -134,26 +136,44 @@ class ToTableTransformer<
         break;
       }
     }
+    const enumContent = fileContent.substring(startIndex, endIndex) + '}\n\n';
 
-    return fileContent.substring(startIndex, endIndex) + '}\n\n';
+    return { enumName, enumContent };
   }
 
-  private getTypeStr(): string {
+  private getTypeStr(enumName: string | undefined): string {
     const fields: string[] = [];
     for (const [header, value] of Object.entries(this.currentData[0])) {
+      if (enumName && header == '_id') {
+        fields.push(`['${header}', ${enumName}]`);
+        continue;
+      }
       fields.push(`['${header}', ${typeof value}]`);
     }
-    return `type S = Schema<[${fields.join(', ')}]>;\n\n`;
+
+    return `{\n${fields.map((f, i) => `\t\t${i}: ${f}, \n`).join('')}}`;
   }
 
-  private getTableStr(tableName: string, csvFilePath: string): string {
+  private async getTableStr<D extends { _id: string | number }>(
+    enumName: string | undefined,
+    currentValues: D[],
+  ): Promise<string> {
+    const headers = Object.keys(currentValues[0]);
+    const data = currentValues.map((d) => Object.values(d));
+
     let table = '';
-    table += `export const table = new Table<S>(\n`;
-    table += `  '${tableName}',\n`;
-    table += `  '${csvFilePath}',\n`;
+    table += `export const table = new Table<`;
+    table += `${this.getTypeStr(enumName)}>(\n`;
+    table += `  ${JSON.stringify(headers)},\n`;
+    table += `  ${JSON.stringify(data, null, 2)},\n`;
     table += `);\n\n`;
 
-    return table;
+    return await prettier.format(table, {
+      parser: 'typescript',
+      printWidth: 80,
+      trailingComma: 'all',
+      singleQuote: true,
+    });
   }
 }
 
@@ -169,7 +189,7 @@ function createFile(path: string, content: string) {
 async function createFiles(object: Record<string, any>) {
   const progress = new Progress('progress.txt', 'skipped.txt');
   const rl = new ReadLine();
-  
+
   const toSkip = await progress.getToSkip();
 
   for (const key in object) {
@@ -201,32 +221,28 @@ async function createFiles(object: Record<string, any>) {
       continue;
     }
 
-    const constantsPath = '../src/constants/'
-    const dataPath = '../data/'
+    const constantsPath = '../src/constants/';
+    const dataPath = '../src/data/';
 
     const currentConstantFilePath = constantsPath + key + '.constants.ts';
     const u_currentConstantFilePath = await rl.ask(
       `Ruta al archivo con los datos (${currentConstantFilePath}):`,
     );
-    const u_tableName = await rl.ask(`Nombre de tabla (${key}):`);
-    const tableName = u_tableName ? u_tableName : key;
-    const fileName = tableName + '.table.ts';
+    const fileName = key + '.table.ts';
 
     const tableFilePath = dataPath + fileName;
-    const csvFilePath = dataPath + tableName + '.csv';
 
-    const tt = new ToTableTransformer(data)
+    const tt = new ToTableTransformer(data);
 
-    const tableFileContent = tt.getTableFileContent(
-      u_currentConstantFilePath ? u_currentConstantFilePath : currentConstantFilePath,
-      fileName,
-      csvFilePath,
+    const tableFileContent = await tt.getTableFileContent(
+      u_currentConstantFilePath
+        ? u_currentConstantFilePath
+        : currentConstantFilePath,
+      data,
     );
-    const csvFileContent = tt.getCsvFileContent()
 
     try {
       await createFile(tableFilePath, tableFileContent);
-      await createFile(csvFilePath, csvFileContent);
       await progress.addToProgress(key);
     } catch (error) {
       console.error('Error al crear el archivo:', (error as Error).message);

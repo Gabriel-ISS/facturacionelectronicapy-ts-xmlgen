@@ -1,5 +1,5 @@
 import { EDocData } from '../../schemas/EDoc.schema';
-import { DocumentoAsociado } from '../../schemas/EDocData/documentoAsociado.schema';
+import { DocumentoAsociado } from '../../schemas/data/documentoAsociado.schema';
 
 class DocAsociadoXMLSG {
   /**H. Campos que identifican al documento asociado (H001-H049)*/

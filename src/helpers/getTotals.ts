@@ -1,7 +1,7 @@
-import { TaxRate } from '../constants/taxRate.constants';
-import { TaxTreatment } from '../constants/taxTreatments.constants';
-import { TaxType } from '../constants/taxTypes.constants';
-import { CompleteItem } from '../schemas/EDocData/item.schema';
+import { TaxRate } from '../types/TaxRate';
+import { TaxTreatment } from '../data/taxTreatments.table';
+import { TaxType } from '../data/taxTypes.table';
+import { CompleteItem } from '../schemas/data/item.schema';
 import { SecureOmit } from '../types/helpers';
 
 type Props = {

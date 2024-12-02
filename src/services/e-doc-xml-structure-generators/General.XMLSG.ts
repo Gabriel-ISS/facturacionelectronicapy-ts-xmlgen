@@ -1,4 +1,4 @@
-import { ValidDocumentType } from '../../constants/documentTypes.constants';
+import { AllDocumentTypes, ValidDocumentType } from '../../data/documentTypes.table';
 import { EDocParams, EDocData } from '../../schemas/EDoc.schema';
 
 class GeneralXMLSG {
@@ -22,7 +22,7 @@ class GeneralXMLSG {
   /**D1. Campos inherentes a la operación comercial (D010-D099) */
   private get_gOpeCom(data: EDocData) {
     // C002 = 7
-    if (data.tipoDocumento == ValidDocumentType.NOTA_DE_REMISION_ELECTRONICA) {
+    if (data.tipoDocumento == AllDocumentTypes.NOTA_DE_REMISION_ELECTRONICA) {
       // No informa si el tipo de documento es 7
       return;
     }

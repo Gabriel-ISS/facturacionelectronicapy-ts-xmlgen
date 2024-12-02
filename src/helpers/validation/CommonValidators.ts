@@ -1,13 +1,12 @@
 import { z } from 'zod';
-import { Country } from '../../constants/countries.constants';
-import { Currency } from '../../constants/curencies.constants';
-import { Department } from '../../constants/departments.constants';
-import { TaxpayerNotTaxpayer } from '../../constants/taxpayerNotTaxpayer.constants';
+import { Country } from '../../data/countries.table';
+import { Currency } from '../../data/currencies.table';
+import { Department } from '../../data/departments.table';
+import { TaxpayerNotTaxpayer } from '../../data/taxpayerNotTaxpayer.table';
+import dbService from '../../services/db.service';
+import { SecureOmit } from '../../types/helpers';
 import DateHelper from '../DateHelper';
 import NumberLength from './NumberLenght';
-import constantsService from '../../services/constants.service';
-import dbService from '../../services/db.service';
-import { TradingCondition } from '../../constants/tradingConditions.constants';
 
 // MENSAJES
 type Int = { int?: string };
@@ -24,10 +23,16 @@ class CommonValidators {
     });
   }
 
-  oneNumberOf(tableName: keyof typeof constantsService, message?: string) {
+  oneNumberOf(
+    tableName: keyof SecureOmit<
+      typeof dbService,
+      'countries' | 'currencies' | 'tradingConditions'
+    >,
+    message?: string,
+  ) {
     return z.number().superRefine((value, ctx) => {
       if (!value) return;
-      const foundData = dbService.select(tableName).findByIdIfExist(value);
+      const foundData = dbService[tableName]._findByIdIfExist(value as any);
       if (foundData) return;
 
       const path = `'${ctx.path.join('.')}'`;
@@ -44,7 +49,7 @@ class CommonValidators {
       if (!value) return;
       const foundData = dbService
         .select(tableName)
-        .findByIdIfExist(value as Country | Currency | TradingCondition);
+        ._findByIdIfExist(value as Country | Currency | TradingCondition);
       if (foundData) return;
 
       const path = `'${ctx.path.join('.')}'`;
@@ -63,9 +68,7 @@ class CommonValidators {
   ) {
     const strPath = `'${ctx.path.join('.')}'`;
 
-    let foundDistrict = dbService
-      .select('districts')
-      .findByIdIfExist(districtId);
+    let foundDistrict = dbService.districts._findByIdIfExist(districtId);
 
     if (districtId && !foundDistrict) {
       this.addFieldError(
@@ -84,10 +87,13 @@ class CommonValidators {
     }
 
     if (!cityId) return;
-    let foundCity = dbService.select('cities').findByIdIfExist(cityId);
+    let foundCity = dbService.cities._findByIdIfExist(cityId);
 
     if (!foundCity) {
-      this.addFieldError(ctx, `No se encontró la ciudad con el Id '${cityId}' en ${strPath}`);
+      this.addFieldError(
+        ctx,
+        `No se encontró la ciudad con el Id '${cityId}' en ${strPath}`,
+      );
     } else if (districtId && foundCity.distrito != districtId) {
       this.addFieldError(
         ctx,
@@ -267,7 +273,7 @@ class CommonValidators {
 
   timbrado() {
     return z.number().superRefine((value, ctx) => {
-      new NumberLength(value, ctx).int().length(8)
+      new NumberLength(value, ctx).int().length(8);
     });
   }
 

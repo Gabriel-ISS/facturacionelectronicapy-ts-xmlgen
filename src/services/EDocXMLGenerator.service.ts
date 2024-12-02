@@ -1,21 +1,20 @@
 import xml2js from 'xml2js';
 
+import { removeUndefinedValues } from '../helpers/removeUndefinedValues';
 import { EDocData, EDocParams } from '../schemas/EDoc.schema';
 import { XmlGenConfig } from '../types/XmlGenConfig';
-import constantService from './constants.service';
-import ComplementariosEspXMLSG from './e-doc-xml-structure-generators/E-section/ComplementariosEsp.XMLSG';
 import ComplementariosGenXMLSG from './e-doc-xml-structure-generators/ComplementariosGen.XMLSG';
-import CondicionXMLSG from './e-doc-xml-structure-generators/E-section/Condicion.XMLSG';
-import { default as DocAsociadoXMLSG, default as jsonDteDocumentIdentify } from './e-doc-xml-structure-generators/DocAsociado.XMLSG';
-import FacturaXMLSG from './e-doc-xml-structure-generators/E-section/Factura.XMLSG';
-import GeneralXMLSG from './e-doc-xml-structure-generators/General.XMLSG';
-import ItemsXMLSG from './e-doc-xml-structure-generators/E-section/Items.XMLSG';
-import TotalesXMLSG from './e-doc-xml-structure-generators/Totales.XMLSG';
-import TransporteXMLSG from './e-doc-xml-structure-generators/E-section/Transporte.XMLSG';
+import { default as DocAsociadoXMLSG } from './e-doc-xml-structure-generators/DocAsociado.XMLSG';
 import AutoFacturaXMLSG from './e-doc-xml-structure-generators/E-section/AutoFactura.XMLSG';
-import NotaRemisionXMLSG from './e-doc-xml-structure-generators/E-section/NotaRemision.XMLSG';
+import ComplementariosEspXMLSG from './e-doc-xml-structure-generators/E-section/ComplementariosEsp.XMLSG';
+import CondicionXMLSG from './e-doc-xml-structure-generators/E-section/Condicion.XMLSG';
+import FacturaXMLSG from './e-doc-xml-structure-generators/E-section/Factura.XMLSG';
+import ItemsXMLSG from './e-doc-xml-structure-generators/E-section/Items.XMLSG';
 import NotaCreditoDebitoXMLSG from './e-doc-xml-structure-generators/E-section/NotaCreditoDebito.XMLSG';
-import { removeUndefinedValues } from '../helpers/removeUndefinedValues';
+import NotaRemisionXMLSG from './e-doc-xml-structure-generators/E-section/NotaRemision.XMLSG';
+import TransporteXMLSG from './e-doc-xml-structure-generators/E-section/Transporte.XMLSG';
+import GeneralXMLSG from './e-doc-xml-structure-generators/General.XMLSG';
+import TotalesXMLSG from './e-doc-xml-structure-generators/Totales.XMLSG';
 
 class EDocXMLGenerator {
   private readonly defaultConfig: XmlGenConfig = {

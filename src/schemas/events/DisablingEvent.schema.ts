@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import {
   AllDocumentTypes
-} from '../../constants/documentTypes.constants';
+} from '../../data/documentTypes.table';
 import CommonValidators from '../../helpers/validation/CommonValidators';
 
 

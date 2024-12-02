@@ -15,9 +15,14 @@
     "prepare": "npm run build"
   },
   "files": [
-    "dist",
-    "data"
+    "dist"
   ],
+  "exports": {
+    ".": "./dist/index.js",
+    "./types": "./dist/types/index.js",
+    "./schemas": "./dist/schemas/index.js",
+    "./helpers": "./dist/helpers/index.js"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/Gabriel-ISS/facturacionelectronicapy-ts-xmlgen.git"
@@ -48,7 +53,6 @@
     "eslint-plugin-mocha": "^8.1.0",
     "eslint-plugin-prettier": "^3.3.1",
     "json2csv": "6.0.0-alpha.2",
-    "prettier": "^2.8.8",
     "ts-node": "^9.1.1",
     "typescript": "^5.6.3"
   }

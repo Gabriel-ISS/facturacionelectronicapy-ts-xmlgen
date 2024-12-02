@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { Taxpayer } from '../constants/taxpayer.constants';
+import { Taxpayer } from '../data/taxpayerTypes.table';
 import { EDocData, EDocParams } from '../schemas/EDoc.schema';
 import calcDV from './calcDV';
 import {

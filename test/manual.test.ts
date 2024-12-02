@@ -1,20 +1,21 @@
+import { Country } from '../src/data/countries.table';
+import { CreditCardProcessingMethod } from '../src/data/creditCardProcessingMethods.table';
+import { CreditCard } from '../src/data/creditCards.table';
+import { CreditType } from '../src/data/creditTypes.table';
+import { Currency } from '../src/data/currencies.table';
+import { Department } from '../src/data/departments.table';
+import { AllDocumentTypes } from '../src/data/documentTypes.table';
+import { UserIdentityDocument } from '../src/data/idDocsUsers.table';
+import { MeasurementUnit } from '../src/data/measurementUnits.table';
+import { PaymentCondition } from '../src/data/paymentConditions.table';
+import { PaymentType } from '../src/data/paymentTypes.table';
+import { PresenceIndicator } from '../src/data/presenceIndicators.table';
+import { Taxpayer } from '../src/data/taxpayerTypes.table';
+import { TaxType } from '../src/data/taxTypes.table';
+import { EDocDataInput } from '../src/schemas/EDocData.schema';
+import { EDocParamsInput } from '../src/schemas/EDocParams.schema';
+import EDocument from '../src'
 import { ZodError } from 'zod';
-import EDocument, { EDocDataInput, EDocParamsInput } from '../src';
-import { Country } from '../src/constants/countries.constants';
-import { CreditCardProcessingMethod } from '../src/constants/creditCardProcessingMethods.constants';
-import { CreditCard } from '../src/constants/creditCards.constants';
-import { CreditType } from '../src/constants/creditTypes.constants';
-import { Currency } from '../src/constants/curencies.constants';
-import { Department } from '../src/constants/departments.constants';
-import { ValidDocumentType } from '../src/constants/documentTypes.constants';
-import { IdentityDocumentReceptor } from '../src/constants/identityDocumentsReceptors.constants';
-import { MeasurementUnit } from '../src/constants/measurementUnits.constants';
-import { PaymentCondition } from '../src/constants/paymentCondition.constants';
-import { PaymentType } from '../src/constants/paymentTypes.constants';
-import { PresenceIndicator } from '../src/constants/presenceIndicators.constants';
-import { Taxpayer } from '../src/constants/taxpayer.constants';
-import { TaxType } from '../src/constants/taxTypes.constants';
-import { UserIdentityDocument } from '../src/constants/userIdentityDocuments.constants';
 
 const params: EDocParamsInput = {
   tipoContribuyente: Taxpayer.PERSONA_FISICA,
@@ -42,7 +43,7 @@ const params: EDocParamsInput = {
 
 const data: EDocDataInput = {
   codigoSeguridadAleatorio: 123456789,
-  tipoDocumento: ValidDocumentType.FACTURA_ELECTRONICA,
+  tipoDocumento: AllDocumentTypes.FACTURA_ELECTRONICA,
   establecimiento: 1,
   punto: 1,
   numero: 5,

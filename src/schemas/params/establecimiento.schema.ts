@@ -50,19 +50,19 @@ export const EstablecimientoSchema = z
 
       // D112
       departamentoDescripcion: dbService
-        .select('departments')
-        .findById(data.departamento).description,
+        .departments
+        ._findById(data.departamento).description,
 
       // D114
       distritoDescripcion: dbService
-        .select('districts')
-        .findByIdIfExist(data.distrito, {
+        .districts
+        ._findByIdIfExist(data.distrito, {
           ctx,
           fieldName: 'distrito',
         })?.description,
 
       // D116
-      ciudadDescripcion: dbService.select('cities').findById(data.ciudad, {
+      ciudadDescripcion: dbService.cities._findById(data.ciudad, {
         ctx,
         fieldName: 'ciudad',
       })?.description,

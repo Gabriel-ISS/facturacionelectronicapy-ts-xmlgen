@@ -1,6 +1,6 @@
 import { EDocData } from '../../../schemas/EDoc.schema';
-import { CompleteItem } from '../../../schemas/EDocData/item.schema';
-import { CompleteMonto } from '../../../schemas/EDocData/monto.schema';
+import { CompleteItem } from '../../../schemas/data/item.schema';
+import { CompleteMonto } from '../../../schemas/data/monto.schema';
 
 class ItemsXMLSG {
   /**E8. Campos que describen los ítems de la operación (E700-E899)*/
@@ -33,7 +33,7 @@ class ItemsXMLSG {
       // E709
       cUniMed: item.unidadMedida,
 
-      // E710: DELETE: el trim una vez se quiten los espacios de las unidades de medida
+      // E710
       dDesUniMed: item.unidadMedidaDescripcion.trim(),
 
       // E711

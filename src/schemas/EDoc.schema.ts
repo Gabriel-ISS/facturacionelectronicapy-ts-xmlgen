@@ -3,7 +3,7 @@ import { EDocDataSchema } from './EDocData.schema';
 import { EDocParamsSchema } from './EDocParams.schema';
 import ZodValidator from '../helpers/validation/ZodValidator';
 import { Path } from '../helpers/Path';
-import { RemissionReason } from '../constants/remissionReasons.constants';
+import { RemissionReason } from '../data/remissionReasons.table';
 import CDCHelper from '../helpers/CDCHelper';
 
 export const EDocSchema = z

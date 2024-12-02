@@ -1,8 +1,8 @@
 import { z } from 'zod';
 import CommonValidators from '../../helpers/validation/CommonValidators';
-import { TaxpayerNotTaxpayer } from '../../constants/taxpayerNotTaxpayer.constants';
+import { TaxpayerNotTaxpayer } from '../../data/taxpayerNotTaxpayer.table';
 import ZodValidator from '../../helpers/validation/ZodValidator';
-import { IdentityDocumentCarriers } from '../../constants/identityDocumentsCarriers.constants';
+import { IdentityDocumentCarriers } from '../../data/idDocsCarriers.table';
 import { Path } from '../../helpers/Path';
 
 // GED001
