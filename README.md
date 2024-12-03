@@ -16,6 +16,9 @@ El módulo está preparado de forma a proveer una fácil integración dentro de 
 - [Características](#características)
 - [Instalación](#instalación)
 - [Ejemplo de uso](#ejemplo-de-uso)
+  - [Generación de documento electrónico](#generación-de-documento-electrónico)
+  - [Generación de evento](#generación-de-evento)
+  - [Base de datos](#base-de-datos)
 - [Estructuras](#estructuras)
   - [Estructura de `params`](#estructura-de-params)
   - [Estructura de `data`](#estructura-de-data)
@@ -81,6 +84,25 @@ try {
   console.log(error);
 }
 
+```
+
+
+### Base de datos
+
+```ts
+import EDocument from 'facturacionelectronicapy-ts-xmlgen';
+import EDTypes from 'facturacionelectronicapy-ts-xmlgen/types';
+
+// retorna el sevicio de base de datos
+const db = EDocument.db();
+
+// resultado: ['_id', 'description']
+const documentTypesHeaders = db.documentTypes.headers;
+// tipo del resultado: [EDocumentType, string][]
+const documentTypesRows = db.documentTypes.data;
+
+// resultado: { _id: 1, description: 'Factura electrónica' }
+const elctronicInvoiceData = await db.documentTypes.findById(EDTypes.EDocumentType.FACTURA_ELECTRONICA);
 ```
 
 ## Estructuras
@@ -909,24 +931,6 @@ export type EventData =
         ruc?: string;
       };
     };
-```
-
-## Base de datos
-
-```ts
-import EDocument from 'facturacionelectronicapy-ts-xmlgen';
-import EDTypes from 'facturacionelectronicapy-ts-xmlgen/types';
-
-// retorna el sevicio de base de datos
-const db = EDocument.db();
-
-// resultado: ['_id', 'description']
-const documentTypesHeaders = db.documentTypes.headers;
-// tipo del resultado: [EDocumentType, string][]
-const documentTypesRows = db.documentTypes.data;
-
-// resultado: { _id: 1, description: 'Factura electrónica' }
-const elctronicInvoiceData = await db.documentTypes.findById(EDTypes.EDocumentType.FACTURA_ELECTRONICA);
 ```
 
 ## Proyectos relacionados
