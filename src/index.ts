@@ -1,4 +1,3 @@
-import { ZodError } from 'zod';
 import translateZodErrors from './helpers/validation/translateZodErrors';
 import { EDocSchema } from './schemas/EDoc.schema';
 import { EDocDataInput } from './schemas/EDocData.schema';
@@ -50,7 +49,3 @@ class EDocument {
 }
 
 export default new EDocument();
-
-export { EDocDataInput, EDocParamsInput };
-export { XmlGenConfig };
-export { SIFENEvent } from './types/Events';
