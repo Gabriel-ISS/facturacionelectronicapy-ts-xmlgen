@@ -43,6 +43,8 @@ Para instalar el módulo en su proyecto node, ejecute el siguiente comando:
 
 ## Ejemplo de uso
 
+Cuando se produce un error puede ser una instancia de `Error` (error imprevisto) o una instancia de (`ZodError`)[https://zod.dev/?id=error-handling].
+
 ### Generación de documento electrónico
 
 El método requiere 2 argumentos tipo **JSON** para general el XML. El primero es un argumento `params` con las informaciones estáticas del Contribuyente emisor, y el segundo es `data` con los datos variables para cada documento electrónico a generar.
