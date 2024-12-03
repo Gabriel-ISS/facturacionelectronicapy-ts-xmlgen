@@ -900,6 +900,25 @@ export type EventData =
     };
 ```
 
+## Base de datos
+
+```ts
+import EDocument from 'facturacionelectronicapy-ts-xmlgen';
+import EDTypes from 'facturacionelectronicapy-ts-xmlgen/types';
+
+// retorna el sevicio de base de datos
+const db = EDocument.db();
+
+// resultado: ['_id', 'description']
+const documentTypesHeaders = db.documentTypes.headers;
+// tipo del resultado: [EDocumentType, string][]
+const documentTypesRows = db.documentTypes.data;
+
+// resultado: { _id: 1, description: 'Factura electrónica' }
+const elctronicInvoiceData = await db.documentTypes.findById(EDTypes.EDocumentType.FACTURA_ELECTRONICA);
+```
+
+
 ## Proyectos relacionados
 
 - [Generación de XML (proyecto original)](https://www.npmjs.com/package/facturacionelectronicapy-xmlgen)
