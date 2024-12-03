@@ -38,7 +38,7 @@ El módulo está preparado de forma a proveer una fácil integración dentro de 
 Para instalar el módulo en su proyecto node, ejecute el siguiente comando:
 
 ```bash
-  npm install facturacionelectronicapy-xmlgen
+  npm install facturacionelectronicapy-ts-xmlgen
 ```
 
 ## Ejemplo de uso
