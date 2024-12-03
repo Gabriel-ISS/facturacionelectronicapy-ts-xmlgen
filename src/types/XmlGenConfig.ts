@@ -1,5 +1,4 @@
 export type XmlGenConfig = {
-  arrayValuesSeparator?: string;
   /**
    * En consideración a la Resolución 347 del 2014 (Secretaría de Defensa del Consumidor-
    * SEDECO).

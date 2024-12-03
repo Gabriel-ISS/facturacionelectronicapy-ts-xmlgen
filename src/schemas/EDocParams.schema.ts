@@ -6,54 +6,54 @@ import CommonValidators from '../helpers/validation/CommonValidators';
 import { RegimeType } from '../data/regimeTypes.table';
 import { TaxpayerType } from '../data/taxpayerTypes.table';
 
-export const EDocParamsSchema = z.object({
-  // AA. Campos que identifican el formato electrónico XML (AA001-AA009)
+export const EDocParamsSchema = z
+  .object({
+    // D2. Campos que identifican al emisor del Documento Electrónico DE (D100-D129)
 
-  // AA002
-  version: z.literal(150).default(150),
+    // ruc con dv, para calcular D101 y D102
+    ruc: CommonValidators.ruc(),
 
-  // D2. Campos que identifican al emisor del Documento Electrónico DE (D100-D129)
+    // D103
+    tipoContribuyente: z.nativeEnum(TaxpayerType),
 
-  // ruc con dv, para calcular D101 y D102
-  ruc: CommonValidators.ruc(),
+    // D104
+    tipoRegimen: z.nativeEnum(RegimeType).optional(),
 
-  // D103
-  tipoContribuyente: z.nativeEnum(TaxpayerType),
+    // D105
+    razonSocial: CommonValidators.legalName(),
 
-  // D104
-  tipoRegimen: z.nativeEnum(RegimeType).optional(),
+    // D106
+    nombreFantasia: CommonValidators.tradeName().optional(),
 
-  // D105
-  razonSocial: CommonValidators.legalName(),
+    // D107 - D119
+    establecimientos: z.array(EstablecimientoSchema).min(1),
 
-  // D106
-  nombreFantasia: CommonValidators.tradeName().optional(),
+    // D2.1 Campos que describen la actividad económica del emisor (D130-D139)
+    actividadesEconomicas: z.array(ActividadEconomicaSchema).min(1).max(9),
 
-  // D107 - D119
-  establecimientos: z.array(EstablecimientoSchema).min(1),
+    // C004
+    timbradoNumero: CommonValidators.timbrado(),
 
-  // D2.1 Campos que describen la actividad económica del emisor (D130-D139)
-  actividadesEconomicas: z.array(ActividadEconomicaSchema).min(1).max(9),
+    // C008
+    timbradoFecha: CommonValidators.isoDate(),
+  })
+  .transform((data, ctx) => {
+    const [rucID, rucDV] = data.ruc.split('-');
 
-  // C004
-  timbradoNumero: CommonValidators.timbrado(),
+    return {
+      ...data,
 
-  // C008
-  timbradoFecha: CommonValidators.isoDate(),
-}).transform((data, ctx) => {
+      // AA. Campos que identifican el formato electrónico XML (AA001-AA009)
 
-  const [rucID, rucDV] = data.ruc.split('-');
+      // AA002
+      version: 150,
 
-  return {
-    ...data,
+      // D101
+      rucID,
 
-    // D101
-    rucID,
-
-    // D102
-    rucDV,
-    
-  };
-});
+      // D102
+      rucDV,
+    };
+  });
 
 export type EDocParamsInput = z.input<typeof EDocParamsSchema>;

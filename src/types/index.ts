@@ -2,6 +2,8 @@ export * from './XmlGenConfig';
 export * from './Events';
 export * from './TaxRate';
 
+export { EventData } from '../services/EventXMLGenerator.service';
+
 export { GlobalAndPerItem } from '../data/shared/globalAndPerItem.table';
 export { IdentityDocument } from '../data/shared/idDoc.table';
 export { AssociatedDocumentType } from '../data/associatedDocumentTypes.table';

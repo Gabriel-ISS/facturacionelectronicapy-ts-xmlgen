@@ -308,6 +308,6 @@ export const TransportUpdateEventSchema = z
     };
   });
 
-export type TransportUpdateEventInput = z.infer<
+export type TransportUpdateEventInput = z.input<
   typeof TransportUpdateEventSchema
 >;
