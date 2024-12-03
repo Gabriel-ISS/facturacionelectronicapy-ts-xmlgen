@@ -27,11 +27,12 @@ Para instalar el módulo en su proyecto node, ejecute el siguiente comando:
   npm install facturacionelectronicapy-xmlgen
 ```
 
-El método requiere 2 argumentos tipo **JSON** para general el XML. El primero es un argumento `params` con las informaciones estáticas del Contribuyente emisor, y el segundo es `data` con los datos variables para cada documento electrónico a generar.
-
 ## Ejemplo de uso
 
 ### Generación de documento electrónico
+
+El método requiere 2 argumentos tipo **JSON** para general el XML. El primero es un argumento `params` con las informaciones estáticas del Contribuyente emisor, y el segundo es `data` con los datos variables para cada documento electrónico a generar.
+
 
 ```ts
 import EDocument from 'facturacionelectronicapy-ts-xmlgen';
