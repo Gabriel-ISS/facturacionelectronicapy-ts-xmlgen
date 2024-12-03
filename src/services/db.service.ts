@@ -11,7 +11,7 @@ import creditTypes from '../data/creditTypes.table';
 import currencies from '../data/currencies.table';
 import departments from '../data/departments.table';
 import districts from '../data/districts.table';
-import documentTypes from '../data/documentTypes.table';
+import eDocumentTypes from '../data/eDocumentTypes.table';
 import emissionTypes from '../data/emissionTypes.table';
 import freightResponsibles from '../data/freightResponsibles.table';
 import fuelTypes from '../data/fuelTypes.table';
@@ -62,7 +62,7 @@ export default Object.freeze({
   idDocsInnominateReceptors,
   identityDocsForNominationEvent,
 
-  documentTypes,
+  eDocumentTypes,
   emissionTypes,
   transactionTypes,
   taxpayerTypes,

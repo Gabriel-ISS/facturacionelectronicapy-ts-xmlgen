@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { IdentityDocumentCarriers } from '../../data/idDocsCarriers.table';
+import { IdentityDocumentCarrier } from '../../data/idDocsCarriers.table';
 import { SellerNatureSelfInvoicing } from '../../data/sellerNatureSelfInvoicingCases.table';
 
 import CommonValidators from '../../helpers/validation/CommonValidators';
@@ -13,7 +13,7 @@ export const AutoFacturaSchema = z
     tipoVendedor: z.nativeEnum(SellerNatureSelfInvoicing),
 
     // E304
-    documentoTipo: z.nativeEnum(IdentityDocumentCarriers),
+    documentoTipo: z.nativeEnum(IdentityDocumentCarrier),
 
     // E306
     documentoNumero: CommonValidators.identityDocNumber(),

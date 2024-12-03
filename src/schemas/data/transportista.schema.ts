@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { IdentityDocumentCarriers } from '../../data/idDocsCarriers.table';
+import { IdentityDocumentCarrier } from '../../data/idDocsCarriers.table';
 import CommonValidators from '../../helpers/validation/CommonValidators';
 
 import ZodValidator from '../../helpers/validation/ZodValidator';
@@ -21,7 +21,7 @@ export const TransportistaSchema = z
     ruc: CommonValidators.ruc(),
 
     // E985
-    documentoTipo: z.nativeEnum(IdentityDocumentCarriers).optional(),
+    documentoTipo: z.nativeEnum(IdentityDocumentCarrier).optional(),
 
     // E987
     documentoNumero: CommonValidators.identityDocNumber().optional(),

@@ -2,7 +2,7 @@ import { z } from 'zod';
 import CommonValidators from '../../helpers/validation/CommonValidators';
 import ZodValidator from '../../helpers/validation/ZodValidator';
 import dbService from '../../services/db.service';
-import { IdentityDocumentCarriers } from '../../data/idDocsCarriers.table';
+import { IdentityDocumentCarrier } from '../../data/idDocsCarriers.table';
 import { TransportType } from '../../data/transportTypes.table';
 import { TransportModality } from '../../data/transportModalities.table';
 import { VehicleIdentification } from '../../data/vehicleIdentifications.table';
@@ -96,7 +96,7 @@ export const TransportUpdateEventSchema = z
       nombre: CommonValidators.name().optional(),
 
       // GET019
-      documentoTipo: z.nativeEnum(IdentityDocumentCarriers).optional(),
+      documentoTipo: z.nativeEnum(IdentityDocumentCarrier).optional(),
 
       // GET021
       documentoNumero: CommonValidators.identityDocNumber().optional(),

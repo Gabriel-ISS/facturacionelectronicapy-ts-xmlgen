@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { IdentityDocumentReceptor } from '../../data/idDocsReceptors.table';
 import { OperationType } from '../../data/operationTypes.table';
-import { Taxpayer } from '../../data/taxpayerTypes.table';
+import { TaxpayerType } from '../../data/taxpayerTypes.table';
 import { TaxpayerNotTaxpayer } from '../../data/taxpayerNotTaxpayer.table';
 import CommonValidators from '../../helpers/validation/CommonValidators';
 
@@ -21,7 +21,7 @@ export const ClienteSchema = z
     pais: CommonValidators.country(),
 
     // D205
-    tipoContribuyente: z.nativeEnum(Taxpayer).optional(),
+    tipoContribuyente: z.nativeEnum(TaxpayerType).optional(),
 
     // para obtener D206 y D207
     ruc: CommonValidators.ruc().optional(),

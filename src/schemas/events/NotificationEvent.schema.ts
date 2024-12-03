@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import CommonValidators from '../../helpers/validation/CommonValidators';
-import { IdentityDocumentCarriers } from '../../data/idDocsCarriers.table';
+import { IdentityDocumentCarrier } from '../../data/idDocsCarriers.table';
 import NumberLength from '../../helpers/validation/NumberLenght';
 import { TaxpayerNotTaxpayer } from '../../data/taxpayerNotTaxpayer.table';
 import ZodValidator from '../../helpers/validation/ZodValidator';
@@ -28,7 +28,7 @@ export const NotificationEventSchema = z
     ruc: CommonValidators.ruc().optional(),
 
     // GEN009
-    documentoTipo: z.nativeEnum(IdentityDocumentCarriers).optional(),
+    documentoTipo: z.nativeEnum(IdentityDocumentCarrier).optional(),
 
     // GEN010
     documentoNumero: CommonValidators.identityDocNumber().optional(),

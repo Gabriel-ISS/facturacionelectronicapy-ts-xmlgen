@@ -1,7 +1,7 @@
 import { IdentityDocument, idDocs } from '../data/shared/idDoc.table';
 import Table from '../helpers/Table';
 
-export enum IdentityDocumentCarriers {
+export enum IdentityDocumentCarrier {
   CEDULA_PARAGUAYA = IdentityDocument.CEDULA_PARAGUAYA,
   PASAPORTE = IdentityDocument.PASAPORTE,
   CEDULA_EXTRANJERA = IdentityDocument.CEDULA_EXTRANJERA,
@@ -9,7 +9,7 @@ export enum IdentityDocumentCarriers {
 }
 
 export default new Table<{
-  0: ['_id', IdentityDocumentCarriers];
+  0: ['_id', IdentityDocumentCarrier];
   1: ['description', string];
 }>(
   ['_id', 'description'],

@@ -2,7 +2,7 @@ import { z } from 'zod';
 import CommonValidators from '../../helpers/validation/CommonValidators';
 import { TaxpayerNotTaxpayer } from '../../data/taxpayerNotTaxpayer.table';
 import ZodValidator from '../../helpers/validation/ZodValidator';
-import { IdentityDocumentCarriers } from '../../data/idDocsCarriers.table';
+import { IdentityDocumentCarrier } from '../../data/idDocsCarriers.table';
 import { Path } from '../../helpers/Path';
 
 // GED001
@@ -27,7 +27,7 @@ export const IgnoranceEventSchema = z
     ruc: CommonValidators.ruc().optional(),
 
     // GED009
-    documentoTipo: z.nativeEnum(IdentityDocumentCarriers).optional(),
+    documentoTipo: z.nativeEnum(IdentityDocumentCarrier).optional(),
 
     // GED010
     documentoNumero: CommonValidators.identityDocNumber().optional(),

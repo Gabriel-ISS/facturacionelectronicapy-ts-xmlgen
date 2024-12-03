@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { Taxpayer } from '../data/taxpayerTypes.table';
+import { TaxpayerType } from '../data/taxpayerTypes.table';
 import { EDocData, EDocParams } from '../schemas/EDoc.schema';
 import calcDV from './calcDV';
 import {
@@ -54,7 +54,7 @@ class CDCHelper {
       number: data.cdc.substring(17, 24),
 
       // D103
-      taxpayerType: Number(data.cdc.substring(24, 25)) as Taxpayer,
+      taxpayerType: Number(data.cdc.substring(24, 25)) as TaxpayerType,
 
       // D002
       date: data.cdc.substring(25, 33),

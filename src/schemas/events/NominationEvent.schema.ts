@@ -3,7 +3,7 @@ import { OperationTypeNoB2G } from '../../data/operationTypes.table';
 import CommonValidators from '../../helpers/validation/CommonValidators';
 import ZodValidator from '../../helpers/validation/ZodValidator';
 import dbService from '../../services/db.service';
-import { Taxpayer } from '../../data/taxpayerTypes.table';
+import { TaxpayerType } from '../../data/taxpayerTypes.table';
 import { TaxpayerNotTaxpayer } from '../../data/taxpayerNotTaxpayer.table';
 import { IdentityDocForNominationEvent } from '../../data/idDocsForNominationEvent.table';
 
@@ -24,7 +24,7 @@ export const NominationEventSchema = z
     pais: CommonValidators.country(),
 
     // GENFE007
-    tipoReceptor: z.nativeEnum(Taxpayer).optional(),
+    tipoReceptor: z.nativeEnum(TaxpayerType).optional(),
 
     // para calcular GENFE008 y GENFE009
     ruc: CommonValidators.ruc().optional(),

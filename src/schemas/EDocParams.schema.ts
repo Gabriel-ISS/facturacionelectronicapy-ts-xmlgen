@@ -4,7 +4,7 @@ import { EstablecimientoSchema } from './params/establecimiento.schema';
 import CommonValidators from '../helpers/validation/CommonValidators';
 
 import { RegimeType } from '../data/regimeTypes.table';
-import { Taxpayer } from '../data/taxpayerTypes.table';
+import { TaxpayerType } from '../data/taxpayerTypes.table';
 
 export const EDocParamsSchema = z.object({
   // AA. Campos que identifican el formato electrónico XML (AA001-AA009)
@@ -18,7 +18,7 @@ export const EDocParamsSchema = z.object({
   ruc: CommonValidators.ruc(),
 
   // D103
-  tipoContribuyente: z.nativeEnum(Taxpayer),
+  tipoContribuyente: z.nativeEnum(TaxpayerType),
 
   // D104
   tipoRegimen: z.nativeEnum(RegimeType).optional(),

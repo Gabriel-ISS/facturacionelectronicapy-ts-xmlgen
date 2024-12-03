@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { UserIdentityDocument } from '../../data/idDocsUsers.table';
+import { IdentityDocumentUser } from '../../data/idDocsUsers.table';
 import CommonValidators from '../../helpers/validation/CommonValidators';
 
 import ZodValidator from '../../helpers/validation/ZodValidator';
@@ -9,7 +9,7 @@ import dbService from '../../services/db.service';
 export const UsuarioSchema = z
   .object({
     // D141
-    documentoTipo: z.nativeEnum(UserIdentityDocument),
+    documentoTipo: z.nativeEnum(IdentityDocumentUser),
 
     // D142
     documentoTipoDescripcion: z.string().min(9).max(41).optional(),
@@ -26,7 +26,7 @@ export const UsuarioSchema = z
   .transform((data, ctx) => {
     const validator = new ZodValidator(ctx, data);
 
-    const isOtherDocument = data.documentoTipo == UserIdentityDocument.OTRO;
+    const isOtherDocument = data.documentoTipo == IdentityDocumentUser.OTRO;
 
     // D141 - documentoTipoDescripcion
     {

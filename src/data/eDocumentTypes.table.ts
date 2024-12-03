@@ -1,6 +1,6 @@
 import Table from '../helpers/Table';
 
-export enum AllDocumentTypes {
+export enum EDocumentType {
   FACTURA_ELECTRONICA = 1,
   FACTURA_ELECTRONICA_DE_EXPORTACION = 2,
   FACTURA_ELECTRONICA_DE_IMPORTACION = 3,
@@ -11,7 +11,8 @@ export enum AllDocumentTypes {
   COMPROBANTE_DE_RETENCION_ELECTRONICO = 8,
 }
 
-export enum ValidDocumentType {
+// DELETE: Esto y los estados si ya no es necesario
+/* export enum ValidDocumentType {
   FACTURA_ELECTRONICA = AllDocumentTypes.FACTURA_ELECTRONICA,
   // Facturas de exportación
   // Facturas de importación
@@ -26,10 +27,10 @@ export enum FutureDocumentType {
   FACTURA_ELECTRONICA_DE_EXPORTACION = AllDocumentTypes.FACTURA_ELECTRONICA_DE_EXPORTACION,
   FACTURA_ELECTRONICA_DE_IMPORTACION = AllDocumentTypes.FACTURA_ELECTRONICA_DE_IMPORTACION,
   COMPROBANTE_DE_RETENCION_ELECTRONICO = AllDocumentTypes.COMPROBANTE_DE_RETENCION_ELECTRONICO,
-}
+} */
 
 export default new Table<{
-  0: ['_id', AllDocumentTypes];
+  0: ['_id', EDocumentType];
   1: ['description', string];
   2: ['state', number];
 }>(

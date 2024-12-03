@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import {
-  AllDocumentTypes
-} from '../../data/documentTypes.table';
+  EDocumentType
+} from '../../data/eDocumentTypes.table';
 import CommonValidators from '../../helpers/validation/CommonValidators';
 
 
@@ -24,7 +24,7 @@ export const DisablingEventSchema = z
     hasta: CommonValidators.zeroPadToLength(7),
 
     // GEI007
-    tipoDocumento: z.nativeEnum(AllDocumentTypes),
+    tipoDocumento: z.nativeEnum(EDocumentType),
 
     // GEI008
     motivo: CommonValidators.motive(),

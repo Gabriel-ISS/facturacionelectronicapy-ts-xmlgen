@@ -1,11 +1,11 @@
 import { z } from 'zod';
 import { Currency } from '../data/currencies.table';
-import { ValidDocumentType } from '../data/documentTypes.table';
+import { EDocumentType } from '../data/eDocumentTypes.table';
 import { EmissionType } from '../data/emissionTypes.table';
-import { GlobalAndPerItem } from '../data/shared/globalAndPerItem.table';
 import { OperationType } from '../data/operationTypes.table';
 import { PaymentType } from '../data/paymentTypes.table';
 import { RemissionReason } from '../data/remissionReasons.table';
+import { GlobalAndPerItem } from '../data/shared/globalAndPerItem.table';
 import { TaxTreatment } from '../data/taxTreatments.table';
 import { TaxType } from '../data/taxTypes.table';
 import { TransactionType } from '../data/transactionTypes.table';
@@ -35,7 +35,6 @@ import { SectorSegurosSchema } from './data/sectorSeguros.schema';
 import { SectorSupermercadosSchema } from './data/sectorSupermercados.schema';
 import { TransporteSchema } from './data/transporte.schema';
 import { UsuarioSchema } from './data/usuario.schema';
-import { AllDocumentTypes } from '../data/documentTypes.table';
 
 /** El esquema no incluye...
  *
@@ -87,7 +86,7 @@ export const EDocDataSchema = z
     // C. Campos de datos del Timbrado (C001-C099)
 
     // C002
-    tipoDocumento: z.nativeEnum(AllDocumentTypes),
+    tipoDocumento: z.nativeEnum(EDocumentType),
 
     // C005: Debe coincidir con la estructura de timbrado
     establecimiento: CommonValidators.zeroPadToLength(3),
@@ -217,19 +216,19 @@ export const EDocDataSchema = z
 
     /**C002 = 1 */
     const isElectronicInvoice =
-      data.tipoDocumento == AllDocumentTypes.FACTURA_ELECTRONICA;
+      data.tipoDocumento == EDocumentType.FACTURA_ELECTRONICA;
     /**C002 = 4 */
     const isAutoInvoice =
-      data.tipoDocumento == AllDocumentTypes.AUTOFACTURA_ELECTRONICA;
+      data.tipoDocumento == EDocumentType.AUTOFACTURA_ELECTRONICA;
     /**C002 = 5 */
     const isElectronicCreditNote =
-      data.tipoDocumento == AllDocumentTypes.NOTA_DE_CREDITO_ELECTRONICA;
+      data.tipoDocumento == EDocumentType.NOTA_DE_CREDITO_ELECTRONICA;
     /**C002 = 6 */
     const isElectronicDebitNote =
-      data.tipoDocumento == AllDocumentTypes.NOTA_DE_DEBITO_ELECTRONICA;
+      data.tipoDocumento == EDocumentType.NOTA_DE_DEBITO_ELECTRONICA;
     /**C002 = 7 */
     const isElectronicRemissionNote =
-      data.tipoDocumento == AllDocumentTypes.NOTA_DE_REMISION_ELECTRONICA;
+      data.tipoDocumento == EDocumentType.NOTA_DE_REMISION_ELECTRONICA;
     /**D015 = PYG */
     const currencyIsGuarani = data.moneda == Currency.GUARANI;
     /**D017 = 1 */
@@ -995,7 +994,7 @@ export const EDocDataSchema = z
 
       // C003
       descripcionDocumento: dbService
-        .documentTypes
+        .eDocumentTypes
         ._findById(data.tipoDocumento).description,
 
       // C004 se define en EDocSchema y C008 en EDocParamsSchema
