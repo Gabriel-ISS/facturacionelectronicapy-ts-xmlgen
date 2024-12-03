@@ -12,6 +12,17 @@ El mismo es utilizado y mantenido por el autor y otorgado a la comunidad de desa
 
 El módulo está preparado de forma a proveer una fácil integración dentro de su entorno **NodeJS** y con cualquier otro lenguaje, sistema o librería que lo requiera, por ejemplo publicando el método desde un REST.
 
+## Indices
+- [Características](#características)
+- [Instalación](#instalación)
+- [Ejemplo de uso](#ejemplo-de-uso)
+- [Estructuras](#estructuras)
+  - [Estructura de `params`](#estructura-de-params)
+  - [Estructura de `data`](#estructura-de-data)
+  - [Estructura de `config`](#estructura-de-config)
+- [Base de datos](#base-de-datos)
+- [Proyectos relacionados](#proyectos-relacionados)
+
 ## Características
 
 - Genera el CDC automáticamente de acuerdo a los datos del documento electrónico
@@ -917,7 +928,6 @@ const documentTypesRows = db.documentTypes.data;
 // resultado: { _id: 1, description: 'Factura electrónica' }
 const elctronicInvoiceData = await db.documentTypes.findById(EDTypes.EDocumentType.FACTURA_ELECTRONICA);
 ```
-
 
 ## Proyectos relacionados
 
