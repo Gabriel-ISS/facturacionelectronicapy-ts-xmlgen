@@ -20,7 +20,6 @@ El módulo está preparado de forma a proveer una fácil integración dentro de 
   - [Generación de evento](#generación-de-evento)
   - [Base de datos](#base-de-datos)
 - [Estructuras](#estructuras)
-- [Base de datos](#base-de-datos)
 - [Proyectos relacionados](#proyectos-relacionados)
 
 ## Características

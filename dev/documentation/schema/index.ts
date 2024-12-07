@@ -50,6 +50,7 @@ const links: string[] = keys.map(
     `- [${k}](https://github.com/Gabriel-ISS/facturacionelectronicapy-ts-xmlgen/blob/main/docs/${k}.md)`,
 );
 
+console.log('Reemplazando links en README.md');
 replaceInTemplate({ structures: links.join('\n') });
 
 console.log('Done');

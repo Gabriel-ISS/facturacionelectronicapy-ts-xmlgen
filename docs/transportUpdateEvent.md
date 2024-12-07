@@ -4,8 +4,8 @@
 | --- | --- | --- | --- | --- |
 | GET002 | cdc | String | Requerido |  |
 | GET003 | motivo | Enum = TransportUpdateMotive | Requerido |  |
-| GET004 - GET030 (excluyendo GET013 - GET021) | entrega | [transportUpdateEvent.entrega](#transportUpdateEvent.entrega) | Requerido |  |
-| GET013 - GET021 | transportista | [transportUpdateEvent.transportista](#transportUpdateEvent.transportista) | Requerido |  |
+| GET004 - GET030 (excluyendo GET013 - GET021) | entrega | [transportUpdateEvent.entrega](#transportUpdateEvententrega) | Requerido |  |
+| GET013 - GET021 | transportista | [transportUpdateEvent.transportista](#transportUpdateEventtransportista) | Requerido |  |
 ### transportUpdateEvent.entrega
 
 | ID | Campo | Tipo | Opcional | Descripción |
@@ -18,7 +18,7 @@
 | GET012 | direccionComplementaria1 | String | Opcional |  |
 | GET022 | tipoTransporte | Enum = TransportType | Opcional |  |
 | GET024 | modalidadTransporte | Enum = TransportModality | Opcional |  |
-| GET026 - GET030 | vehiculo | [transportUpdateEvent.entrega.vehiculo](#transportUpdateEvent.entrega.vehiculo) | Requerido |  |
+| GET026 - GET030 | vehiculo | [transportUpdateEvent.entrega.vehiculo](#transportUpdateEvententregavehiculo) | Requerido |  |
 ### transportUpdateEvent.entrega.vehiculo
 
 | ID | Campo | Tipo | Opcional | Descripción |
@@ -32,7 +32,7 @@
 
 | ID | Campo | Tipo | Opcional | Descripción |
 | --- | --- | --- | --- | --- |
-| GET013 - GET014 | chofer | [transportUpdateEvent.transportista.chofer](#transportUpdateEvent.transportista.chofer) | Opcional |  |
+| GET013 - GET014 | chofer | [transportUpdateEvent.transportista.chofer](#transportUpdateEventtransportistachofer) | Opcional |  |
 | GET015 | contribuyente | Boolean | Opcional |  |
 | GET016 y GET017 | ruc | String | Opcional |  |
 | GET018 | nombre | String | Opcional |  |

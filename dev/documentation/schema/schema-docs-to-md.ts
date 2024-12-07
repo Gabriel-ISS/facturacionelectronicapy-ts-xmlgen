@@ -14,7 +14,7 @@ export function generateMarkdown(
     mdg.setHeaderRow(['ID', 'Campo', 'Tipo', 'Opcional', 'Descripción']);
     Object.entries(docs).map(([key, value]) => {
       if (value.inner) {
-        value.type = value.type.replace('Object', mdg.getLink(path + '.' + key));
+        value.type = value.type.replace(/Object/g, mdg.getLink(path + '.' + key));
       }
       if (!value.description) {
         throw new Error(`Missing description for ${path}.${key}`);
@@ -25,6 +25,9 @@ export function generateMarkdown(
       } catch (e) {
         console.log(`Error en ${path}.${key}`);
         throw e;
+      }
+      if (parsedDescription.id == 'H') {
+        console.log(value);
       }
       let description = '';
       description += parsedDescription.d ? `${parsedDescription.d}. ` : '';
@@ -58,16 +61,9 @@ export function generateMarkdown(
     });
   };
 
-  const multipleOptions: Docs[][] = [];
   if (Array.isArray(docs)) {
-    multipleOptions.push(docs);
+    generate(docs[0], path);
   } else {
     generate(docs, path);
   }
-
-  multipleOptions.forEach((docs) => {
-    docs.forEach((docs, i) => {
-      generate(docs, path + `(${i})`);
-    });
-  });
 }

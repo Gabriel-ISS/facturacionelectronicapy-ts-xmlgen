@@ -7,8 +7,8 @@
 | D104 | tipoRegimen | Enum = RegimeType | Opcional |  |
 | D105 | razonSocial | String | Requerido |  |
 | D106 | nombreFantasia | String | Opcional |  |
-| D107 - D119 | establecimientos | [params.establecimientos](#params.establecimientos)[] | Requerido |  |
-| D2.1 | actividadesEconomicas | [params.actividadesEconomicas](#params.actividadesEconomicas)[] | Requerido | Campos que describen la actividad económica del emisor (D130-D139). Ver: https://servicios.set.gov.py/eset-publico/consultarActividadEconomicaIService.do.  |
+| D107 - D119 | establecimientos | [params.establecimientos](#paramsestablecimientos)[] | Requerido |  |
+| D2.1 | actividadesEconomicas | [params.actividadesEconomicas](#paramsactividadesEconomicas)[] | Requerido | Campos que describen la actividad económica del emisor (D130-D139). Ver: https://servicios.set.gov.py/eset-publico/consultarActividadEconomicaIService.do.  |
 | C004 | timbradoNumero | Number | Requerido |  |
 | C008 | timbradoFecha | Date | Requerido |  |
 ### params.establecimientos

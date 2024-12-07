@@ -14,7 +14,9 @@ type ValidSchema =
   | z.ZodOptional<z.AnyZodObject>
   | z.ZodEffects<z.ZodOptional<z.AnyZodObject>>;
 
-function getShape(schema: z.ZodTypeAny): z.ZodRawShape | null {
+function getShape(
+  schema: z.ZodTypeAny,
+): z.ZodRawShape | z.ZodRawShape[] | null {
   if (schema instanceof z.ZodObject) {
     return schema._def.shape();
   } else if (schema instanceof z.ZodEffects) {
@@ -23,6 +25,8 @@ function getShape(schema: z.ZodTypeAny): z.ZodRawShape | null {
     return getShape(schema._def.innerType);
   } else if (schema instanceof z.ZodArray) {
     return getShape(schema._def.type);
+  } else if (schema instanceof z.ZodUnion) {
+    return schema._def.options.map(getShape).filter((s: any) => s !== null);
   } else {
     return null;
   }
@@ -38,8 +42,8 @@ function getType(value: z.ZodTypeAny): string {
   } else if (value instanceof z.ZodArray) {
     return `${getType(value._def.type)}[]`;
   } else if (value instanceof z.ZodUnion) {
-    return value._def.options.map(getType).join(' \\| ');
-  }  else if (value instanceof z.ZodNativeEnum) {
+    return (value._def.options as z.ZodTypeAny[]).map(getType).join(' \\| ');
+  } else if (value instanceof z.ZodNativeEnum) {
     return 'Enum';
   } else {
     try {
@@ -49,12 +53,15 @@ function getType(value: z.ZodTypeAny): string {
       throw e;
     }
   }
-};
+}
 
-export function generateDocs(Schema: ValidSchema, shape?: z.ZodRawShape | null): Docs {
-  shape = shape ?? getShape(Schema);
+export function generateDocs(
+  Schema: ValidSchema,
+  shape?: z.ZodRawShape | null,
+): Docs {
+  shape = shape ?? getShape(Schema) as z.ZodRawShape;
 
-  if (!shape) {
+  if (!shape || Array.isArray(shape)) {
     console.log('Invalid schema:', Schema);
     throw new Error('Invalid schema');
   }
@@ -73,19 +80,12 @@ export function generateDocs(Schema: ValidSchema, shape?: z.ZodRawShape | null):
     const childShape = getShape(value);
 
     if (childShape) {
-      doc.inner = generateDocs(definition.type as ValidSchema, childShape);
-    } else if (value instanceof z.ZodUnion) {
-      const docs = (definition.options as z.ZodTypeAny[]).map((option) => {
-        const childShape = getShape(option);
-        if (childShape) {
-          return generateDocs(option as ValidSchema, childShape);
-        }
-
-        return null;
-      }).filter((option) => option !== null);
-
-      if (docs.length) {
-        doc.inner = docs;
+      if (Array.isArray(childShape)) {
+        doc.inner = childShape.map((s) =>
+          generateDocs(definition.type as ValidSchema, s),
+        );
+      } else {
+        doc.inner = generateDocs(definition.type as ValidSchema, childShape);
       }
     }
 

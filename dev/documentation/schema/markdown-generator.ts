@@ -12,7 +12,7 @@ export default class MarkdownGenerator {
   }
 
   getLink(value: string) {
-    return `[${value}](#${value})`;
+    return `[${value}](#${value.replace(/ /g, '-').replace(/\./g, '')})`;
   }
 
   setHeaderRow(headers: any[]) {
