@@ -27,7 +27,6 @@ class FacturaXMLSG {
     if (!dncp) return;
 
     return {
-
       // E021
       dModCont: dncp.modalidad,
 

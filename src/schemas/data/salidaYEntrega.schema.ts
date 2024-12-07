@@ -5,6 +5,7 @@ import NumberLength from '../../helpers/validation/NumberLenght';
 import ZodValidator from '../../helpers/validation/ZodValidator';
 import dbService from '../../services/db.service';
 import CommonValidators from '../../helpers/validation/CommonValidators';
+import SDParser from '../../helpers/SDParser';
 
 /**
  * E10.1. Campos que identifican el local de salida de las mercaderías (E920-E939)
@@ -41,14 +42,33 @@ import CommonValidators from '../../helpers/validation/CommonValidators';
  */
 export const SalidaYEntregaSchema = z
   .object({
-    direccion: CommonValidators.address(),
-    numeroCasa: CommonValidators.houseNumber().default(0),
-    complementoDireccion1: CommonValidators.address().optional(),
-    complementoDireccion2: CommonValidators.address().optional(),
-    departamento: z.nativeEnum(Department),
-    distrito: CommonValidators.district().optional(),
-    ciudad: CommonValidators.city(),
-    telefonoContacto: z.string().min(6).max(15).optional(),
+    direccion: CommonValidators.address().describe(
+      SDParser.stringify('E921 o E941'),
+    ),
+    numeroCasa: CommonValidators.houseNumber().describe(
+      SDParser.stringify('E922 o E942'),
+    ),
+    complementoDireccion1: CommonValidators.address()
+      .optional()
+      .describe(SDParser.stringify('E923 o E943')),
+    complementoDireccion2: CommonValidators.address()
+      .optional()
+      .describe(SDParser.stringify('E924 o E944')),
+    departamento: z
+      .nativeEnum(Department)
+      .describe(SDParser.stringify('E925 o E945', { e: 'Department' })),
+    distrito: CommonValidators.district()
+      .optional()
+      .describe(SDParser.stringify('E926 o E946', { t: 'distritos' })),
+    ciudad: CommonValidators.city().describe(
+      SDParser.stringify('E929 o E949', { t: 'ciudades' }),
+    ),
+    telefonoContacto: z
+      .string()
+      .min(6)
+      .max(15)
+      .optional()
+      .describe(SDParser.stringify('E931 o E951')),
   })
   .transform((data, ctx) => {
     CommonValidators.location(
@@ -60,17 +80,15 @@ export const SalidaYEntregaSchema = z
 
     return {
       ...data,
-      departamentoDescripcion: dbService
-        .departments
-        ._findById(data.departamento).description,
+      departamentoDescripcion: dbService.departments._findById(
+        data.departamento,
+      ).description,
 
       // E928 - E948
-      distritoDescripcion: dbService
-        .districts
-        ._findByIdIfExist(data.distrito, {
-          ctx,
-          fieldName: 'distrito',
-        })?.description,
+      distritoDescripcion: dbService.districts._findByIdIfExist(data.distrito, {
+        ctx,
+        fieldName: 'distrito',
+      })?.description,
 
       ciudadDescripcion: dbService.cities._findById(data.ciudad, {
         ctx,

@@ -12,7 +12,7 @@ export const EDocSchema = z
     params: EDocParamsSchema,
   })
   .transform((eDoc, ctx) => {
-    const { data, params } = eDoc
+    const { data, params } = eDoc;
     const validator = new ZodValidator(ctx, eDoc);
     const dataPath = new Path<EDoc>('data');
     const paramsPath = new Path<EDoc>('params');

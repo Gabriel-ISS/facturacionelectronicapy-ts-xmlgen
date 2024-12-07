@@ -1,36 +1,48 @@
 import { z } from 'zod';
-import {
-  EDocumentType
-} from '../../data/eDocumentTypes.table';
+import { EDocumentType } from '../../data/eDocumentTypes.table';
 import CommonValidators from '../../helpers/validation/CommonValidators';
-
+import SDParser from '../../helpers/SDParser';
 
 // GEI001
 export const DisablingEventSchema = z
   .object({
     // GEI002
-    timbrado: CommonValidators.timbrado(),
+    timbrado: CommonValidators.timbrado().describe(
+      SDParser.stringify('GEI002'),
+    ),
 
     // GEI003
-    establecimiento: CommonValidators.zeroPadToLength(3),
+    establecimiento: CommonValidators.zeroPadToLength(3).describe(
+      SDParser.stringify('GEI003'),
+    ),
 
     // GEI004
-    punto: CommonValidators.zeroPadToLength(3),
+    punto: CommonValidators.zeroPadToLength(3).describe(
+      SDParser.stringify('GEI004'),
+    ),
 
     // GEI005
-    desde: CommonValidators.zeroPadToLength(7),
+    desde: CommonValidators.zeroPadToLength(7).describe(
+      SDParser.stringify('GEI005'),
+    ),
 
     // GEI006
-    hasta: CommonValidators.zeroPadToLength(7),
+    hasta: CommonValidators.zeroPadToLength(7).describe(
+      SDParser.stringify('GEI006'),
+    ),
 
     // GEI007
-    tipoDocumento: z.nativeEnum(EDocumentType),
+    tipoDocumento: z
+      .nativeEnum(EDocumentType)
+      .describe(SDParser.stringify('GEI007', { e: 'EDocumentType' })),
 
     // GEI008
-    motivo: CommonValidators.motive(),
+    motivo: CommonValidators.motive().describe(SDParser.stringify('GEI008')),
 
     // GEI009
-    serie: CommonValidators.serie().optional(),
+    serie: CommonValidators.serie()
+      .optional()
+      .describe(SDParser.stringify('GEI009')),
   })
   .superRefine((value, ctx) => {
     if (value.desde > value.hasta) {

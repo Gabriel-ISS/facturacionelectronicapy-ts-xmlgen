@@ -29,7 +29,10 @@ class EDocument {
         config,
       );
     } catch (error) {
-      if (error instanceof Error && Object.getPrototypeOf(error) === Error.prototype) {
+      if (
+        error instanceof Error &&
+        Object.getPrototypeOf(error) === Error.prototype
+      ) {
         error.message +=
           '. Por favor reporte el error en https://github.com/Gabriel-ISS/facturacionelectronicapy-ts-xmlgen/issues/new';
       }

@@ -5,17 +5,32 @@ import { EntregaSchema } from './entregas.schema';
 import dbService from '../../services/db.service';
 import ZodValidator from '../../helpers/validation/ZodValidator';
 import { Credito, CreditoSchema } from './credito.schema';
+import SDParser from '../../helpers/SDParser';
 
 export const CondicionSchema = z
   .object({
     // E601
-    tipo: z.nativeEnum(PaymentCondition),
+    tipo: z
+      .nativeEnum(PaymentCondition)
+      .describe(SDParser.stringify('E601', { e: 'PaymentCondition' })),
 
     // E7.1. Campos que describen la forma de pago de la operación al contado o del monto de la entrega inicial (E605-E619)
-    entregas: z.array(EntregaSchema).max(999).optional(),
+    entregas: z
+      .array(EntregaSchema)
+      .max(999)
+      .optional()
+      .describe(
+        SDParser.stringify('E7.1', {
+          d: 'Campos que describen la forma de pago de la operación al contado o del monto de la entrega inicial (E605-E619)',
+        }),
+      ),
 
     // E7.2. Campos que describen la operación a crédito (E640-E649)
-    credito: CreditoSchema.optional(),
+    credito: CreditoSchema.optional().describe(
+      SDParser.stringify('E7.2', {
+        d: 'Campos que describen la operación a crédito (E640-E649)',
+      }),
+    ),
   })
   .transform((data, ctx) => {
     const validator = new ZodValidator(ctx, data);

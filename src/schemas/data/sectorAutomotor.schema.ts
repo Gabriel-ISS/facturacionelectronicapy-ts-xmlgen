@@ -6,18 +6,31 @@ import NumberLength from '../../helpers/validation/NumberLenght';
 import dbService from '../../services/db.service';
 import ZodValidator from '../../helpers/validation/ZodValidator';
 import { Path } from '../../helpers/Path';
+import SDParser from '../../helpers/SDParser';
 
 /**E8.5. Sector de automotores nuevos y usados (E770-E789) */
 export const SectorAutomotorSchema = z
   .object({
     // E771
-    tipo: z.nativeEnum(VehicleOperationType).optional(),
+    tipo: z
+      .nativeEnum(VehicleOperationType)
+      .optional()
+      .describe(SDParser.stringify('E771', { e: 'VehicleOperationType' })),
 
     // E773
-    chasis: z.string().length(17).optional(),
+    chasis: z
+      .string()
+      .length(17)
+      .optional()
+      .describe(SDParser.stringify('E773')),
 
     // E774
-    color: z.string().min(1).max(10).optional(),
+    color: z
+      .string()
+      .min(1)
+      .max(10)
+      .optional()
+      .describe(SDParser.stringify('E774')),
 
     // E775
     potencia: z
@@ -26,7 +39,8 @@ export const SectorAutomotorSchema = z
       .superRefine((value, ctx) => {
         if (value == undefined) return;
         new NumberLength(value, ctx).int().max(4);
-      }),
+      })
+      .describe(SDParser.stringify('E775')),
 
     // E776
     capacidadMotor: z
@@ -35,7 +49,8 @@ export const SectorAutomotorSchema = z
       .superRefine((value, ctx) => {
         if (value == undefined) return;
         new NumberLength(value, ctx).int().max(4);
-      }),
+      })
+      .describe(SDParser.stringify('E776')),
 
     // E777
     pesoNeto: z
@@ -44,7 +59,8 @@ export const SectorAutomotorSchema = z
       .superRefine((value, ctx) => {
         if (value == undefined) return;
         new NumberLength(value, ctx).max(6).maxDecimals(4);
-      }),
+      })
+      .describe(SDParser.stringify('E777')),
 
     // E778
     pesoBruto: z
@@ -53,16 +69,30 @@ export const SectorAutomotorSchema = z
       .superRefine((value, ctx) => {
         if (value == undefined) return;
         new NumberLength(value, ctx).max(6).maxDecimals(4);
-      }),
+      })
+      .describe(SDParser.stringify('E778')),
 
     // E779
-    tipoCombustible: z.nativeEnum(FuelType).optional(),
+    tipoCombustible: z
+      .nativeEnum(FuelType)
+      .optional()
+      .describe(SDParser.stringify('E779', { e: 'FuelType' })),
 
     // E780
-    tipoCombustibleDescripcion: z.string().min(3).max(20).optional(),
+    tipoCombustibleDescripcion: z
+      .string()
+      .min(3)
+      .max(20)
+      .optional()
+      .describe(SDParser.stringify('E780')),
 
     // E781
-    numeroMotor: z.string().min(1).max(21).optional(),
+    numeroMotor: z
+      .string()
+      .min(1)
+      .max(21)
+      .optional()
+      .describe(SDParser.stringify('E781')),
 
     // E782
     // Capacidad máxima de tracción
@@ -72,7 +102,8 @@ export const SectorAutomotorSchema = z
       .superRefine((value, ctx) => {
         if (value == undefined) return;
         new NumberLength(value, ctx).max(6).maxDecimals(4);
-      }),
+      })
+      .describe(SDParser.stringify('E782')),
 
     // E783
     año: z
@@ -81,10 +112,16 @@ export const SectorAutomotorSchema = z
       .superRefine((value, ctx) => {
         if (value == undefined) return;
         new NumberLength(value, ctx).int().length(4);
-      }),
+      })
+      .describe(SDParser.stringify('E783')),
 
     // E784
-    tipoVehiculo: z.string().min(4).max(10).optional(),
+    tipoVehiculo: z
+      .string()
+      .min(4)
+      .max(10)
+      .optional()
+      .describe(SDParser.stringify('E784')),
 
     // E785
     capacidadPasajeros: z
@@ -93,10 +130,15 @@ export const SectorAutomotorSchema = z
       .superRefine((value, ctx) => {
         if (value == undefined) return;
         new NumberLength(value, ctx).int().max(3);
-      }),
+      })
+      .describe(SDParser.stringify('E785')),
 
     // E786
-    cilindradas: z.string().length(4).optional(),
+    cilindradas: z
+      .string()
+      .length(4)
+      .optional()
+      .describe(SDParser.stringify('E786')),
   })
   .transform((data, ctx) => {
     type Data = typeof data;
@@ -115,9 +157,9 @@ export const SectorAutomotorSchema = z
         if (isOtherFuelType) {
           validator.requiredField('tipoCombustibleDescripcion');
         } else if (data.tipoCombustible) {
-          const foundFuelType = dbService
-            .fuelTypes
-            ._findById(data.tipoCombustible);
+          const foundFuelType = dbService.fuelTypes._findById(
+            data.tipoCombustible,
+          );
           data.tipoCombustibleDescripcion = foundFuelType.description;
         }
       }
@@ -137,9 +179,9 @@ export const SectorAutomotorSchema = z
       ...data,
 
       // E772
-      tipoDescripcion: dbService
-        .vehicleOperationTypes
-        ._findByIdIfExist(data.tipo)?.description,
+      tipoDescripcion: dbService.vehicleOperationTypes._findByIdIfExist(
+        data.tipo,
+      )?.description,
     };
   });
 

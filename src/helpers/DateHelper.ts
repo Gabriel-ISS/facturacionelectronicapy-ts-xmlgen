@@ -3,10 +3,10 @@ class DateHelper {
    * @returns {string} la fecha en formato AAAAMMDD
    */
   getCdcFormatDate(date: Date) {
-    const [dateStr] = date.toISOString().split('T')
+    const [dateStr] = date.toISOString().split('T');
     return dateStr.split('-').join('');
   }
-  
+
   getIsoDate(date: Date) {
     const [dateStr] = date.toISOString().split('T');
     return dateStr;

@@ -32,5 +32,4 @@ export class Path<T, K extends Key<T> = Key<T>> {
   toString() {
     return this.path.join('.');
   }
-
 }

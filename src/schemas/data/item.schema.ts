@@ -10,6 +10,7 @@ import { ItemDncpSchema } from './itemDncp.schema';
 import { CompleteMonto, MontoSchema } from './monto.schema';
 import { SectorAutomotorSchema } from './sectorAutomotor.schema';
 import { MeasurementUnit } from '../../data/measurementUnits.table';
+import SDParser from '../../helpers/SDParser';
 
 /**E8. Campos que describen los ítems de la operación (E700-E899) */
 export const ItemSchema = z
@@ -19,7 +20,12 @@ export const ItemSchema = z
     codigo: z
       .string()
       .min(1)
-      .max(50, { message: 'El código no puede tener más de 20 caracteres' }),
+      .max(50)
+      .describe(
+        SDParser.stringify('E701', {
+          v: 'https://www.dnit.gov.py/documents/20123/420595/NT_E_KUATIA_009_MT_V150.pdf/c268a447-11e3-ee1e-b4d5-8d83dd408401?t=1687353746900',
+        }),
+      ),
 
     // E702
     partidaArancelaria: z
@@ -28,7 +34,8 @@ export const ItemSchema = z
       .superRefine((value, ctx) => {
         if (value == undefined) return;
         new NumberLength(value, ctx).int().length(4);
-      }),
+      })
+      .describe(SDParser.stringify('E702')),
 
     // E703
     ncm: z
@@ -37,31 +44,64 @@ export const ItemSchema = z
       .superRefine((value, ctx) => {
         if (value == undefined) return;
         new NumberLength(value, ctx).int().min(6).max(8);
-      }),
+      })
+      .describe(SDParser.stringify('E703')),
 
     // E704 - E707
-    dncp: ItemDncpSchema.optional(),
+    dncp: ItemDncpSchema.optional().describe(SDParser.stringify('E704-E707')),
 
     // E708
     // VER: https://www.dnit.gov.py/documents/20123/420595/NT_E_KUATIA_009_MT_V150.pdf/c268a447-11e3-ee1e-b4d5-8d83dd408401?t=1687353746900
-    descripcion: z.string().min(1).max(2000),
+    descripcion: z
+      .string()
+      .min(1)
+      .max(2000)
+      .describe(
+        SDParser.stringify('E708', {
+          v: 'https://www.dnit.gov.py/documents/20123/420595/NT_E_KUATIA_009_MT_V150.pdf/c268a447-11e3-ee1e-b4d5-8d83dd408401?t=1687353746900',
+        }),
+      ),
 
     // E709
-    unidadMedida: z.nativeEnum(MeasurementUnit),
+    unidadMedida: z
+      .nativeEnum(MeasurementUnit)
+      .describe(SDParser.stringify('E709', { e: 'MeasurementUnit' })),
 
-    // E711: VER: https://www.dnit.gov.py/documents/20123/420595/NT_E_KUATIA_023_MT_V150.pdf/9580922b-5dd5-60f9-4857-ae66a757898f?t=1724956850006
-    cantidad: z.number().superRefine((value, ctx) => {
-      new NumberLength(value, ctx).max(10).maxDecimals(8);
-    }),
+    // E711
+    // VER: https://www.dnit.gov.py/documents/20123/420595/NT_E_KUATIA_023_MT_V150.pdf/9580922b-5dd5-60f9-4857-ae66a757898f?t=1724956850006
+    cantidad: z
+      .number()
+      .superRefine((value, ctx) => {
+        new NumberLength(value, ctx).max(10).maxDecimals(8);
+      })
+      .describe(
+        SDParser.stringify('E711', {
+          v: 'https://www.dnit.gov.py/documents/20123/420595/NT_E_KUATIA_023_MT_V150.pdf/9580922b-5dd5-60f9-4857-ae66a757898f?t=1724956850006',
+        }),
+      ),
 
     // E712
-    pais: CommonValidators.country().optional(),
+    pais: CommonValidators.country()
+      .optional()
+      .describe(
+        SDParser.stringify('E712', {
+          e: 'Country',
+        }),
+      ),
 
     // E714
-    observacion: z.string().min(1).max(500).optional(),
+    observacion: z
+      .string()
+      .min(1)
+      .max(500)
+      .optional()
+      .describe(SDParser.stringify('E714')),
 
     // E715
-    tolerancia: z.nativeEnum(MerchandiseRelevance).optional(),
+    tolerancia: z
+      .nativeEnum(MerchandiseRelevance)
+      .optional()
+      .describe(SDParser.stringify('E715', { e: 'MerchandiseRelevance' })),
 
     // E717
     toleranciaCantidad: z
@@ -70,7 +110,8 @@ export const ItemSchema = z
       .superRefine((value, ctx) => {
         if (value == undefined) return;
         new NumberLength(value, ctx).max(10).maxDecimals(4);
-      }),
+      })
+      .describe(SDParser.stringify('E717')),
 
     // E718
     toleranciaPorcentaje: z
@@ -79,16 +120,29 @@ export const ItemSchema = z
       .superRefine((value, ctx) => {
         if (value == undefined) return;
         new NumberLength(value, ctx).max(3).maxDecimals(8);
-      }),
+      })
+      .describe(SDParser.stringify('E718')),
 
     // E719
-    cdcAnticipo: z.string().length(44).optional(),
+    cdcAnticipo: z
+      .string()
+      .length(44)
+      .optional()
+      .describe(SDParser.stringify('E719')),
 
     // E8.1. Campos que describen el precio, tipo de cambio y valor total de la operación por ítem (E720-E729)
-    monto: MontoSchema.optional(),
+    monto: MontoSchema.optional().describe(
+      SDParser.stringify('E8.1', {
+        d: 'Campos que describen el precio, tipo de cambio y valor total de la operación por ítem (E720-E729)',
+      }),
+    ),
 
     // E8.2. Campos que describen el IVA de la operación por ítem (E730-E739)
-    impuesto: ImpuestoSchema.optional(),
+    impuesto: ImpuestoSchema.optional().describe(
+      SDParser.stringify('E8.2', {
+        d: 'Campos que describen el IVA de la operación por ítem (E730-E739)',
+      }),
+    ),
 
     // E8.4. Grupo de rastreo de la mercadería (E750-E761)
 
@@ -96,12 +150,9 @@ export const ItemSchema = z
     lote: z
       .string()
       .min(1)
-      .max(80, {
-        message:
-          'El número de lote debe tener una longitud máxima de 80 caracteres',
-      })
+      .max(80)
       .optional()
-      .describe('Número de Lote del producto'),
+      .describe(SDParser.stringify('E751')),
 
     // E752
     vencimiento: z.coerce
@@ -110,39 +161,69 @@ export const ItemSchema = z
       .transform((value) => {
         if (!value) return value;
         return DateHelper.getIsoDate(value);
-      }),
+      })
+      .describe(SDParser.stringify('E752')),
 
     // E753
     numeroSerie: z
       .string()
       .min(1)
-      .max(10, {
-        message:
-          'El número de serie debe tener una longitud máxima de 10 caracteres',
-      })
-      .optional(),
+      .max(10)
+      .optional()
+      .describe(SDParser.stringify('E753')),
 
     // E754
-    numeroPedido: z.string().min(1).max(20).optional(),
+    numeroPedido: z
+      .string()
+      .min(1)
+      .max(20)
+      .optional()
+      .describe(SDParser.stringify('E754')),
 
     // E755
-    numeroSeguimiento: z.string().min(1).max(20).optional(),
+    numeroSeguimiento: z
+      .string()
+      .min(1)
+      .max(20)
+      .optional()
+      .describe(SDParser.stringify('E755')),
 
     // E756, E757 y E758 (eliminados)
     // VER: https://www.dnit.gov.py/documents/20123/420595/NT_E_KUATIA_010_MT_V150.pdf/d64a693b-6c63-86e1-ec6a-d4fe5ec4eeea?t=1687353747196
 
     // E759
-    registroSenave: z.string().length(20).optional(),
+    registroSenave: z
+      .string()
+      .length(20)
+      .optional()
+      .describe(SDParser.stringify('E759')),
 
     // E760
-    registroEntidadComercial: z.string().length(20).optional(),
+    registroEntidadComercial: z
+      .string()
+      .length(20)
+      .optional()
+      .describe(SDParser.stringify('E760')),
 
     // E761
     // VER: https://www.dnit.gov.py/documents/20123/420595/NT_E_KUATIA_010_MT_V150.pdf/d64a693b-6c63-86e1-ec6a-d4fe5ec4eeea?t=1687353747196
-    nombreProducto: z.string().min(1).max(30).optional(),
+    nombreProducto: z
+      .string()
+      .min(1)
+      .max(30)
+      .optional()
+      .describe(
+        SDParser.stringify('E761', {
+          v: 'https://www.dnit.gov.py/documents/20123/420595/NT_E_KUATIA_010_MT_V150.pdf/d64a693b-6c63-86e1-ec6a-d4fe5ec4eeea?t=1687353747196',
+        }),
+      ),
 
     // E8.5. Sector de automotores nuevos y usados (E770-E789)
-    sectorAutomotor: SectorAutomotorSchema.optional(),
+    sectorAutomotor: SectorAutomotorSchema.optional().describe(
+      SDParser.stringify('E8.5', {
+        d: 'Sector de automotores nuevos y usados (E770-E789)',
+      }),
+    ),
   })
   .transform((data, ctx) => {
     const validator = new ZodValidator(ctx, data);
@@ -181,25 +262,24 @@ export const ItemSchema = z
       ...data,
 
       // E713
-      paisDescripcion: dbService
-        .countries
-        ._findByIdIfExist(data.pais, {
-          ctx,
-          fieldName: 'pais',
-        })?.description,
+      paisDescripcion: dbService.countries._findByIdIfExist(data.pais, {
+        ctx,
+        fieldName: 'pais',
+      })?.description,
 
       // E710
-      unidadMedidaDescripcion: dbService
-        .measurementUnits
-        ._findById(data.unidadMedida, {
+      unidadMedidaDescripcion: dbService.measurementUnits._findById(
+        data.unidadMedida,
+        {
           ctx,
           fieldName: 'unidadMedida',
-        }).representation,
+        },
+      ).representation,
 
       // E716
-      toleranciaDescripcion: dbService
-        .merchandiseRelevances
-        ._findByIdIfExist(data.tolerancia)?.description,
+      toleranciaDescripcion: dbService.merchandiseRelevances._findByIdIfExist(
+        data.tolerancia,
+      )?.description,
 
       monto,
     };

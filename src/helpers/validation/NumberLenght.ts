@@ -29,7 +29,9 @@ export default class NumberLength {
   /** No es necesario si el mínimo es menor o igual a 1 */
   int(message?: string) {
     if (!this.intPart.length || this.decimalPart.length) {
-      this.addError(message ?? `El campo '${this.path}' debe ser un número entero`);
+      this.addError(
+        message ?? `El campo '${this.path}' debe ser un número entero`,
+      );
     }
 
     return this as SecureOmit<
@@ -41,7 +43,8 @@ export default class NumberLength {
   min(min: number, message?: string) {
     if (this.intPart.length < min) {
       this.addError(
-        message ?? `El campo '${this.path}' debe tener al menos ${min} dígitos enteros`,
+        message ??
+          `El campo '${this.path}' debe tener al menos ${min} dígitos enteros`,
       );
     }
     return this;
@@ -50,7 +53,8 @@ export default class NumberLength {
   max(max: number, message?: string) {
     if (this.intPart.length > max) {
       this.addError(
-        message ?? `El campo '${this.path}' no puede tener más de ${max} dígitos enteros`,
+        message ??
+          `El campo '${this.path}' no puede tener más de ${max} dígitos enteros`,
       );
     }
     return this;
@@ -58,14 +62,19 @@ export default class NumberLength {
 
   length(len: number, message?: string) {
     if (this.intPart.length != len) {
-      this.addError(message ?? `El campo '${this.path}' debe tener ${len} dígitos enteros`);
+      this.addError(
+        message ?? `El campo '${this.path}' debe tener ${len} dígitos enteros`,
+      );
     }
     return this;
   }
 
   minDecimals(min: number, message?: string) {
     if (this.decimalPart.length < min) {
-      this.addError(message ?? `El campo '${this.path}' debe tener al menos ${min} decimales`);
+      this.addError(
+        message ??
+          `El campo '${this.path}' debe tener al menos ${min} decimales`,
+      );
     }
     return this;
   }
@@ -73,7 +82,8 @@ export default class NumberLength {
   maxDecimals(max: number, message?: string) {
     if (this.decimalPart.length > max) {
       this.addError(
-        message ?? `El campo '${this.path}' no puede tener más de ${max} decimales`,
+        message ??
+          `El campo '${this.path}' no puede tener más de ${max} decimales`,
       );
     }
     return this;
@@ -81,7 +91,9 @@ export default class NumberLength {
 
   decimalsLength(length: number, message?: string) {
     if (this.decimalPart.length != length) {
-      this.addError(message ?? `El campo '${this.path}' debe tener ${length} decimales`);
+      this.addError(
+        message ?? `El campo '${this.path}' debe tener ${length} decimales`,
+      );
     }
     return this;
   }

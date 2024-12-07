@@ -1,13 +1,17 @@
 import { z } from 'zod';
 import NumberLength from '../../helpers/validation/NumberLenght';
+import SDParser from '../../helpers/SDParser';
 
 /**E8.1. Campos que describen el precio, tipo de cambio y valor total de la operación por ítem (E720-E729) */
 export const MontoSchema = z
   .object({
     // E721
-    precioUnitario: z.number().superRefine((value, ctx) => {
-      new NumberLength(value, ctx).max(15).maxDecimals(8);
-    }),
+    precioUnitario: z
+      .number()
+      .superRefine((value, ctx) => {
+        new NumberLength(value, ctx).max(15).maxDecimals(8);
+      })
+      .describe(SDParser.stringify('E721')),
 
     // E725
     cambio: z
@@ -17,7 +21,8 @@ export const MontoSchema = z
       .superRefine((value, ctx) => {
         if (value == undefined) return;
         new NumberLength(value, ctx).max(5).maxDecimals(4);
-      }),
+      })
+      .describe(SDParser.stringify('E725')),
 
     // E8.1.1 Campos que describen los descuentos, anticipos y valor total por ítem (EA001-EA050)
 
@@ -28,7 +33,8 @@ export const MontoSchema = z
       .superRefine((value, ctx) => {
         if (value == undefined) return;
         new NumberLength(value, ctx).max(15).maxDecimals(8);
-      }),
+      })
+      .describe(SDParser.stringify('EA002')),
 
     // EA006
     anticipo: z
@@ -37,7 +43,8 @@ export const MontoSchema = z
       .superRefine((value, ctx) => {
         if (value == undefined) return;
         new NumberLength(value, ctx).max(15).maxDecimals(8);
-      }),
+      })
+      .describe(SDParser.stringify('EA006')),
   })
   .transform((data, ctx) => {
     return {

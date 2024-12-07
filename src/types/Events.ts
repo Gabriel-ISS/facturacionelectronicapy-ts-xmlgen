@@ -6,7 +6,7 @@ export enum SIFENEvent {
 
   //A futuro
   // ENDOSO = 3,
-  
+
   CONFORMIDAD = 11,
   DISCONFORMIDAD = 12,
   DESCONOCIMIENTO = 13,

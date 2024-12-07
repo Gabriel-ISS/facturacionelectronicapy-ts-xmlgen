@@ -6,73 +6,118 @@ import dbService from '../../services/db.service';
 import { TaxpayerType } from '../../data/taxpayerTypes.table';
 import { TaxpayerNotTaxpayer } from '../../data/taxpayerNotTaxpayer.table';
 import { IdentityDocForNominationEvent } from '../../data/idDocsForNominationEvent.table';
+import SDParser from '../../helpers/SDParser';
 
 // VER: https://www.dnit.gov.py/documents/20123/420595/NT_E_KUATIA_014_MT_V150X.pdf/dbbb0294-8678-357a-1657-bcd0318077f9?t=1706189857282
 // GENFE001
 export const NominationEventSchema = z
   .object({
     // GENFE002
-    cdc: CommonValidators.cdc(),
+    cdc: CommonValidators.cdc().describe(SDParser.stringify('GENFE002')),
 
     // GENFE003
-    motive: CommonValidators.motive(),
+    motive: CommonValidators.motive().describe(SDParser.stringify('GENFE003')),
 
     // GENFE004
-    contribuyente: CommonValidators.taxpayer(),
+    contribuyente: CommonValidators.taxpayer().describe(
+      SDParser.stringify('GENFE004'),
+    ),
 
     // GENFE005
-    pais: CommonValidators.country(),
+    pais: CommonValidators.country().describe(SDParser.stringify('GENFE005',  {
+      e: 'Country'
+    })),
 
     // GENFE007
-    tipoReceptor: z.nativeEnum(TaxpayerType).optional(),
+    tipoReceptor: z
+      .nativeEnum(TaxpayerType)
+      .optional()
+      .describe(SDParser.stringify('GENFE007', { e: 'TaxpayerType' })),
 
     // para calcular GENFE008 y GENFE009
-    ruc: CommonValidators.ruc().optional(),
+    ruc: CommonValidators.ruc()
+      .optional()
+      .describe(SDParser.stringify('GENFE008 y GENFE009')),
 
     // GENFE010
-    documentoTipo: z.nativeEnum(IdentityDocForNominationEvent).optional(),
+    documentoTipo: z
+      .nativeEnum(IdentityDocForNominationEvent)
+      .optional()
+      .describe(
+        SDParser.stringify('GENFE010', { e: 'IdentityDocForNominationEvent' }),
+      ),
 
     // GENFE011
-    descripcionTipoDocumento: CommonValidators.identityDocDescription().optional(),
+    descripcionTipoDocumento: CommonValidators.identityDocDescription()
+      .optional()
+      .describe(SDParser.stringify('GENFE011')),
 
     // GENFE012
-    documentoNumero: CommonValidators.identityDocNumber().optional(),
+    documentoNumero: CommonValidators.identityDocNumber()
+      .optional()
+      .describe(SDParser.stringify('GENFE012')),
 
     // GENFE013
-    razonSocial: CommonValidators.legalName().optional(),
+    razonSocial: CommonValidators.legalName()
+      .optional()
+      .describe(SDParser.stringify('GENFE013')),
 
     // GENFE014
-    nombreFantasia: CommonValidators.tradeName().optional(),
+    nombreFantasia: CommonValidators.tradeName()
+      .optional()
+      .describe(SDParser.stringify('GENFE014')),
 
     // GENFE015
-    direccion: CommonValidators.address().optional(),
+    direccion: CommonValidators.address()
+      .optional()
+      .describe(SDParser.stringify('GENFE015')),
 
     // GENFE016
-    numeroCasa: CommonValidators.houseNumber().optional(),
+    numeroCasa: CommonValidators.houseNumber()
+      .optional()
+      .describe(SDParser.stringify('GENFE016')),
 
     // GENFE017
-    departamento: CommonValidators.department().optional(),
+    departamento: CommonValidators.department()
+      .optional()
+      .describe(SDParser.stringify('GENFE017', {
+        e: 'Department'
+      })),
 
     // GENFE019
-    distrito: CommonValidators.district().optional(),
+    distrito: CommonValidators.district()
+      .optional()
+      .describe(SDParser.stringify('GENFE019')),
 
     // GENFE021
-    ciudad: CommonValidators.city().optional(),
+    ciudad: CommonValidators.city()
+      .optional()
+      .describe(SDParser.stringify('GENFE021')),
 
     // GENFE023
-    telefono: CommonValidators.tel().optional(),
+    telefono: CommonValidators.tel()
+      .optional()
+      .describe(SDParser.stringify('GENFE023')),
 
     // GENFE024
-    celular: CommonValidators.cel().optional(),
+    celular: CommonValidators.cel()
+      .optional()
+      .describe(SDParser.stringify('GENFE024')),
 
     // GENFE025
-    email: CommonValidators.email().optional(),
+    email: CommonValidators.email()
+      .optional()
+      .describe(SDParser.stringify('GENFE025')),
 
     // GENFE026
-    codigo: CommonValidators.clientCode().optional(),
+    codigo: CommonValidators.clientCode()
+      .optional()
+      .describe(SDParser.stringify('GENFE026')),
 
     // GENFE027
-    tipoOperacion: z.nativeEnum(OperationTypeNoB2G),
+    tipoOperacion: z
+      .nativeEnum(OperationTypeNoB2G)
+      .describe(SDParser.stringify('GENFE027', { e: 'OperationTypeNoB2G' })),
   })
   .transform((data, ctx) => {
     const validator = new ZodValidator(ctx, data);
@@ -128,9 +173,10 @@ export const NominationEventSchema = z
       if (isOther) {
         validator.requiredField('descripcionTipoDocumento');
       } else {
-        data.descripcionTipoDocumento = dbService
-          .identityDocsForNominationEvent
-          ._findByIdIfExist(data.documentoTipo)?.description;
+        data.descripcionTipoDocumento =
+          dbService.identityDocsForNominationEvent._findByIdIfExist(
+            data.documentoTipo,
+          )?.description;
       }
     }
 
@@ -167,14 +213,13 @@ export const NominationEventSchema = z
       rucDV: rucDV as string | undefined,
 
       // GENFE018
-      descripcionDepartamento: dbService
-        .departments
-        ._findByIdIfExist(data.departamento)?.description,
+      descripcionDepartamento: dbService.departments._findByIdIfExist(
+        data.departamento,
+      )?.description,
 
       // GENFE020
-      descripcionDistrito: dbService
-        .districts
-        ._findByIdIfExist(data.distrito)?.description,
+      descripcionDistrito: dbService.districts._findByIdIfExist(data.distrito)
+        ?.description,
 
       // GENFE022
       descripcionCiudad: dbService.cities._findByIdIfExist(data.ciudad)

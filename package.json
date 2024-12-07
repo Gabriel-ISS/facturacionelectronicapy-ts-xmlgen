@@ -5,14 +5,15 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
+    "format": "prettier --write \"src/**/*.ts\"",
+    "gen-docs": "ts-node dev/documentation/schema/index.ts",
+    "build": "tsc",
+    "prepare": "npm run build",
+
     "start": "nodemon --config nodemon.json ./app.ts",
     "debug": "export DEBUG=* && npm start",
     "test": "mocha -r ts-node/register 'test/**/*.test.ts'",
-    "test-debug": "export DEBUG=* && npm test",
-    "build": "tsc",
-    "format": "prettier --write \"src/**/*.ts\"",
-    "lint": "tslint -p tsconfig.json",
-    "prepare": "npm run build"
+    "test-debug": "export DEBUG=* && npm test"
   },
   "files": [
     "dist"

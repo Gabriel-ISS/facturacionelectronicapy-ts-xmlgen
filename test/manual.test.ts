@@ -4,21 +4,23 @@ import { CreditCard } from '../src/data/creditCards.table';
 import { CreditType } from '../src/data/creditTypes.table';
 import { Currency } from '../src/data/currencies.table';
 import { Department } from '../src/data/departments.table';
-import { AllDocumentTypes } from '../src/data/documentTypes.table';
-import { UserIdentityDocument } from '../src/data/idDocsUsers.table';
+import { EDocumentType } from '../src/data/eDocumentTypes.table';
+import { IdentityDocumentUser } from '../src/data/idDocsUsers.table';
 import { MeasurementUnit } from '../src/data/measurementUnits.table';
 import { PaymentCondition } from '../src/data/paymentConditions.table';
 import { PaymentType } from '../src/data/paymentTypes.table';
 import { PresenceIndicator } from '../src/data/presenceIndicators.table';
-import { Taxpayer } from '../src/data/taxpayerTypes.table';
+import { TaxpayerType } from '../src/data/taxpayerTypes.table';
 import { TaxType } from '../src/data/taxTypes.table';
 import { EDocDataInput } from '../src/schemas/EDocData.schema';
 import { EDocParamsInput } from '../src/schemas/EDocParams.schema';
 import EDocument from '../src'
 import { ZodError } from 'zod';
+import { EventData } from '../src/services/EventXMLGenerator.service';
+import { SIFENEvent } from '../src/types/Events';
 
 const params: EDocParamsInput = {
-  tipoContribuyente: Taxpayer.PERSONA_FISICA,
+  tipoContribuyente: TaxpayerType.PERSONA_FISICA,
   razonSocial: 'Gabriel Sanabria',
   ruc: '5859019-9',
   establecimientos: [
@@ -43,7 +45,7 @@ const params: EDocParamsInput = {
 
 const data: EDocDataInput = {
   codigoSeguridadAleatorio: 123456789,
-  tipoDocumento: AllDocumentTypes.FACTURA_ELECTRONICA,
+  tipoDocumento: EDocumentType.FACTURA_ELECTRONICA,
   establecimiento: 1,
   punto: 1,
   numero: 5,
@@ -66,7 +68,7 @@ const data: EDocDataInput = {
     distrito: 143,
     ciudad: 3344,
     pais: Country.PARAGUAY,
-    tipoContribuyente: Taxpayer.PERSONA_FISICA,
+    tipoContribuyente: TaxpayerType.PERSONA_FISICA,
     //documentoTipo: IdentityDocumentReceptor.CEDULA_PARAGUAYA,
     //documentoNumero: '2324234',
     telefono: '100000',
@@ -75,7 +77,7 @@ const data: EDocDataInput = {
     //codigo: '1548',
   },
   usuario: {
-    documentoTipo: UserIdentityDocument.CEDULA_PARAGUAYA,
+    documentoTipo: IdentityDocumentUser.CEDULA_PARAGUAYA,
     documentoNumero: '157264',
     nombre: 'Marcos Jara',
     cargo: 'Vendedor',
@@ -161,7 +163,11 @@ const data: EDocDataInput = {
   ],
 };
 
-/* const soap = require('soap'); */
+const eventData: EventData = {
+  event: SIFENEvent.CANCELACION,
+  cdc: '12345678901234567890123456789012345678901234',
+  motivo: 'Cancelación por falta de pago',
+}
 
 async function sendRequest(test = true) {
   const baseURL = test
@@ -180,6 +186,7 @@ async function sendRequest(test = true) {
   try {
     // Generar el XML que se enviará
     const xml = await EDocument.generateXMLDocument(params, data);
+    //const xml = await EDocument.generateXMLEvent(1, eventData);
     console.log(xml);
 
     // Crear el cliente SOAP usando el WSDL

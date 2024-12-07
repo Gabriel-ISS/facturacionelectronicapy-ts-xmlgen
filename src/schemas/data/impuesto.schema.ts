@@ -3,18 +3,28 @@ import { TaxRate } from '../../types/TaxRate';
 import { TaxTreatment } from '../../data/taxTreatments.table';
 import ZodValidator from '../../helpers/validation/ZodValidator';
 import dbService from '../../services/db.service';
+import SDParser from '../../helpers/SDParser';
 
 /**E8.2. Campos que describen el IVA de la operación por ítem (E730-E739) */
 export const ImpuestoSchema = z
   .object({
     // E731
-    ivaTipo: z.nativeEnum(TaxTreatment),
+    ivaTipo: z
+      .nativeEnum(TaxTreatment)
+      .describe(SDParser.stringify('E731', { e: 'TaxTreatment' })),
 
     // E733
-    proporcionGravada: z.number().min(0).max(100).optional(),
+    proporcionGravada: z
+      .number()
+      .min(0)
+      .max(100)
+      .optional()
+      .describe(SDParser.stringify('E733')),
 
     // E734
-    iva: z.nativeEnum(TaxRate),
+    iva: z
+      .nativeEnum(TaxRate)
+      .describe(SDParser.stringify('E734', { e: 'TaxRate' })),
   })
   .transform((data, ctx) => {
     const validator = new ZodValidator(ctx, data);
@@ -93,9 +103,8 @@ export const ImpuestoSchema = z
       proporcionGravada: data.proporcionGravada as number,
 
       // E732
-      ivaTipoDescripcion: dbService
-        .taxTreatments
-        ._findById(data.ivaTipo).description,
+      ivaTipoDescripcion: dbService.taxTreatments._findById(data.ivaTipo)
+        .description,
     };
   });
 

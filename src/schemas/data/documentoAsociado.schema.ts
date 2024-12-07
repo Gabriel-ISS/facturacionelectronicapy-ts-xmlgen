@@ -7,44 +7,69 @@ import CommonValidators from '../../helpers/validation/CommonValidators';
 import NumberLength from '../../helpers/validation/NumberLenght';
 import ZodValidator from '../../helpers/validation/ZodValidator';
 import dbService from '../../services/db.service';
+import SDParser from '../../helpers/SDParser';
 
 /**H. Campos que identifican al documento asociado (H001-H049) */
 export const DocumentoAsociadoSchema = z
   .object({
     // H002
-    formato: z.nativeEnum(AssociatedDocumentType),
+    formato: z
+      .nativeEnum(AssociatedDocumentType)
+      .describe(SDParser.stringify('H002', { e: 'AssociatedDocumentType' })),
 
     // H004
-    cdc: CommonValidators.cdc().optional(),
+    cdc: CommonValidators.cdc().optional().describe(SDParser.stringify('H004')),
 
     // H005
-    timbrado: CommonValidators.timbrado().optional(),
+    timbrado: CommonValidators.timbrado()
+      .optional()
+      .describe(SDParser.stringify('H005')),
 
     // H006
-    establecimiento: CommonValidators.zeroPadToLength(3).optional(),
+    establecimiento: CommonValidators.zeroPadToLength(3)
+      .optional()
+      .describe(SDParser.stringify('H006')),
 
     // H007
-    punto: CommonValidators.zeroPadToLength(3).optional(),
+    punto: CommonValidators.zeroPadToLength(3)
+      .optional()
+      .describe(SDParser.stringify('H007')),
 
     // H008
-    numero: CommonValidators.zeroPadToLength(7).optional(),
+    numero: CommonValidators.zeroPadToLength(7)
+      .optional()
+      .describe(SDParser.stringify('H008')),
 
     // H009
     tipoDocumentoImpreso: z
       .nativeEnum(PrintedDocumentType)
-      .optional(),
+      .optional()
+      .describe(SDParser.stringify('H009', { e: 'PrintedDocumentType' })),
 
     // H011
-    fecha: CommonValidators.isoDate().optional(),
+    fecha: CommonValidators.isoDate()
+      .optional()
+      .describe(SDParser.stringify('H011')),
 
     // H012
-    numeroRetencion: z.string().length(15).optional(),
+    numeroRetencion: z
+      .string()
+      .length(15)
+      .optional()
+      .describe(SDParser.stringify('H012')),
 
     // H013
-    resolucionCreditoFiscal: z.string().length(15).optional(),
+    resolucionCreditoFiscal: z
+      .string()
+      .length(15)
+      .optional()
+      .describe(SDParser.stringify('H013')),
 
     // H014
-    constanciaTipo: z.nativeEnum(ConstancyType).optional(),
+    constanciaTipo: z
+      .nativeEnum(ConstancyType)
+      .optional()
+      .describe(SDParser.stringify('H014', { e: 'ConstancyType' })),
 
     // H016
     constanciaNumero: z
@@ -53,10 +78,15 @@ export const DocumentoAsociadoSchema = z
       .superRefine((value, ctx) => {
         if (value == undefined) return;
         new NumberLength(value, ctx).int().length(11);
-      }),
+      })
+      .describe(SDParser.stringify('H016')),
 
     // H017
-    constanciaControl: z.string().length(8).optional(),
+    constanciaControl: z
+      .string()
+      .length(8)
+      .optional()
+      .describe(SDParser.stringify('H017')),
 
     /*
     OBS: Obligatorio cuando el CDC del DTE referenciado
@@ -64,7 +94,17 @@ export const DocumentoAsociadoSchema = z
     */
     // H018
     // VER: https://www.dnit.gov.py/documents/20123/420595/NT_E_KUATIA_023_MT_V150.pdf/9580922b-5dd5-60f9-4857-ae66a757898f?t=1724956850006
-    rucFusionado: z.string().min(3).max(8).optional(),
+    rucFusionado: z
+      .string()
+      .min(3)
+      .max(8)
+      .optional()
+      .describe(
+        SDParser.stringify('H018', {
+          v: 'https://www.dnit.gov.py/documents/20123/420595/NT_E_KUATIA_023_MT_V150.pdf/9580922b-5dd5-60f9-4857-ae66a757898f?t=1724956850006',
+          d: 'Obligatorio cuando el CDC del DTE referenciado corresponda a un RUC fusionado',
+        }),
+      ),
   })
   .transform((data, ctx) => {
     const validator = new ZodValidator(ctx, data);
@@ -215,19 +255,20 @@ export const DocumentoAsociadoSchema = z
       ...data,
 
       // H003
-      formatoDescripcion: dbService
-        .associatedDocumentTypes
-        ._findById(data.formato)?.description,
+      formatoDescripcion: dbService.associatedDocumentTypes._findById(
+        data.formato,
+      )?.description,
 
       // H010
-      tipoDocumentoImpresoDescripcion: dbService
-        .printedDocumentTypes
-        ._findByIdIfExist(data.tipoDocumentoImpreso)?.description,
+      tipoDocumentoImpresoDescripcion:
+        dbService.printedDocumentTypes._findByIdIfExist(
+          data.tipoDocumentoImpreso,
+        )?.description,
 
       // H015
-      constanciaTipoDescripcion: dbService
-        .constancyTypes
-        ._findByIdIfExist(data.constanciaTipo)?.description,
+      constanciaTipoDescripcion: dbService.constancyTypes._findByIdIfExist(
+        data.constanciaTipo,
+      )?.description,
     };
   });
 

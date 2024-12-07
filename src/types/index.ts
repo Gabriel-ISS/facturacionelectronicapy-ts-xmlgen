@@ -32,7 +32,10 @@ export { MeasurementUnit } from '../data/measurementUnits.table';
 export { MerchandiseRelevance } from '../data/merchandiseRelevances.table';
 export { Obligation } from '../data/obligations.table';
 export { OperatingCondition } from '../data/operatingConditions.table';
-export { OperationType, OperationTypeNoB2G } from '../data/operationTypes.table';
+export {
+  OperationType,
+  OperationTypeNoB2G,
+} from '../data/operationTypes.table';
 export { PaymentCondition } from '../data/paymentConditions.table';
 export { PaymentType } from '../data/paymentTypes.table';
 export { PresenceIndicator } from '../data/presenceIndicators.table';

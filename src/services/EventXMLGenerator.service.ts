@@ -66,37 +66,20 @@ class EventService {
     },
   });
 
-  public generateXMLEvent(
-    _id: number,
-    data: EventData,
-  ): Promise<string> {
+  public generateXMLEvent(_id: number, data: EventData): Promise<string> {
     return new Promise(async (resolve, reject) => {
       try {
-        let xml = await this.generateXMLEventoService(data);
-        xml = xml.replace(
+        let xml = await this._generateXMLEvent(_id, data);
+        // DELETE: una vez este seguro de que no tiene sentido
+        /* xml = xml.replace(
           '<?xml version="1.0" encoding="UTF-8" standalone="no"?>',
           '',
-        );
-
-        let soapXMLData = this.wrapEvent(_id, xml);
-        resolve(soapXMLData);
+        ); */
+        resolve(xml);
       } catch (error) {
         reject(error);
       }
     });
-  }
-
-  private wrapEvent(_id: number, xml: string) {
-    return `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-            <env:Envelope xmlns:env="http://www.w3.org/2003/05/soap-envelope">\n\
-                <env:Header/>\n\
-                <env:Body>\n\
-                    <rEnviEventoDe xmlns="http://ekuatia.set.gov.py/sifen/xsd">\n\
-                      <dId>${_id}</dId>\n\
-                      <dEvReg>${xml}</dEvReg>\n\
-                    </rEnviEventoDe>\n\
-                </env:Body>\n\
-            </env:Envelope>\n`;
   }
 
   /**
@@ -105,9 +88,50 @@ class EventService {
    * @param data
    * @returns
    */
-  private generateXMLEventoService(data: EventData) {
+  private _generateXMLEvent(Id: number, data: EventData) {
     const result = {
-      // GDE000
+      rEnviEventoDe: {
+        $: {
+          xmlns: 'http://ekuatia.set.gov.py/sifen/xsd',
+          'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
+        },
+
+        dEvReg: {
+          // GDE000
+          gGroupGesEve: {
+            // GDE001
+            rGesEve: {
+              $: {
+                'xsi:schemaLocation':
+                  'http://ekuatia.set.gov.py/sifen/xsd siRecepEvento_v150.xsd',
+                'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
+              },
+
+              // GDE002
+              rEve: {
+                $: {
+                  // GDE003
+                  Id,
+                },
+
+                // GDE004
+                dFecFirma: DateHelper.getIsoDateTime(new Date()),
+
+                // GDE005
+                dVerFor: 150,
+
+                // GDE007
+                gGroupTiEvt: removeUndefinedValues(this.get_gGroupTiEvt(data)),
+
+                // GDE008
+                Signature: undefined,
+              },
+            },
+          },
+        },
+      },
+
+      /* // GDE000
       gGroupGesEve: {
         $: {
           xmlns: 'http://ekuatia.set.gov.py/sifen/xsd',
@@ -136,7 +160,7 @@ class EventService {
             gGroupTiEvt: removeUndefinedValues(this.get_gGroupTiEvt(data)),
           },
         },
-      },
+      }, */
     };
 
     return this.builder.buildObject(result); //Para firmar tiene que estar normalizado

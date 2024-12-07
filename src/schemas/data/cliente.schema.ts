@@ -7,66 +7,106 @@ import CommonValidators from '../../helpers/validation/CommonValidators';
 
 import ZodValidator from '../../helpers/validation/ZodValidator';
 import dbService from '../../services/db.service';
+import SDParser from '../../helpers/SDParser';
 
 /** Campos que identifican al receptor del Documento Electrónico DE (D200-D299) */
 export const ClienteSchema = z
   .object({
     // D201
-    contribuyente: CommonValidators.taxpayer(),
+    contribuyente: CommonValidators.taxpayer().describe(
+      SDParser.stringify('D201'),
+    ),
 
     // D202
-    tipoOperacion: z.nativeEnum(OperationType),
+    tipoOperacion: z
+      .nativeEnum(OperationType)
+      .describe(SDParser.stringify('D202', { e: 'OperationType' })),
 
     // D203
-    pais: CommonValidators.country(),
+    pais: CommonValidators.country().describe(
+      SDParser.stringify('D203', { e: 'Country' }),
+    ),
 
     // D205
-    tipoContribuyente: z.nativeEnum(TaxpayerType).optional(),
+    tipoContribuyente: z
+      .nativeEnum(TaxpayerType)
+      .optional()
+      .describe(SDParser.stringify('D205', { e: 'TaxpayerType' })),
 
     // para obtener D206 y D207
-    ruc: CommonValidators.ruc().optional(),
+    ruc: CommonValidators.ruc().optional().describe(SDParser.stringify('D206')),
 
     // D208
-    documentoTipo: z.nativeEnum(IdentityDocumentReceptor).optional(),
+    documentoTipo: z
+      .nativeEnum(IdentityDocumentReceptor)
+      .optional()
+      .describe(SDParser.stringify('D208', { e: 'IdentityDocumentReceptor' })),
 
     // D209
-    descripcionTipoDocumento: CommonValidators.identityDocDescription().optional(),
+    descripcionTipoDocumento: CommonValidators.identityDocDescription()
+      .optional()
+      .describe(SDParser.stringify('D209')),
 
     // D210
-    documentoNumero: CommonValidators.identityDocNumber().optional(),
+    documentoNumero: CommonValidators.identityDocNumber()
+      .optional()
+      .describe(SDParser.stringify('D210')),
 
     // D211
-    razonSocial: CommonValidators.legalName(),
+    razonSocial: CommonValidators.legalName().describe(
+      SDParser.stringify('D211'),
+    ),
 
     // D212
-    nombreFantasia: CommonValidators.tradeName().optional(),
+    nombreFantasia: CommonValidators.tradeName()
+      .optional()
+      .describe(SDParser.stringify('D212')),
 
     // D213
-    direccion: CommonValidators.address().optional(),
+    direccion: CommonValidators.address()
+      .optional()
+      .describe(SDParser.stringify('D213')),
 
     // D214
-    telefono: CommonValidators.tel(),
+    telefono: CommonValidators.tel().describe(SDParser.stringify('D214')),
 
     // D215
-    celular: z.string().min(10).max(20).optional(),
+    celular: z
+      .string()
+      .min(10)
+      .max(20)
+      .optional()
+      .describe(SDParser.stringify('D215')),
 
     // D216
-    email: CommonValidators.email().optional(),
+    email: CommonValidators.email()
+      .optional()
+      .describe(SDParser.stringify('D216')),
 
     // D217
-    codigo: CommonValidators.clientCode().optional(),
+    codigo: CommonValidators.clientCode()
+      .optional()
+      .describe(SDParser.stringify('D217')),
 
     // D218
-    numeroCasa: CommonValidators.houseNumber().optional(),
+    numeroCasa: CommonValidators.houseNumber()
+      .optional()
+      .describe(SDParser.stringify('D218')),
 
     // D219
-    departamento: CommonValidators.department().optional(),
+    departamento: CommonValidators.department()
+      .optional()
+      .describe(SDParser.stringify('D219', { e: 'Department' })),
 
     // D221
-    distrito: CommonValidators.district().optional(),
+    distrito: CommonValidators.district()
+      .optional()
+      .describe(SDParser.stringify('D221', { t: 'distritos' })),
 
     // D223
-    ciudad: CommonValidators.city().optional(),
+    ciudad: CommonValidators.city()
+      .optional()
+      .describe(SDParser.stringify('D223', { t: 'ciudades' })),
   })
   .transform((data, ctx) => {
     const validator = new ZodValidator(ctx, data);
@@ -141,9 +181,10 @@ export const ClienteSchema = z
       if (isOther) {
         validator.requiredField('descripcionTipoDocumento');
       } else {
-        data.descripcionTipoDocumento = dbService
-          .idDocsReceptors
-          ._findByIdIfExist(data.documentoTipo)?.description;
+        data.descripcionTipoDocumento =
+          dbService.idDocsReceptors._findByIdIfExist(
+            data.documentoTipo,
+          )?.description;
       }
     }
 
@@ -222,8 +263,7 @@ export const ClienteSchema = z
       ...data,
 
       // D204
-      paisDescripcion: dbService.countries._findById(data.pais)
-        .description,
+      paisDescripcion: dbService.countries._findById(data.pais).description,
 
       // D206
       rucID: rucID as string | undefined,
@@ -232,14 +272,13 @@ export const ClienteSchema = z
       rucDV: rucDV as string | undefined,
 
       // D220
-      descripcionDepartamento: dbService
-        .departments
-        ._findByIdIfExist(data.departamento)?.description,
+      descripcionDepartamento: dbService.departments._findByIdIfExist(
+        data.departamento,
+      )?.description,
 
       // D222
-      descripcionDistrito: dbService
-        .districts
-        ._findByIdIfExist(data.distrito)?.description,
+      descripcionDistrito: dbService.districts._findByIdIfExist(data.distrito)
+        ?.description,
 
       // D224
       descripcionCiudad: dbService.cities._findByIdIfExist(data.ciudad)

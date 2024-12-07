@@ -3,7 +3,7 @@ import { EDocData } from '../../schemas/EDoc.schema';
 class TotalesXMLSG {
   /**F. Campos que describen los subtotales y totales de la transacción documentada (F001-F099)*/
   public get_gTotSub(data: EDocData) {
-    const totales = data.totales
+    const totales = data.totales;
     if (!totales) return;
 
     return {
@@ -21,10 +21,10 @@ class TotalesXMLSG {
 
       //F008
       dTotOpe: totales.totalBruto,
-      
+
       // F009
       dTotDesc: totales.totalDescuento,
-      
+
       // F033
       dTotDescGlotem: totales.totalDescuentoGlobalItem,
 

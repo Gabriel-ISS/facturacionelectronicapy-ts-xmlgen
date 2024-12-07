@@ -61,10 +61,7 @@ class EDocXMLGenerator {
     });
   }
 
-  private transformToXMLStructure(
-    params: EDocParams,
-    data: EDocData,
-  ) {
+  private transformToXMLStructure(params: EDocParams, data: EDocData) {
     return {
       rDE: this.get_rDE(params, data),
     };
@@ -84,9 +81,9 @@ class EDocXMLGenerator {
       },
       dVerFor: params.version,
       DE: this.get_DE(params, data),
-      
+
       // I. Información de la Firma Digital del DTE (I001-I049)
-      Signature: {},
+      Signature: undefined,
 
       // J. Campos fuera de la Firma Digital (J001-J049)
       gCamFuFD: undefined,

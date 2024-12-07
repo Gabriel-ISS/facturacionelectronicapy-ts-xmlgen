@@ -35,6 +35,7 @@ import { SectorSegurosSchema } from './data/sectorSeguros.schema';
 import { SectorSupermercadosSchema } from './data/sectorSupermercados.schema';
 import { TransporteSchema } from './data/transporte.schema';
 import { UsuarioSchema } from './data/usuario.schema';
+import SDParser from '../helpers/SDParser';
 
 /** El esquema no incluye...
  *
@@ -49,7 +50,7 @@ export const EDocDataSchema = z
     // A. Campos firmados del Documento Electrónico (A001-A099)
 
     // para calcular A002
-    cdc: CommonValidators.cdc().optional(),
+    cdc: CommonValidators.cdc().optional().describe(SDParser.stringify('A002')),
 
     // A004
     fechaFirmaDigital: z.coerce
@@ -59,12 +60,21 @@ export const EDocDataSchema = z
         return value
           ? DateHelper.getIsoDateTime(value)
           : DateHelper.getIsoDateTime(new Date());
-      }),
+      })
+      .describe(SDParser.stringify('A004')),
 
     // B. Campos inherentes a la operación de Documentos Electrónicos (B001-B099)
 
     // B002
-    tipoEmision: z.nativeEnum(EmissionType).default(EmissionType.NORMAL),
+    tipoEmision: z
+      .nativeEnum(EmissionType)
+      .default(EmissionType.NORMAL)
+      .describe(
+        SDParser.stringify('B002', {
+          e: 'EmissionType',
+          d: 'NORMAL por defecto',
+        }),
+      ),
 
     // B004
     // VER: 10.3. Generación del código de seguridad
@@ -75,115 +85,245 @@ export const EDocDataSchema = z
         if (value == undefined) return;
         new NumberLength(value, ctx).int().length(9);
         return value.toString();
-      }),
+      })
+      .describe(SDParser.stringify('B004')),
 
     // B005
-    observacion: z.string().min(1).max(3000).optional(),
+    observacion: z
+      .string()
+      .min(1)
+      .max(3000)
+      .optional()
+      .describe(SDParser.stringify('B005')),
 
     // B006
-    descripcion: z.string().min(1).max(3000).optional(),
+    descripcion: z
+      .string()
+      .min(1)
+      .max(3000)
+      .optional()
+      .describe(SDParser.stringify('B006')),
 
     // C. Campos de datos del Timbrado (C001-C099)
 
     // C002
-    tipoDocumento: z.nativeEnum(EDocumentType),
+    tipoDocumento: z.nativeEnum(EDocumentType).describe(
+      SDParser.stringify('C002', {
+        e: 'EDocumentType',
+      }),
+    ),
 
     // C005: Debe coincidir con la estructura de timbrado
-    establecimiento: CommonValidators.zeroPadToLength(3),
+    establecimiento: CommonValidators.zeroPadToLength(3).describe(
+      SDParser.stringify('C005'),
+    ),
 
     // C006: Debe coincidir con la estructura de timbrado
-    punto: CommonValidators.zeroPadToLength(3),
+    punto: CommonValidators.zeroPadToLength(3).describe(
+      SDParser.stringify('C006'),
+    ),
 
     // C007: Debe coincidir con la estructura de timbrado
-    numero: CommonValidators.zeroPadToLength(7),
+    numero: CommonValidators.zeroPadToLength(7).describe(
+      SDParser.stringify('C007'),
+    ),
 
     // C010: obligatorio cuando se consumió la numeración permitida
     // VER: "10.5. Manejo del timbrado y Numeración"
-    serie: CommonValidators.serie().optional(),
+    serie: CommonValidators.serie()
+      .optional()
+      .describe(
+        SDParser.stringify('C010', {
+          d: 'Obligatorio cuando se consumió la numeración permitida',
+          v: '10.5. Manejo del timbrado y Numeración',
+        }),
+      ),
 
     // D. Campos Generales del Documento Electrónico DE (D001-D299)
 
     // D002
-    fecha: CommonValidators.isoDateTime(),
+    fecha: CommonValidators.isoDateTime().describe(SDParser.stringify('D002')),
 
     // D011: En este repo se agrega el tipo por defecto
     tipoTransaccion: z
       .nativeEnum(TransactionType)
-      .default(TransactionType.VENTA_DE_MERCADERIA),
+      .default(TransactionType.VENTA_DE_MERCADERIA)
+      .describe(
+        SDParser.stringify('D011', {
+          e: 'TransactionType',
+          d: 'Por defecto venta de mercadería',
+        }),
+      ),
 
     // D013
-    tipoImpuesto: z.nativeEnum(TaxType),
+    tipoImpuesto: z.nativeEnum(TaxType).describe(
+      SDParser.stringify('D013', {
+        e: 'TaxType',
+      }),
+    ),
 
     // D015
-    moneda: CommonValidators.currency().default(Currency.GUARANI),
+    moneda: CommonValidators.currency()
+      .default(Currency.GUARANI)
+      .describe(
+        SDParser.stringify('D015', { e: 'Currency', d: 'Guarani por defecto' }),
+      ),
 
     // D017
-    condicionTipoCambio: z.nativeEnum(GlobalAndPerItem).optional(),
+    condicionTipoCambio: z
+      .nativeEnum(GlobalAndPerItem)
+      .optional()
+      .describe(SDParser.stringify('D017', { e: 'GlobalAndPerItem' })),
 
     // D018
-    cambio: CommonValidators.currencyChange().optional(),
+    cambio: CommonValidators.currencyChange()
+      .optional()
+      .describe(SDParser.stringify('D018')),
 
     // D019
-    condicionAnticipo: z.nativeEnum(GlobalAndPerItem).optional(),
+    condicionAnticipo: z
+      .nativeEnum(GlobalAndPerItem)
+      .optional()
+      .describe(SDParser.stringify('D019', { e: 'GlobalAndPerItem' })),
 
-    // https://www.dnit.gov.py/documents/20123/420595/NT_E_KUATIA_018_MT_V150-+Junio.pdf/2ace18c4-5c03-c339-7f5c-bed6d5b5eb5e?t=1717699899642
+    // VER: https://www.dnit.gov.py/documents/20123/420595/NT_E_KUATIA_018_MT_V150-+Junio.pdf/2ace18c4-5c03-c339-7f5c-bed6d5b5eb5e?t=1717699899642
     // D1.1. Campos que identifican las obligaciones afectadas (D030-D040)
-    obligaciones: z.array(ObligacionSchema).max(11).optional(),
+    obligaciones: z
+      .array(ObligacionSchema)
+      .max(11)
+      .optional()
+      .describe(
+        SDParser.stringify('D1.1', {
+          d: 'Campos que identifican las obligaciones afectadas (D030-D040)',
+          v: 'https://www.dnit.gov.py/documents/20123/420595/NT_E_KUATIA_018_MT_V150-+Junio.pdf/2ace18c4-5c03-c339-7f5c-bed6d5b5eb5e?t=1717699899642',
+        }),
+      ),
 
     // ⚠️ No es del manual, pero si del repo original
     // Es el valor monetario total a descontar de la suma de los items
     // Se usa para calcular EA004
-    descuentoGlobal: z.number().default(0),
+    descuentoGlobal: z
+      .number()
+      .default(0)
+      .describe(
+        SDParser.stringify('para calcular EA004', {
+          d: 'Es el valor monetario total a descontar de la suma de los items',
+        }),
+      ),
 
     // ⚠️ No es del manual, pero si del repo original
     // Es el valor monetario total que se aplica como anticipo a la suma de los items
     // Se usa para calcular EA007
-    anticipoGlobal: z.number().default(0),
+    anticipoGlobal: z
+      .number()
+      .default(0)
+      .describe(
+        SDParser.stringify('para calcular EA007', {
+          d: 'Es el valor monetario total que se aplica como anticipo a la suma de los items',
+        }),
+      ),
 
     // D2.2 Campos que identifican al responsable de la generación del DE (D140-D160)
-    usuario: UsuarioSchema.optional(),
+    usuario: UsuarioSchema.optional().describe(
+      SDParser.stringify('D2.2', {
+        d: 'Campos que identifican al responsable de la generación del DE (D140-D160)',
+      }),
+    ),
 
-    // Campos que identifican al receptor del Documento Electrónico DE (D200-D299)
-    cliente: ClienteSchema,
+    // D3. Campos que identifican al receptor del Documento Electrónico DE (D200-D299)
+    cliente: ClienteSchema.describe(
+      SDParser.stringify('D3', {
+        d: 'Campos que identifican al receptor del Documento Electrónico DE (D200-D299)',
+      }),
+    ),
 
     // E1. Campos que componen la Factura Electrónica FE (E002-E099)
-    factura: FacturaSchema.optional(),
+    factura: FacturaSchema.optional().describe(
+      SDParser.stringify('E1', {
+        d: 'Campos que componen la Factura Electrónica FE (E002-E099)',
+      }),
+    ),
 
     // E1.1. Campos de informaciones de Compras Públicas (E020-E029)
-    dncp: DncpSchema.optional(),
+    dncp: DncpSchema.optional().describe(
+      SDParser.stringify('E1.1', {
+        d: 'Campos de informaciones de Compras Públicas (E020-E029)',
+      }),
+    ),
 
     // E4. Campos que componen la Autofactura Electrónica AFE (E300-E399)
-    autoFactura: AutoFacturaSchema.optional(),
+    autoFactura: AutoFacturaSchema.optional().describe(
+      SDParser.stringify('E4', {
+        d: 'Campos que componen la Autofactura Electrónica AFE (E300-E399)',
+      }),
+    ),
 
     // E5. Campos que componen la Nota de Crédito/Débito Electrónica NCE-NDE (E400-E499)
-    notaCreditoDebito: NotaCreditoDebitoSchema.optional(),
+    notaCreditoDebito: NotaCreditoDebitoSchema.optional().describe(
+      SDParser.stringify('E5', {
+        d: 'Campos que componen la Nota de Crédito/Débito Electrónica NCE-NDE (E400-E499)',
+      }),
+    ),
 
     // E6. Campos que componen la Nota de Remisión Electrónica (E500-E599)
-    remision: RemisionSchema.optional(),
+    remision: RemisionSchema.optional().describe(
+      SDParser.stringify('E6', {
+        d: 'Campos que componen la Nota de Remisión Electrónica (E500-E599)',
+      }),
+    ),
 
     // E7. Campos que describen la condición de la operación (E600-E699)
-    condicion: CondicionSchema.optional(),
+    condicion: CondicionSchema.optional().describe(
+      SDParser.stringify('E7', {
+        d: 'Campos que describen la condición de la operación (E600-E699)',
+      }),
+    ),
 
     // E8. Campos que describen los ítems de la operación (E700-E899)
-    items: z.array(ItemSchema),
+    items: z.array(ItemSchema).describe(
+      SDParser.stringify('E8', {
+        d: 'Campos que describen los ítems de la operación (E700-E899)',
+      }),
+    ),
 
     // E9. Campos complementarios comerciales de uso específico (E790-E899)
 
     // VER: https://www.dnit.gov.py/documents/20123/420595/NT_E_KUATIA_023_MT_V150.pdf/9580922b-5dd5-60f9-4857-ae66a757898f?t=1724956850006
     // E9.2. Sector Energía Eléctrica (E791-E799)
-    sectorEnergiaElectrica: SectorEnergiaElectricaSchema.optional(),
+    sectorEnergiaElectrica: SectorEnergiaElectricaSchema.optional().describe(
+      SDParser.stringify('E9.2', {
+        d: 'Sector Energía Eléctrica (E791-E799)',
+        v: 'https://www.dnit.gov.py/documents/20123/420595/NT_E_KUATIA_023_MT_V150.pdf/9580922b-5dd5-60f9-4857-ae66a757898f?t=1724956850006',
+      }),
+    ),
 
     // E9.3. Sector de Seguros (E800-E809)
-    sectorSeguros: SectorSegurosSchema.optional(),
+    sectorSeguros: SectorSegurosSchema.optional().describe(
+      SDParser.stringify('E9.3', {
+        d: 'Sector de Seguros (E800-E809)',
+      }),
+    ),
 
     // E9.4. Sector de Supermercados (E810-E819)
-    sectorSupermercados: SectorSupermercadosSchema.optional(),
+    sectorSupermercados: SectorSupermercadosSchema.optional().describe(
+      SDParser.stringify('E9.4', {
+        d: 'Sector de Supermercados (E810-E819)',
+      }),
+    ),
 
     // E9.5. Grupo de datos adicionales de uso comercial (E820-E829)
-    sectorAdicional: SectorAdicionalSchema.optional(),
+    sectorAdicional: SectorAdicionalSchema.optional().describe(
+      SDParser.stringify('E9.5', {
+        d: 'Grupo de datos adicionales de uso comercial (E820-E829)',
+      }),
+    ),
 
     // E10. Campos que describen el transporte de las mercaderías (E900-E999)
-    transporte: TransporteSchema.optional(),
+    transporte: TransporteSchema.optional().describe(
+      SDParser.stringify('E10', {
+        d: 'Campos que describen el transporte de las mercaderías (E900-E999)',
+      }),
+    ),
 
     // F025
     comision: z
@@ -192,15 +332,25 @@ export const EDocDataSchema = z
       .superRefine((value, ctx) => {
         if (value == undefined) return;
         new NumberLength(value, ctx).max(15).maxDecimals(8);
-      }),
+      })
+      .describe(SDParser.stringify('F025')),
 
     // G. Campos complementarios comerciales de uso general (G001-G049)
-    complementarios: ComplementariosSchema.optional(),
+    complementarios: ComplementariosSchema.optional().describe(
+      SDParser.stringify('G', {
+        d: 'Campos complementarios comerciales de uso general (G001-G049)',
+      }),
+    ),
 
     // H. Campos que identifican al documento asociado (H001-H049)
     documentoAsociado: z
       .union([DocumentoAsociadoSchema, DocumentoAsociadoSchema.array().max(99)])
-      .optional(),
+      .optional()
+      .describe(
+        SDParser.stringify('H', {
+          d: 'Campos que identifican al documento asociado (H001-H049)',
+        }),
+      ),
   })
   .transform((data, ctx) => {
     type Data = typeof data;
@@ -988,36 +1138,35 @@ export const EDocDataSchema = z
       sistemaDeFacturacion: 1,
 
       // B003
-      descripcionEmision: dbService
-        .emissionTypes
-        ._findById(data.tipoEmision).description,
+      descripcionEmision: dbService.emissionTypes._findById(data.tipoEmision)
+        .description,
 
       // C003
-      descripcionDocumento: dbService
-        .eDocumentTypes
-        ._findById(data.tipoDocumento).description,
+      descripcionDocumento: dbService.eDocumentTypes._findById(
+        data.tipoDocumento,
+      ).description,
 
       // C004 se define en EDocSchema y C008 en EDocParamsSchema
 
       // VER: https://www.dnit.gov.py/documents/20123/420595/NT_E_KUATIA_010_MT_V150.pdf/d64a693b-6c63-86e1-ec6a-d4fe5ec4eeea?t=1687353747196
       // D012
-      descripcionTipoTransaccion: dbService
-        .transactionTypes
-        ._findById(data.tipoTransaccion).description,
+      descripcionTipoTransaccion: dbService.transactionTypes._findById(
+        data.tipoTransaccion,
+      ).description,
 
       // D014
-      descripcionTipoImpuesto: dbService
-        .taxTypes
-        ._findById(data.tipoImpuesto).description,
+      descripcionTipoImpuesto: dbService.taxTypes._findById(data.tipoImpuesto)
+        .description,
 
       // D016
       descripcionMoneda: dbService.currencies._findById(data.moneda)
         .description,
 
       // D020
-      descripcionCondicionAnticipo: dbService
-        .advancePaymentConditions
-        ._findByIdIfExist(data.condicionAnticipo)?.description,
+      descripcionCondicionAnticipo:
+        dbService.advancePaymentConditions._findByIdIfExist(
+          data.condicionAnticipo,
+        )?.description,
 
       items,
 

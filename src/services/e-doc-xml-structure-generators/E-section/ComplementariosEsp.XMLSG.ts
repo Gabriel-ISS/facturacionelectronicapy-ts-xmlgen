@@ -16,7 +16,7 @@ class ComplementariosEspXMLSG {
 
       // E9.5. Grupo de datos adicionales de uso comercial (E820-E829)
       gGrupAdi: this.get_gGrupAdi(data),
-    }
+    };
   }
 
   /**E9.2. Sector Energía Eléctrica (E791-E799)*/
@@ -73,7 +73,7 @@ class ComplementariosEspXMLSG {
 
       // EA793
       dVigencia: sectorSeguros.vigencia,
-      
+
       // EA794
       dNumPoliza: sectorSeguros.numeroPoliza,
 

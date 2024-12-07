@@ -1,7 +1,5 @@
 import fs from 'fs';
-import { Parser } from 'json2csv';
 import * as readline from 'readline';
-import constantsService from '../src/services/constants.service';
 // @ts-ignore
 import * as prettier from 'prettier';
 

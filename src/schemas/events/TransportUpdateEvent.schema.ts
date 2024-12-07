@@ -8,99 +8,171 @@ import { TransportModality } from '../../data/transportModalities.table';
 import { VehicleIdentification } from '../../data/vehicleIdentifications.table';
 import { Path } from '../../helpers/Path';
 import { TaxpayerNotTaxpayer } from '../../data/taxpayerNotTaxpayer.table';
-
-export enum TransportUpdateMotive {
-  CAMBIO_LOCAL_ENTREGA = 1,
-  CAMBIO_CHOFER = 2,
-  CAMBIO_TRANSPORTISTA = 3,
-  CAMBIO_VEHICULO = 4,
-}
+import SDParser from '../../helpers/SDParser';
+import { TransportUpdateMotive } from '../../types/TransporteUpdateMotive';
 
 // GET001
 export const TransportUpdateEventSchema = z
   .object({
     // GET002
-    cdc: CommonValidators.cdc(),
+    cdc: CommonValidators.cdc().describe(SDParser.stringify('GET002')),
 
     // GET003
-    motivo: z.nativeEnum(TransportUpdateMotive),
+    motivo: z
+      .nativeEnum(TransportUpdateMotive)
+      .describe(SDParser.stringify('GET003', { e: 'TransportUpdateMotive' })),
 
-    entrega: z.object({
-      // GET004
-      departamento: CommonValidators.department().optional(),
+    // GET004 - GET030 (excluyendo GET013 - GET021)
+    entrega: z
+      .object({
+        // GET004
+        departamento: CommonValidators.department()
+          .optional()
+          .describe(SDParser.stringify('GET004', {
+            e: 'Department'
+          })),
 
-      // GET006
-      distrito: CommonValidators.district().optional(),
+        // GET006
+        distrito: CommonValidators.district()
+          .optional()
+          .describe(SDParser.stringify('GET006')),
 
-      // GET008
-      ciudad: CommonValidators.city().optional(),
+        // GET008
+        ciudad: CommonValidators.city()
+          .optional()
+          .describe(SDParser.stringify('GET008')),
 
-      // GET010
-      direccion: CommonValidators.address().optional(),
+        // GET010
+        direccion: CommonValidators.address()
+          .optional()
+          .describe(SDParser.stringify('GET010')),
 
-      // GET011
-      numeroCasa: CommonValidators.houseNumber().optional(),
+        // GET011
+        numeroCasa: CommonValidators.houseNumber()
+          .optional()
+          .describe(SDParser.stringify('GET011')),
 
-      // GET012
-      direccionComplementaria1: CommonValidators.address().optional(),
+        // GET012
+        direccionComplementaria1: CommonValidators.address()
+          .optional()
+          .describe(SDParser.stringify('GET012')),
 
-      // GET022
-      tipoTransporte: z.nativeEnum(TransportType).optional(),
+        // GET022
+        tipoTransporte: z
+          .nativeEnum(TransportType)
+          .optional()
+          .describe(SDParser.stringify('GET022', { e: 'TransportType' })),
 
-      // GET024
-      modalidadTransporte: z.nativeEnum(TransportModality).optional(),
+        // GET024
+        modalidadTransporte: z
+          .nativeEnum(TransportModality)
+          .optional()
+          .describe(SDParser.stringify('GET024', { e: 'TransportModality' })),
 
-      vehiculo: z.object({
-        // GET026
-        tipo: z.string().min(4).max(10).optional(),
+        // GET026 - GET030
+        vehiculo: z
+          .object({
+            // GET026
+            tipo: z
+              .string()
+              .min(4)
+              .max(10)
+              .optional()
+              .describe(SDParser.stringify('GET026')),
 
-        // GET027
-        marca: z.string().min(1).max(10).optional(),
+            // GET027
+            marca: z
+              .string()
+              .min(1)
+              .max(10)
+              .optional()
+              .describe(SDParser.stringify('GET027')),
 
-        // GET028
-        documentoTipo: z.nativeEnum(VehicleIdentification).optional(),
+            // GET028
+            documentoTipo: z
+              .nativeEnum(VehicleIdentification)
+              .optional()
+              .describe(
+                SDParser.stringify('GET028', { e: 'VehicleIdentification' }),
+              ),
 
-        // GET029
-        documentoNumero: z.string().min(1).max(20).optional(),
+            // GET029
+            documentoNumero: z
+              .string()
+              .min(1)
+              .max(20)
+              .optional()
+              .describe(SDParser.stringify('GET029')),
 
-        // GET030
-        numeroMatricula: z.string().length(6).optional(),
-      }),
-    }).superRefine((data, ctx) => {
-      CommonValidators.location(
-        ctx,
-        data.departamento,
-        data.distrito,
-        data.ciudad,
-      );
-    }),
+            // GET030
+            numeroMatricula: z
+              .string()
+              .length(6)
+              .optional()
+              .describe(SDParser.stringify('GET030')),
+          })
+          .describe(SDParser.stringify('GET026 - GET030')),
+      })
+      .superRefine((data, ctx) => {
+        CommonValidators.location(
+          ctx,
+          data.departamento,
+          data.distrito,
+          data.ciudad,
+        );
+      })
+      .describe(
+        SDParser.stringify('GET004 - GET030 (excluyendo GET013 - GET021)'),
+      ),
 
-    transportista: z.object({
-      chofer: z
-        .object({
-          // GET013: TODO_NT: obligatorio SI, pero "Obligatorio si ..." debería ser opcional
-          nombre: CommonValidators.name(),
+    // GET013 - GET021
+    transportista: z
+      .object({
+        // GET013 - GET014
+        chofer: z
+          .object({
+            // GET013: TODO_NT: obligatorio SI, pero "Obligatorio si ..." debería ser opcional
+            nombre: CommonValidators.name().describe(
+              SDParser.stringify('GET013'),
+            ),
 
-          // GET014
-          documentoNumero: CommonValidators.identityDocNumber(),
-        })
-        .optional(),
+            // GET014
+            documentoNumero: CommonValidators.identityDocNumber().describe(
+              SDParser.stringify('GET014'),
+            ),
+          })
+          .optional()
+          .describe(SDParser.stringify('GET013 - GET014')),
 
-      // GET015
-      contribuyente: CommonValidators.taxpayer().optional(),
+        // GET015
+        contribuyente: CommonValidators.taxpayer()
+          .optional()
+          .describe(SDParser.stringify('GET015')),
 
-      // para calcular GET016 y GET017
-      ruc: CommonValidators.ruc().optional(),
+        // para calcular GET016 y GET017
+        ruc: CommonValidators.ruc()
+          .optional()
+          .describe(SDParser.stringify('GET016 y GET017')),
 
-      // GET018
-      nombre: CommonValidators.name().optional(),
+        // GET018
+        nombre: CommonValidators.name()
+          .optional()
+          .describe(SDParser.stringify('GET018')),
 
-      // GET019
-      documentoTipo: z.nativeEnum(IdentityDocumentCarrier).optional(),
+        // GET019
+        documentoTipo: z
+          .nativeEnum(IdentityDocumentCarrier)
+          .optional()
+          .describe(
+            SDParser.stringify('GET019', { e: 'IdentityDocumentCarrier' }),
+          ),
 
-      // GET021
-      documentoNumero: CommonValidators.identityDocNumber().optional(),
-    }),
+        // GET021
+        documentoNumero: CommonValidators.identityDocNumber()
+          .optional()
+          .describe(SDParser.stringify('GET021')),
+      })
+      .describe(SDParser.stringify('GET013 - GET021')),
   })
   .transform((data, ctx) => {
     const validator = new ZodValidator(ctx, data);
@@ -193,11 +265,11 @@ export const TransportUpdateEventSchema = z
       Obligatorio si GET015 = 2
       No informar si GET015 = 1
       */
-     if (isNotTaxpayer) {
-       validator.requiredField(transporterPath.concat('documentoTipo'));
-     } else {
-       validator.undesiredField(transporterPath.concat('documentoTipo'));
-     }
+      if (isNotTaxpayer) {
+        validator.requiredField(transporterPath.concat('documentoTipo'));
+      } else {
+        validator.undesiredField(transporterPath.concat('documentoTipo'));
+      }
     }
 
     // GET021
@@ -205,9 +277,9 @@ export const TransportUpdateEventSchema = z
       /*
       Obligatorio si existe el campo GET019
       */
-     if (data.transportista.documentoTipo) {
-       validator.requiredField(transporterPath.concat('documentoNumero'));
-     }
+      if (data.transportista.documentoTipo) {
+        validator.requiredField(transporterPath.concat('documentoNumero'));
+      }
     }
 
     // GET022, GET024, GET026, GET027, GET028
@@ -215,13 +287,13 @@ export const TransportUpdateEventSchema = z
       /*
       Obligatorio si GET003=4
       */
-     if (isVehicleChange) {
-      validator.requiredField(deliveryPath.concat('tipoTransporte'));
-      validator.requiredField(deliveryPath.concat('modalidadTransporte'));
-      validator.requiredField(vehiclePath.concat('tipo'));
-      validator.requiredField(vehiclePath.concat('marca'));
-      validator.requiredField(vehiclePath.concat('documentoTipo'));
-     }
+      if (isVehicleChange) {
+        validator.requiredField(deliveryPath.concat('tipoTransporte'));
+        validator.requiredField(deliveryPath.concat('modalidadTransporte'));
+        validator.requiredField(vehiclePath.concat('tipo'));
+        validator.requiredField(vehiclePath.concat('marca'));
+        validator.requiredField(vehiclePath.concat('documentoTipo'));
+      }
     }
 
     // GET029
@@ -229,7 +301,10 @@ export const TransportUpdateEventSchema = z
       /*
       Debe informarse cuando el GET028=1
       */
-      if (data.entrega.vehiculo.documentoTipo == VehicleIdentification.NUMERO_DE_IDENTIFICACION_DEL_VEHICULO) {
+      if (
+        data.entrega.vehiculo.documentoTipo ==
+        VehicleIdentification.NUMERO_DE_IDENTIFICACION_DEL_VEHICULO
+      ) {
         validator.requiredField(vehiclePath.concat('documentoNumero'));
       }
     }
@@ -239,7 +314,10 @@ export const TransportUpdateEventSchema = z
       /*
       Debe informarse cuando el GET028=2
       */
-      if (data.entrega.vehiculo.documentoTipo == VehicleIdentification.NUMERO_DE_MATRICULA_DEL_VEHICULO) {
+      if (
+        data.entrega.vehiculo.documentoTipo ==
+        VehicleIdentification.NUMERO_DE_MATRICULA_DEL_VEHICULO
+      ) {
         validator.requiredField(vehiclePath.concat('numeroMatricula'));
       }
     }
@@ -258,29 +336,29 @@ export const TransportUpdateEventSchema = z
         ...entrega,
 
         // GET005
-        descripcionDepartamento: dbService
-          .departments
-          ._findByIdIfExist(entrega.departamento)?.description,
+        descripcionDepartamento: dbService.departments._findByIdIfExist(
+          entrega.departamento,
+        )?.description,
 
         // GET007
-        descripcionDistrito: dbService
-          .districts
-          ._findByIdIfExist(entrega.distrito)?.description,
+        descripcionDistrito: dbService.districts._findByIdIfExist(
+          entrega.distrito,
+        )?.description,
 
         // GET009
-        descripcionCiudad: dbService
-          .cities
-          ._findByIdIfExist(entrega.ciudad)?.description,
+        descripcionCiudad: dbService.cities._findByIdIfExist(entrega.ciudad)
+          ?.description,
 
         // GET023
-        descripcionTipoTransporte: dbService
-          .transportTypes
-          ._findByIdIfExist(data.entrega.tipoTransporte)?.description,
+        descripcionTipoTransporte: dbService.transportTypes._findByIdIfExist(
+          data.entrega.tipoTransporte,
+        )?.description,
 
         // GET025
-        descripcionModalidadTransporte: dbService
-          .transportModalities
-          ._findByIdIfExist(data.entrega.modalidadTransporte)?.description,
+        descripcionModalidadTransporte:
+          dbService.transportModalities._findByIdIfExist(
+            data.entrega.modalidadTransporte,
+          )?.description,
 
         vehiculo: {
           ...vehiculo,
@@ -297,9 +375,9 @@ export const TransportUpdateEventSchema = z
         rucDV: rucDV as string | undefined,
 
         // GET020
-        descripcionTipoDocumento: dbService
-          .idDocsCarriers
-          ._findByIdIfExist(transportista.documentoTipo)?.description,
+        descripcionTipoDocumento: dbService.idDocsCarriers._findByIdIfExist(
+          transportista.documentoTipo,
+        )?.description,
 
         chofer: {
           ...chofer,

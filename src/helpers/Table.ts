@@ -110,13 +110,17 @@ export default class Table<
 
   _findById(id: ID, _notFoundErrorData?: NotFoundErrorData): R {
     let index = this.idIndex.get(id);
-    if (index == undefined) this.manageNotFoundError(undefined, _notFoundErrorData);
+    if (index == undefined)
+      this.manageNotFoundError(undefined, _notFoundErrorData);
     index ??= 0;
     const result = this.data.at(index) as RR;
     return this.normalizeRow(result);
   }
 
-  _findByIdIfExist(id: ID | undefined, _notFoundErrorData?: NotFoundErrorData): R | null {
+  _findByIdIfExist(
+    id: ID | undefined,
+    _notFoundErrorData?: NotFoundErrorData,
+  ): R | null {
     if (id == undefined) return null;
     return this._findById(id, _notFoundErrorData);
   }
