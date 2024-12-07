@@ -39,7 +39,7 @@ Para instalar el módulo en su proyecto node, ejecute el siguiente comando:
 
 ## Ejemplo de uso
 
-Cuando se produce un error puede ser una instancia de `Error` (error imprevisto) o una instancia de (ZodError)[https://zod.dev/?id=error-handling] (error de validación).
+Cuando se produce un error puede ser una instancia de `Error` (error imprevisto) o una instancia de [ZodError](https://zod.dev/?id=error-handling) (error de validación).
 
 ### Generación de documento electrónico
 
