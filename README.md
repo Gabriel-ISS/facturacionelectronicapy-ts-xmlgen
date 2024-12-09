@@ -2,9 +2,7 @@
 
 Módulo NodeJS que genera el **archivo XML** para enviar a la **SET** _(Subsecretaria de Estado de Tributación del Ministerio de Hacienda)_ para el proceso y generación del documento electrónico, a partir de una estructura de datos en formato JSON.
 
-Versión del Manual Técnico: **150**.
-
-Basado en la [documentación técnica de e-kuatia](https://www.dnit.gov.py/web/e-kuatia/documentacion-tecnica)
+Basado en la [documentación técnica de e-kuatia (Manual Técnico: **150**)](https://www.dnit.gov.py/web/e-kuatia/documentacion-tecnica)
 
 Este paquete pretende servir de **modelo de transferencia estandarizado** para la comunicación con la **SET** contemplando la totalidad de los campos exigidos para cada bloque y tipos de documentos electrónicos.
 

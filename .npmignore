@@ -1,9 +1,12 @@
+/.vscode
 /dev
+/test
+/docs
+/node_modules
 /src
 /test
-/node_modules
 
 .eslintrc.js
 .prettierrc
+README_DEV.md
 tsconfig.json
-tsup.config.ts
