@@ -1,6 +1,6 @@
 {
   "name": "facturacionelectronicapy-ts-xmlgen",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Genera el contenido del archivo XML del Documento electrónico exigido por la SET",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -8,21 +8,24 @@
     "format": "prettier --write \"src/**/*.ts\"",
     "gen-docs": "ts-node dev/documentation/schema/index.ts",
     "build": "tsc",
-    "prepare": "npm run build",
-
-    "start": "nodemon --config nodemon.json ./app.ts",
-    "debug": "export DEBUG=* && npm start",
-    "test": "mocha -r ts-node/register 'test/**/*.test.ts'",
-    "test-debug": "export DEBUG=* && npm test"
+    "prepare": "npm run build"
   },
   "files": [
     "dist"
   ],
   "exports": {
-    ".": "./dist/index.js",
-    "./types": "./dist/types/index.js",
-    "./schemas": "./dist/schemas/index.js",
-    "./helpers": "./dist/helpers/index.js"
+    ".": {
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./types": {
+      "require": "./dist/types/index.js",
+      "types": "./dist/types/index.d.ts"
+    },
+    "./schemas": {
+      "require": "./dist/schemas/index.js",
+      "types": "./dist/schemas/index.d.ts"
+    }
   },
   "repository": {
     "type": "git",

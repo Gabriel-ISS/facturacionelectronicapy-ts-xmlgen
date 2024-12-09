@@ -10,3 +10,8 @@
 .prettierrc
 README_DEV.md
 tsconfig.json
+
+.env
+*.log
+*.lock
+
