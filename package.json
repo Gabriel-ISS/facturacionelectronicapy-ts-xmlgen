@@ -1,30 +1,37 @@
 {
   "name": "facturacionelectronicapy-ts-xmlgen",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Genera el contenido del archivo XML del Documento electrónico exigido por la SET",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/cjs/index.d.ts",
   "scripts": {
+    "build:cjs": "tsc --project tsconfig.cjs.json",
+    "build:esm": "tsc --project tsconfig.esm.json",
+    "build": "npm run build:cjs && npm run build:esm",
+    "prepare": "npm run build",
+
     "format": "prettier --write \"src/**/*.ts\"",
-    "gen-docs": "ts-node dev/documentation/schema/index.ts",
-    "build": "tsc",
-    "prepare": "npm run build"
+    "gen-docs": "ts-node dev/documentation/schema/index.ts"
   },
   "files": [
     "dist"
   ],
   "exports": {
     ".": {
-      "require": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/cjs/index.js",
+      "import": "./dist/esm/index.js",
+      "types": "./dist/cjs/index.d.ts"
     },
     "./types": {
-      "require": "./dist/types/index.js",
-      "types": "./dist/types/index.d.ts"
+      "require": "./dist/cjs/types/index.js",
+      "import": "./dist/esm/types/index.js",
+      "types": "./dist/cjs/types/index.d.ts"
     },
     "./schemas": {
-      "require": "./dist/schemas/index.js",
-      "types": "./dist/schemas/index.d.ts"
+      "require": "./dist/cjs/schemas/index.js",
+      "import": "./dist/esm/schemas/index.js",
+      "types": "./dist/cjs/schemas/index.d.ts"
     }
   },
   "repository": {
