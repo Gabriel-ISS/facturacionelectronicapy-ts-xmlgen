@@ -1,6 +1,6 @@
 {
   "name": "facturacionelectronicapy-ts-xmlgen",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Genera el contenido del archivo XML del Documento electrónico exigido por la SET",
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
