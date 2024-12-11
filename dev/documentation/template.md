@@ -2,9 +2,7 @@
 
 Módulo NodeJS que genera el **archivo XML** para enviar a la **SET** _(Subsecretaria de Estado de Tributación del Ministerio de Hacienda)_ para el proceso y generación del documento electrónico, a partir de una estructura de datos en formato JSON.
 
-Versión del Manual Técnico: **150**.
-
-Basado en la [documentación técnica de e-kuatia](https://www.dnit.gov.py/web/e-kuatia/documentacion-tecnica)
+Basado en la [documentación técnica de e-kuatia](https://www.dnit.gov.py/web/e-kuatia/documentacion-tecnica) (Manual Técnico **150**).
 
 Este paquete pretende servir de **modelo de transferencia estandarizado** para la comunicación con la **SET** contemplando la totalidad de los campos exigidos para cada bloque y tipos de documentos electrónicos.
 
@@ -78,6 +76,7 @@ const data: EDTypes.EventData = {...};
 
 try {
   const xml = await EDocument.generateXMLEvent(id, data);
+  console.log(xml);
 } catch (error) {
   console.log(error);
 }
@@ -89,7 +88,7 @@ try {
 
 ```ts
 import EDocument from 'facturacionelectronicapy-ts-xmlgen';
-import EDTypes from 'facturacionelectronicapy-ts-xmlgen/types';
+import { EDocumentType } from 'facturacionelectronicapy-ts-xmlgen/types';
 
 // retorna el sevicio de base de datos
 const db = EDocument.db();
@@ -100,7 +99,7 @@ const documentTypesHeaders = db.documentTypes.headers;
 const documentTypesRows = db.documentTypes.data;
 
 // resultado: { _id: 1, description: 'Factura electrónica' }
-const elctronicInvoiceData = await db.documentTypes.findById(EDTypes.EDocumentType.FACTURA_ELECTRONICA);
+const elctronicInvoiceData = await db.eDocumentTypes.findById(EDocumentType.FACTURA_ELECTRONICA);
 ```
 
 ## Estructuras

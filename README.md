@@ -41,7 +41,7 @@ Cuando se produce un error puede ser una instancia de `Error` (error imprevisto)
 
 ### Generación de documento electrónico
 
-El método requiere 2 argumentos tipo **JSON** para general el XML. El primero es un argumento `params` con las informaciones estáticas del Contribuyente emisor, y el segundo es `data` con los datos variables para cada documento electrónico a generar.
+El método requiere 2 argumentos para general el XML. El primero es un argumento `params` con las informaciones estáticas del Contribuyente emisor, y el segundo es `data` con los datos variables para cada documento electrónico a generar.
 
 
 ```ts
@@ -76,10 +76,10 @@ const data: EDTypes.EventData = {...};
 
 try {
   const xml = await EDocument.generateXMLEvent(id, data);
+  console.log(xml);
 } catch (error) {
   console.log(error);
 }
-
 ```
 
 
@@ -87,7 +87,7 @@ try {
 
 ```ts
 import EDocument from 'facturacionelectronicapy-ts-xmlgen';
-import EDTypes from 'facturacionelectronicapy-ts-xmlgen/types';
+import { EDocumentType } from 'facturacionelectronicapy-ts-xmlgen/types';
 
 // retorna el sevicio de base de datos
 const db = EDocument.db();
@@ -98,7 +98,7 @@ const documentTypesHeaders = db.documentTypes.headers;
 const documentTypesRows = db.documentTypes.data;
 
 // resultado: { _id: 1, description: 'Factura electrónica' }
-const elctronicInvoiceData = await db.documentTypes.findById(EDTypes.EDocumentType.FACTURA_ELECTRONICA);
+const elctronicInvoiceData = await db.eDocumentTypes.findById(EDocumentType.FACTURA_ELECTRONICA);
 ```
 
 ## Estructuras

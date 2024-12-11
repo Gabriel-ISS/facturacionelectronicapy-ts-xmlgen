@@ -29,7 +29,7 @@
 ### General
 - ASEGURARSE DE QUE LAS DESCRIPCIONES ESTÉN BIEN VALIDADAS, CONSIDERAR undefined Y "OTRO"
     - para todos los findByIdIfExist agregar ctx si ese necesario bajo alguna condición
-- CREAR FUNCIÓN PARA SOBRESCRIBIR TODOS LOS MENSAJES
+- ofrecer una manera de sobrescribir los mensajes de error.
 - en el manual y las notas hay validaciones especiales que no tuve en cuenta.
 - validaciones de timbrado?
 
@@ -38,8 +38,5 @@
     - config.pygDecimals si la moneda es PYG en cálculos de totales, ver donde se usa ademas de E727, EA006, EA007 y EA008.
 
 # TAREAS A FUTURO:
-- measurementUnits: `data[i].trim()`
-- Documentar como usar generateXMLEvent
-- Documentar como usar db
-- Documentar tipos e informar de enums disponibles
+- Hacer que se vean mejor los links a las notas técnicas en la documentación.
 - Probar todo el repo
